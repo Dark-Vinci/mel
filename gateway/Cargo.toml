@@ -4,3 +4,22 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+axum = { version = "0.7.9", features = ["ws"] }
+axum-extra = { version = "0.9.6", features = ["typed-header"] }
+futures = "0.3"
+futures-util = { version = "0.3", default-features = false, features = ["sink", "std"] }
+headers = "0.4"
+serde = { version = "1.0.215", features = ["serde_derive"] }
+serde_json = "1.0.133"
+thiserror = "2.0.3"
+tokio = { version = "1.0", features = ["full"] }
+tokio-tungstenite = "0.24.0"
+tower-http = { version = "0.6.1", features = ["fs", "trace"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+uuid = { version = "1.11.0", features = ["v4"] }
+sdk ={ path = "../sdk" }
+
+[[bin]]
+name = "gateway"
+path = "main.rs"
