@@ -1,78 +1,110 @@
-use fred::clients::RedisClient;
-use fred::interfaces::{EventInterface, KeysInterface, PubsubInterface};
-use fred::types::{RedisConfig};
-use tokio::sync::mpsc::{Sender};
+use {
+    redis::{AsyncCommands, Client},
+    tokio::sync::mpsc::Sender,
+};
 
 pub struct MyRedis {
-    publisher: RedisClient,
-    subscriber: RedisClient,
-    others: RedisClient,
-    channel: String,
+    client: Client,
 }
 
-pub trait MyRedisImpl {
-    async fn subscribe(&self, value: &[u8]) -> String;
-    async fn publish(&self, message: String);
+pub trait RedisInterface {
+    async fn subscribe(&self, sender: Sender<Vec<u8>>, channel: &str);
+    async fn publish(&self, chan: String, message: String);
     async fn get_value(&self, key: String) -> &[u8];
-    async fn set_value(&self, key: String, message: &[u8]);
+    async fn set_value(
+        &self,
+        key: String,
+        message: String,
+    ) -> Result<(), String>;
 }
 
 impl MyRedis {
-    pub fn new(url: String, channel: String) -> Self {
-        let config = RedisConfig::from_url(&url).unwrap();
+    pub async fn new(
+        username: &str,
+        password: &str,
+        host: &str,
+        port: &str,
+        db: &str,
+    ) -> Self {
+        let connection_string = format!(
+            "redis://{}:{}@{}:{}/{}",
+            username, password, host, port, db
+        );
 
-        let publ = RedisClient::new(config.clone(), None, None, None); // todo:: add tomer
-        let subs = RedisClient::new(config.clone(), None, None, None);
-        let others = RedisClient::new(config, None, None, None);
+        let mut conn = redis::Client::open(connection_string).unwrap();
 
-        Self {
-            publisher: publ,
-            subscriber: subs,
-            others,
-            channel,
-        }
+        Self { client: conn }
     }
 }
 
-impl MyRedisImpl for MyRedis {
-    async fn subscribe(&self, sender: Sender<Vec<u8>>) {
-        self.subscriber.on_message(async |sub| {
-            if self.channel == sub.channel {
-                let _ = sender.send(sub.value.as_bytes().unwrap().to_vec()).await.unwrap();
-            }
+impl RedisInterface for MyRedis {
+    async fn subscribe(&self, sender: Sender<Vec<u8>>, channel: &str) {
+        let config =
+            redis::AsyncConnectionConfig::new().set_push_sender(sender);
+        let mut con = self
+            .client
+            .get_multiplexed_async_connection_with_config(&config)
+            .await
+            .unwrap();
 
-            return Ok(())
-        });
+        con.subscribe(channel).await.unwrap();
     }
 
-    async fn publish(&self, message: String) -> Result<String, String> {
-        if let Err(err) = self.publisher.publish(&self.channel, message).await {
-            println!("Failed to publish message: {}", err);
-            return Err("Failed to publish message".to_string());
+    async fn publish(
+        &self,
+        chan: String,
+        message: String,
+    ) -> Result<(), String> {
+        let mut con = self
+            .client
+            .get_multiplexed_async_connection()
+            .await
+            .unwrap();
+
+        let res = con.publish(chan, message).await;
+
+        if let Err(e) = res {
+            return Err(e.to_string());
         }
 
-        Ok("success".to_string())
+        Ok(())
     }
 
     async fn get_value(&self, key: String) -> String {
-        let result = self.others.get(key.as_bytes()).await;
+        let mut result = self
+            .client
+            .get_multiplexed_async_connection()
+            .await
+            .unwrap();
 
-        if let Err(err) = result {
+        let res = result.get(key).await;
+
+        if let Err(err) = res {
             println!("Failed to get value: {}", err);
             return err.to_string();
         }
 
-        result.unwrap()
+        res.unwrap()
     }
 
-    async fn set_value(&self, key: String, message: String) -> Result<(), String> {
-        let result: Result((), String) = self.others.set(key.as_bytes(), message.as_bytes(), None, None, false).await;
+    async fn set_value(
+        &self,
+        key: String,
+        message: String,
+    ) -> Result<(), String> {
+        let mut result = self
+            .client
+            .get_multiplexed_async_connection()
+            .await
+            .unwrap();
+
+        let res = result.set(key, message).await;
 
         if let Err(err) = result {
             println!("Failed to get value: {}", err);
             return Err("failed".into());
         }
 
-        Ok("okay".into())
+        Ok(())
     }
 }

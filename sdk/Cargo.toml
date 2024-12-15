@@ -5,4 +5,11 @@ edition = "2021"
 
 [dependencies]
 fred = "9.4.0"
+lapin = "2.5.0"
+rdkafka = "0.37.0"
 tokio = "1.41.1"
+uuid = "1.11.0"
+log = "0.4.22"
+tokio-core = "0.1.18"
+redis = { version = "0.27.6", features = ["tokio-rustls-comp"] }
+mockall = "0.13.1"
