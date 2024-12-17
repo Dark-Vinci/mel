@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+package mel_utils;
+
+message Empty{}

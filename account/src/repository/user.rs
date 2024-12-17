@@ -12,5 +12,4 @@ impl User {
     }
 }
 
-impl UserRepository for User {
-}
+impl UserRepository for User {}

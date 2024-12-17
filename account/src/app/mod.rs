@@ -1,5 +1,5 @@
 mod account;
-mod auth;
-mod settings;
-pub mod interface;
 pub mod app;
+mod auth;
+mod interface;
+mod settings;

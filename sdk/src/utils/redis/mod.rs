@@ -1,3 +1,5 @@
+use mockall::automock;
+use tonic::async_trait;
 use {
     redis::{AsyncCommands, Client},
     tokio::sync::mpsc::Sender,
@@ -7,6 +9,7 @@ pub struct MyRedis {
     client: Client,
 }
 
+#[async_trait]
 pub trait RedisInterface {
     async fn subscribe(&self, sender: Sender<Vec<u8>>, channel: &str);
     async fn publish(&self, chan: String, message: String);

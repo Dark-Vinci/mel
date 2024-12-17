@@ -1,15 +1,18 @@
 use {
     crate::{
-        app::interface::AccountInterface,
+        app::interface::{Account, Auth, Settings},
         config::config::Config,
         connections::db::DB,
-        repository::user::{UserRepository},
+        repository::user::UserRepository,
     },
     sdk::utils::{
         kafka::kafka::{Kafka, KafkaInterface},
         redis::{MyRedis, RedisInterface},
     },
+    uuid::Uuid,
 };
+
+pub trait AccountInterface: Auth + Account + Settings {}
 
 #[derive(Debug)]
 pub struct App {
@@ -50,6 +53,12 @@ impl App {
             redis: Box::new(redis),
             kafka: Box::new(kafka),
         }
+    }
+}
+
+impl App {
+    pub fn ping(&self, id: Uuid) -> String {
+        format!("PING FROM ACCOUNT SERVICE: {}", id)
     }
 }
 

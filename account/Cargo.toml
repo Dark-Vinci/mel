@@ -9,11 +9,13 @@ doc = false
 path= "src/bin/main.rs"
 
 [dependencies]
+anyhow = "1.0.94"
 async-trait = "0.1.83"
 lapin = "2.5.0"
 sdk = {path = "../sdk"}
 sea-orm = "1.1.1"
 sea-orm-migration = "1.1.2"
 tokio = { version = "1.42.0", features = ["full"] }
+tonic = "0.12.3"
 tracing = "0.1.41"
 uuid = { version = "1.11.0", features = ["v4"] }

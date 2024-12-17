@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package mel_account;
+
+import "utils/util.proto";
+import "account/request.proto";
+import "account/response.proto";
+
+service AccountService {
+  rpc Ping(mel_utils.Empty) returns (PingResponse);
+  rpc SayHello(SayHelloRequest) returns (SayHelloResponse);
+}
