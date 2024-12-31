@@ -9,5 +9,7 @@ impl Account for App {
         if let a = &*self.redis {
             bail!(GrpcError::Generic)
         }
+
+        "".into()
     }
 }
