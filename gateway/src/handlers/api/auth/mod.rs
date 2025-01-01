@@ -1,8 +1,7 @@
-use axum::extract::State;
-use axum::response::IntoResponse;
-use axum::Router;
-use axum::routing::get;
-use crate::handlers::AppState;
+use {
+    crate::handlers::AppState,
+    axum::{extract::State, response::IntoResponse, routing::get, Router},
+};
 
 pub fn router(state: &AppState) -> Router {
     Router::new()
@@ -11,14 +10,6 @@ pub fn router(state: &AppState) -> Router {
         .with_state(state)
 }
 
-fn signup(
-    State(app): State<AppState>
-) -> impl IntoResponse {
+fn signup(State(app): State<AppState>) -> impl IntoResponse {}
 
-}
-
-fn login(
-    State(app): State<AppState>
-) -> impl IntoResponse {
-
-}
+fn login(State(app): State<AppState>) -> impl IntoResponse {}

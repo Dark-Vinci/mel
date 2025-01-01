@@ -1,7 +1,8 @@
 mod app;
 mod config;
 mod connections;
-mod migrations;
+mod downstream;
+mod migration;
 mod repository;
 mod server;
 // context: requestID

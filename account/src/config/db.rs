@@ -6,3 +6,15 @@ pub struct DBConfig {
     pub port: String,
     pub name: String,
 }
+
+impl DBConfig {
+    pub fn new() -> Self {
+        Self {
+            password: "".into(),
+            username: "".into(),
+            host: "".into(),
+            port: "".into(),
+            name: "".into(),
+        }
+    }
+}

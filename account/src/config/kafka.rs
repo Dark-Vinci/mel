@@ -10,3 +10,19 @@ pub struct KafkaConfig {
     pub port: String,
     pub host: String,
 }
+
+impl KafkaConfig {
+    pub fn new() -> Self {
+        Self {
+            url: "".into(),
+            topic: "".into(),
+            consumer_group: "".into(),
+            broker: "".into(),
+            username: "".into(),
+            group_id: "".into(),
+            password: "".into(),
+            port: "".into(),
+            host: "".into(),
+        }
+    }
+}

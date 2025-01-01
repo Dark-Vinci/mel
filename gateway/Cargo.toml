@@ -22,4 +22,4 @@ sdk ={ path = "../sdk" }
 
 [[bin]]
 name = "gateway"
-path = "main.rs"
+path = "src/bin/main.rs"

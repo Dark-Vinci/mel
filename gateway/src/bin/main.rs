@@ -1,6 +1,5 @@
-
 #[tokio::main]
-fn main() {
+async fn main() {
     let file_writer = debug_logger.and(warning_error_logger);
 
     let filter = EnvFilter::builder()

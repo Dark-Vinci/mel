@@ -5,3 +5,14 @@ pub struct RedisConfig {
     pub host: String,
     pub port: String,
 }
+
+impl RedisConfig {
+    pub fn new() -> Self {
+        Self {
+            password: "".into(),
+            username: "".into(),
+            host: "".into(),
+            port: "".into(),
+        }
+    }
+}

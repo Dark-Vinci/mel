@@ -1,8 +1,8 @@
-
 #[tokio::main]
 async fn main() {
     async {
         println!("Hello, world!");
-    }.await;
+    }
+    .await;
     println!("Hello, world!");
 }

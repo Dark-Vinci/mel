@@ -1,9 +1,5 @@
-
-
 #[derive(Clone, Debug)]
-pub struct ApplicationConfig {
-
-}
+pub struct ApplicationConfig {}
 
 impl Default for ApplicationConfig {
     fn default() -> Self {

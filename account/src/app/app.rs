@@ -3,6 +3,7 @@ use {
         app::interface::{Account, Auth, Settings},
         config::config::Config,
         connections::db::DB,
+        downstream::downstream::Downstream,
         repository::user::UserRepository,
     },
     sdk::utils::{
@@ -17,6 +18,8 @@ pub trait AccountInterface: Auth + Account + Settings {}
 #[derive(Debug)]
 pub struct App {
     pub db: DB,
+    pub config: Config,
+    // pub downstream: Box<dyn Downstream>,
     pub redis: Box<dyn RedisInterface>,
     pub kafka: Box<dyn KafkaInterface>,
     pub user_repo: Box<dyn UserRepository>,
@@ -25,6 +28,16 @@ pub struct App {
 impl App {
     pub async fn new(c: &Config) -> Self {
         let db = DB::new(&c);
+
+        let redis = MyRedis::new(
+            &c.redis.username,
+            &c.redis.password,
+            &c.redis.host,
+            &c.redis.port,
+            "0",
+        );
+
+        let (db, redis) = join!(db, redis,);
 
         let kafka = Kafka::new(
             &c.kafka.broker,
@@ -36,20 +49,12 @@ impl App {
             &c.kafka.port,
         );
 
-        let redis = MyRedis::new(
-            &c.redis.username,
-            &c.redis.password,
-            &c.redis.host,
-            &c.redis.port,
-            "0",
-        )
-        .await;
-
         let u = Box::new(&db);
 
         Self {
             db,
             user_repo: u,
+            config: Config::new(),
             redis: Box::new(redis),
             kafka: Box::new(kafka),
         }

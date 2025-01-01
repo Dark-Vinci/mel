@@ -1,6 +1,8 @@
-use axum::http;
-use serde::{Deserialize, Serialize};
-use crate::errors::{GatewayError};
+use {
+    crate::errors::GatewayError,
+    axum::http,
+    serde::{Deserialize, Serialize},
+};
 
 #[derive(Debug)]
 pub struct LoginStruct {
@@ -25,7 +27,9 @@ struct WsResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Response<T: Clone + Copy + serde::ser::Serialize + serde::de::DeserializeOwned> {
+pub struct Response<
+    T: Clone + Copy + serde::ser::Serialize + serde::de::DeserializeOwned,
+> {
     data: Option<T>,
     error: Option<GatewayError>,
     message: String,
@@ -50,7 +54,7 @@ impl<T> Response<T> {
                 status_code: stat_code,
                 request_id: request_id.to_string(),
                 timestamp: std::time::SystemTime::now(),
-            }
+            };
         }
 
         Self {

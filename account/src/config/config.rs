@@ -15,25 +15,12 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(app: AppConfig) -> Self {
+    pub fn new() -> Self {
         Self {
-            kafka: KafkaConfig {
-                url: "".to_string(),
-                topic: "".to_string(),
-                consumer_group: "".to_string(),
-            },
-            app,
-            redis: RedisConfig {
-                password: "".to_string(),
-                username: "".to_string(),
-                host: "".to_string(),
-                port: "".to_string(),
-            },
-            db: DBConfig {
-                password: "".to_string(),
-                username: "".to_string(),
-                host: "".to_string(),
-            },
+            app: AppConfig::new(),
+            kafka: KafkaConfig::new(),
+            redis: RedisConfig::new(),
+            db: DBConfig::new(),
             environment: Environment::default(),
         }
     }

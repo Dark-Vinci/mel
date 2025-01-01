@@ -1,7 +1,8 @@
-use axum::async_trait;
-use crate::config;
-use crate::downstream::Downstream;
-use sdk::utils::redis::{MyRedisImpl, MyRedis};
+use {
+    crate::{config, downstream::Downstream},
+    axum::async_trait,
+    sdk::utils::redis::{MyRedis, MyRedisImpl},
+};
 
 #[derive(Clone, Debug)]
 pub struct App {
@@ -15,14 +16,14 @@ impl App {
         Self {
             config: Default::default(),
             downstream: Downstream::new(),
-            redis: Box::new(MyRedis::new("url".into(), "".to_string()))
+            redis: Box::new(MyRedis::new("url".into(), "".to_string())),
         }
     }
 }
 
 impl Account for App {
     async fn get_user_by_id(&self, id: String) -> Self {
-        let a  = self.redis.get_value(id).await;
+        let a = self.redis.get_value(id).await;
 
         "this is the string".into()
     }

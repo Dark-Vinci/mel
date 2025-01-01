@@ -1,16 +1,18 @@
-use std::collections::HashMap;
-use std::sync::{Mutex};
-use axum::extract::{State, WebSocketUpgrade};
-use axum::extract::ws::{Message, WebSocket};
-use axum::response::IntoResponse;
-use axum::Router;
-use axum::routing::{get};
-use futures_util::{SinkExt, StreamExt};
-use tokio::sync::broadcast;
-use serde::{Deserialize, Serialize};
-use crate::handlers::AppState;
-
-
+use {
+    crate::handlers::AppState,
+    axum::{
+        extract::{
+            ws::{Message, WebSocket},
+            State, WebSocketUpgrade,
+        },
+        response::IntoResponse,
+        Router,
+    },
+    futures_util::{SinkExt, StreamExt},
+    serde::{Deserialize, Serialize},
+    std::collections::HashMap,
+    tokio::sync::broadcast,
+};
 
 // #[derive(Debug, Clone)]
 pub struct Hub {
@@ -44,19 +46,14 @@ struct UserMessage {
 }
 
 pub fn handler(state: &AppState) -> Router {
-    Router::new()
-        .route("/", get(ws_handler))
-        .with_state(state)
-
+    Router::new().route("/", get(ws_handler)).with_state(state)
 }
 
 async fn ws_handler(
     ws: WebSocketUpgrade,
     State(app): State<AppState>,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| {
-        handle_socket(socket, app)
-    })
+    ws.on_upgrade(move |socket| handle_socket(socket, app))
 }
 
 async fn handle_socket(mut socket: WebSocket, hub: AppState) {
@@ -112,7 +109,7 @@ async fn handle_socket(mut socket: WebSocket, hub: AppState) {
 
                     Actions::Chat => {
                         println!("Chat");
-                    }
+                    },
                 }
             }
         }
