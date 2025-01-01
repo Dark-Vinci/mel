@@ -16,10 +16,25 @@ pub struct LoginResponse {
     pub user_id: String,
 }
 
-struct WsRequest<T> {
+#[derive(Debug, Clone)]
+struct WsRequest<T: Clone> {
     pub action: String,
     pub payload: T,
     pub token: String,
+}
+
+#[derive(Debug, Clone)]
+struct Message {
+    pub content: String,
+    pub to: Type,
+    pub files: Vec<&str>
+}
+
+enum Type {
+    // user id
+    Private(String),
+    // channel id
+    Channel(String)
 }
 
 struct WsResponse {
@@ -28,10 +43,9 @@ struct WsResponse {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Response<
-    T: Clone + Copy + serde::ser::Serialize + serde::de::DeserializeOwned,
+    T: serde::ser::Serialize
 > {
     data: Option<T>,
-    error: Option<GatewayError>,
     message: String,
     status_code: http::StatusCode,
     request_id: String,
@@ -49,17 +63,16 @@ impl<T> Response<T> {
         if data.is_none() {
             return Self {
                 data: None,
-                error,
                 message,
                 status_code: stat_code,
-                request_id: request_id.to_string(),
+                request_id: request_id.into(),
                 timestamp: std::time::SystemTime::now(),
             };
         }
 
         Self {
             data,
-            error: None,
+            // error: None,
             message,
             status_code: stat_code,
             request_id: request_id.to_string(),
