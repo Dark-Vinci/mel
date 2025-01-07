@@ -2,9 +2,7 @@ use crate::connections::db::DB;
 
 pub trait UserRepository {}
 
-pub struct User<'a> {
-    db: &'a DB,
-}
+pub struct User(DatabaseConnection);
 
 impl User {
     pub fn new(db: &DB) -> Self {

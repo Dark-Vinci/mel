@@ -1,5 +1,5 @@
 mod app;
-mod config;
+pub mod config;
 mod connections;
 mod downstream;
 mod migration;

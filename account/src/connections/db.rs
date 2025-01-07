@@ -2,7 +2,7 @@ use {
     crate::{config::config::Config, migrations::migrator::Migrator},
     sdk::{constants::Environment, utils::helper},
     sea_orm::{ConnectOptions, Database, DatabaseConnection},
-    sea_orm_migration::MigratorTrait,
+    // sea_orm_migration::MigratorTrait,
     std::{sync::Arc, time::Duration},
     tokio::{runtime, task},
     tracing::{debug, log},
@@ -65,7 +65,7 @@ impl DB {
 
 impl Drop for DB {
     fn drop(&mut self) {
-        let connection = self.conn.clone();
+        let connection = *self.connection.clone();
 
         task::block_in_place(move || {
             let runtime = runtime::Handle::current();

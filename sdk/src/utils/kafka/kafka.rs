@@ -15,14 +15,14 @@ use {
 
 pub type SdkConsumer = StreamConsumer<CustomContext>;
 
-pub struct Kafka<'a> {
+pub struct Kafka {
     topic: Vec<String>,
     topic_name: String,
     host: String,
     password: String,
     username: String,
-    producer: &'a FutureProducer,
-    consumer: &'a SdkConsumer,
+    producer: FutureProducer,
+    consumer: SdkConsumer,
 }
 
 pub trait KafkaInterface {
@@ -43,7 +43,6 @@ impl Kafka {
         let context = CustomContext;
 
         let client = ClientConfig::new()
-            .set("bootstrap.servers", &brokers)
             .set("group.id", group_id)
             .set("bootstrap.servers", brokers)
             .set("bootstrap.servers", format!("{}:{}", host, port))
@@ -57,6 +56,8 @@ impl Kafka {
             .set("auto.offset.reset", "smallest")
             .set_log_level(RDKafkaLogLevel::Debug)
             .create_with_context(context);
+        
+        client.
 
         let producer: &FutureProducer = client.create().clone().unwrap();
         let consumer: &SdkConsumer = client.create().unwrap();

@@ -9,36 +9,60 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Post::Table)
+                    .table(User::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Post::Id)
-                            .integer()
+                        ColumnDef::new(User::Id)
+                            .uuid()
                             .not_null()
-                            .auto_increment()
                             .primary_key(),
                     )
-                    .col(ColumnDef::new(Post::Title).string().not_null())
-                    .col(ColumnDef::new(Post::Text).string().not_null())
+                    .col(ColumnDef::new(User::FirstName).string().not_null())
+                    .col(ColumnDef::new(User::LastName).string().not_null())
+                    .col(
+                        ColumnDef::new(User::CreatedAt)
+                            .timestamp()
+                            .default(Expr::current_timestamp())
+                            .not_null(),
+                    )
+                    .col(
+                        ColumnDef::new(User::UpdatedAt)
+                            .timestamp()
+                            .default(Expr::current_timestamp())
+                            .not_null(),
+                    )
+                    .col(ColumnDef::new(User::DateOfBirth).date().not_null())
+                    .col(
+                        ColumnDef::new(User::Email)
+                            .string()
+                            .unique_key()
+                            .not_null(),
+                    )
+                    .col(ColumnDef::new(User::Password).text().not_null())
                     .to_owned(),
             )
             .await
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        // todo!();
-
         manager
-            .drop_table(Table::drop().table(Post::Table).to_owned())
-            .await
+            .drop_table(Table::drop().table(User::Table).to_owned())
+            .await?;
+
+        Ok(())
     }
 }
 
 #[derive(DeriveIden)]
-enum Post {
+enum User {
     Table,
     Id,
-    Title,
-    Text,
+    FirstName,
+    LastName,
+    DateOfBirth,
+    Email,
+    Password,
+    CreatedAt,
+    UpdatedAt,
+    DeletedAt,
 }

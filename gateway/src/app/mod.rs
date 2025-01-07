@@ -12,11 +12,13 @@ pub struct App {
 }
 
 impl App {
-    fn new() -> Self {
+    async fn new() -> Self {
+        let r = MyRedis::new("url".into(), "".to_string()).await;
+        
         Self {
             config: Default::default(),
             downstream: Downstream::new(),
-            redis: Box::new(MyRedis::new("url".into(), "".to_string())),
+            redis: Box::new(r),
         }
     }
 }

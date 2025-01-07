@@ -1,5 +1,5 @@
 use {
-    crate::app::app::App,
+    crate::app::app::{AccountInterface, App},
     sdk::generated_proto_rs::{
         mel_account::{
             account_service_server::AccountService, PingResponse,
@@ -11,17 +11,26 @@ use {
     uuid::Uuid,
 };
 
-pub struct Server(App);
+pub struct Account<A: AccountInterface>(A);
+
+impl<A: AccountInterface> Account<A> {
+    pub fn new(a: App) -> Self {
+        Self(a)
+    }
+}
 
 #[async_trait::async_trait]
-impl AccountService for Server {
+impl<A: AccountInterface + Send + Sync + 'static> AccountService
+    for Account<A>
+{
     async fn ping(
         &self,
-        _request: Request<Empty>,
+        request: Request<Empty>,
     ) -> Result<Response<PingResponse>, Status> {
         let id = Uuid::new_v4();
+
         let res = PingResponse {
-            message: self.0.ping(id),
+            message: format!("{} HELLO", id.to_string()),
         };
 
         Ok(Response::new(res))
