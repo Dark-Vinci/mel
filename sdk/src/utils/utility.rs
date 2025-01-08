@@ -42,26 +42,28 @@ pub fn compare_password(expected: &str, password: String) -> bool {
     true
 }
 
-pub use tokio::{select, signal};
+// pub use tokio::{select, signal::{ctrl_c, unix}};
 
-pub async fn graceful_shutdown() {
-    let ctr_l = async { signal::ctrl_c().await.expect("FAILED TO HANDLE CONTROL C") };
+pub async fn graceful_shutdown() {}
 
-    #[cfg(unix)]
-    let terminate = async {
-        signal::unix::signal(signal::unix::SignalKind::terminate())
-            .expect("FAILED TO INSTALL SIGNAL HANDLER")
-            .recv()
-            .await
-    };
+//     let ctr_l =
+//         async { ctrl_c().await.expect("FAILED TO HANDLE CONTROL C") };
 
-    #[cfg(not(unix))]
-    let terminate = future::pending::<()>();
+//     #[cfg(unix)]
+//     let terminate = async {
+//         unix::signal(unix::SignalKind::terminate())
+//             .expect("FAILED TO INSTALL SIGNAL HANDLER")
+//             .recv()
+//             .await
+//     };
 
-    select! {
-        _ = ctr_l => {},
-        _ = terminate => {},
-    }
+//     #[cfg(not(unix))]
+//     let terminate = future::pending::<()>();
 
-    println!("SIGNAL RECEIVED🚨: Handling graceful shutdown🛑 server🦾")
-}
+//     tokio::select! {
+//         _ = ctr_l => {},
+//         _ = terminate => {},
+//     }
+
+//     println!("SIGNAL RECEIVED🚨: Handling graceful shutdown🛑 server🦾")
+// }

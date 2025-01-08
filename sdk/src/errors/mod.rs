@@ -10,3 +10,17 @@ pub enum GrpcError {
     #[error("invalid uuid: {0}")]
     InvalidID(String),
 }
+
+#[derive(Debug, Error)]
+pub enum RepoError {
+    DuplicateKey,
+
+    #[error("invalid model")]
+    FailedToInsert,
+
+    #[error("not found")]
+    NotFound,
+
+    #[error("something went wrong")]
+    SomethingWentWrong,
+}

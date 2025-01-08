@@ -1,10 +1,10 @@
-mod app;
+pub mod app;
 pub mod config;
 mod connections;
 mod downstream;
-mod migration;
-mod repository;
-mod server;
+pub mod migration;
+pub mod repository;
+pub mod server;
 // context: requestID
 // timeZone
 // language

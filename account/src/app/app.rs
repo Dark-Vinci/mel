@@ -1,16 +1,14 @@
 use {
-    
     crate::{
         app::interface::{Account, Auth, Settings},
         config::config::Config,
         connections::db::DB,
         // downstream::downstream::Downstream,
-        repository::user::UserRepository,
+        // repository::user::UserRepository,
     },
     uuid::Uuid,
 };
-
-pub trait AccountInterface: Auth + Account + Settings {}
+use crate::repository::user::{ UserRepo, UserRepository};
 
 #[derive(Debug)]
 pub struct App {
@@ -46,11 +44,13 @@ impl App {
         //     &c.kafka.port,
         // );
 
-        let u = Box::new(&db);
+        let db = db.unwrap();
+
+        let u = UserRepo::new(&db);
 
         Self {
             db,
-            user_repo: u,
+            user_repo: Box::new(u),
             config: Config::new(),
             // redis: Box::new(redis),
             // kafka: Box::new(kafka),
@@ -63,5 +63,7 @@ impl App {
         format!("PING FROM ACCOUNT SERVICE: {}", id)
     }
 }
+
+pub trait AccountInterface: Auth + Account + Settings {}
 
 impl AccountInterface for App {}

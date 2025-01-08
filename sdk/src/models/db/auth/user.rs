@@ -1,7 +1,9 @@
+use sea_orm::ActiveValue::Set;
 use {
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
 };
+use crate::models::others::auth::create::CreateUserRequest;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -30,6 +32,22 @@ pub struct Model {
 
     #[sea_orm(nullable)]
     pub deleted_at: Option<DateTime>,
+}
+
+impl From<CreateUserRequest> for ActiveModel {
+    fn from(val: CreateUserRequest) -> Self {
+        Self {
+            id: Default::default(),
+            first_name: Set(val.first_name),
+            last_name: Set(val.last_name),
+            date_of_birth: Set(val.date_of_birth),
+            email: Set(val.email),
+            password: Set(val.password),
+            created_at: Default::default(),
+            updated_at: Default::default(),
+            deleted_at: Default::default(),
+        }
+    }
 }
 
 impl ActiveModelBehavior for ActiveModel {}

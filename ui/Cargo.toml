@@ -7,4 +7,3 @@ edition = "2021"
 git-fetch-with-cli = true
 
 [dependencies]
-gpui = { git = "https://github.com/zed-industries/zed" }

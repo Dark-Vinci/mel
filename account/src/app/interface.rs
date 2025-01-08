@@ -1,4 +1,4 @@
-use {async_trait::async_trait, sdk::errors::GrpcError, uuid::Uuid};
+use {async_trait::async_trait, uuid::Uuid};
 
 struct CTX {
     request_id: Uuid,
@@ -21,12 +21,12 @@ pub struct User {
 }
 
 pub trait Auth {
-    async fn create_user(&self, ctx: &CTX, user: CreateUserRequest) -> User;
+    // async fn create_user(&self, ctx: &CTX, user: CreateUserRequest) -> User;
 }
 
 #[async_trait]
 pub trait Account {
-    async fn name(&self) -> Result<String, GrpcError>;
+    // async fn name(&self) -> Result<String, GrpcError>;
 }
 
 pub trait Settings {}

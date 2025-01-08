@@ -25,7 +25,7 @@ impl<A: AccountInterface + Send + Sync + 'static> AccountService
 {
     async fn ping(
         &self,
-        request: Request<Empty>,
+        _request: Request<Empty>,
     ) -> Result<Response<PingResponse>, Status> {
         let id = Uuid::new_v4();
 

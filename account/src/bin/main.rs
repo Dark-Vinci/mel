@@ -1,17 +1,19 @@
 use {
-    account::{config::config::Config, app::app::App},
+    account::{app::app::App, config::config::Config, server::server::Account},
     sdk::{
         constants::constant::{
-            LAGOS_TIME, LOG_DIR, LOG_FILE_NAME, LOG_WARNING_FILE_NAME,
-            TIME_ZONE,
+            LAGOS_TIME, LOCAL_HOST, LOG_DIR, LOG_FILE_NAME,
+            LOG_WARNING_FILE_NAME, TIME_ZONE,
         },
         errors::AppError,
-        utils::utility::graceful_shutdown,
         generated_proto_rs::mel_account::account_service_server::AccountServiceServer,
+        utils::utility::graceful_shutdown,
     },
-    std::panic,
+    std::{env, net::SocketAddr, panic},
     tonic::transport::Server,
+    tracing::{debug, log::LevelFilter},
     tracing_appender::rolling,
+    tracing_subscriber::{fmt::writer::MakeWriterExt, EnvFilter},
 };
 
 #[tokio::main]
@@ -25,9 +27,9 @@ async fn main() -> Result<(), AppError> {
     let file_writer = debug_logger.and(warning_error_logger);
 
     let filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::INFO.into())
+        .with_default_directive(LevelFilter::Info.into())
         .from_env()?
-        .add_directive("auth=debug".parse()?);
+        .add_directive("account=debug".parse()?);
 
     tracing_subscriber::fmt()
         .pretty()
@@ -39,16 +41,30 @@ async fn main() -> Result<(), AppError> {
         .with_file(true)
         .with_line_number(true)
         .init();
+
+    panic::set_hook(Box::new(|info| {
+        if let Some(location) = info.location() {
+            tracing::error!(
+                message = %info,
+                panic.file = location.file(),
+                panic.line = location.line(),
+                panic.column = location.column(),
+            );
+        } else {
+            tracing::error!(message = %info);
+        }
+    }));
+
     let config = Config::new();
 
     let addr: SocketAddr =
-        format!("{0}:{1}", LOCAL_HOST, &config.app_port).parse()?;
+        format!("{0}:{1}", LOCAL_HOST, &config.app.port).parse()?;
 
     let app_name: &str = &config.app.app_name.clone();
     let service_name: &str = &config.app.service_name.clone();
 
     // bootstrap application
-    let app = App::new(&config).await?;
+    let app = App::new(&config).await;
 
     // bootstrap service controller
     let account_server = Account::new(app);
@@ -57,11 +73,6 @@ async fn main() -> Result<(), AppError> {
         "🚀{0} for {1} is listening on address {2} 🚀",
         app_name, service_name, addr
     );
-    
-    panic::set_hook(Box::new(|info| {
-        // send notification
-        println!("A panic has occured with info {}", info.to_string());
-    }));
 
     // start service and listen to shut down hooks;
     Server::builder()
