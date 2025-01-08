@@ -1,3 +1,4 @@
+use crate::repository::user::{UserRepo, UserRepository};
 use {
     crate::{
         app::interface::{Account, Auth, Settings},
@@ -8,7 +9,6 @@ use {
     },
     uuid::Uuid,
 };
-use crate::repository::user::{ UserRepo, UserRepository};
 
 #[derive(Debug)]
 pub struct App {
