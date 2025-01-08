@@ -21,6 +21,10 @@ pub struct App {
 }
 
 impl App {
+    pub async fn delete_user(&self, r: Uuid) {
+        let res = self.user_repo.soft_delete(r, r).await;
+    }
+
     pub async fn new(c: &Config) -> Self {
         let db = DB::new(&c).await;
 

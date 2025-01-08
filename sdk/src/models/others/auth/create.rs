@@ -1,3 +1,4 @@
+use chrono::Utc;
 use sea_orm::prelude::DateTime;
 
 pub struct CreateUserRequest {
@@ -6,4 +7,13 @@ pub struct CreateUserRequest {
     pub date_of_birth: DateTime,
     pub email: String,
     pub password: String,
+}
+
+#[derive(Debug)]
+pub struct UpdateUserRequest {
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub email: Option<String>,
+    pub password: Option<String>,
+    pub date_of_birth: Option<chrono::DateTime<Utc>>,
 }

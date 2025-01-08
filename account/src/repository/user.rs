@@ -1,20 +1,23 @@
 use {
     crate::connections::db::DB,
     async_trait::async_trait,
-    sdk::models::{
-        db::{
-            auth,
-            auth::{user, user::Entity as User, user::Model},
+    chrono::Utc,
+    sdk::{
+        errors::RepoError,
+        models::{
+            db::{
+                auth,
+                auth::{
+                    user,
+                    user::{Entity as User, Model},
+                },
+            },
+            others::auth::create::{CreateUserRequest, UpdateUserRequest},
         },
-        others::auth::create::CreateUserRequest,
     },
+    sea_orm::{ActiveModelTrait, ActiveValue::Set, DbErr, EntityTrait},
     tracing::{debug, error, Level},
     uuid::Uuid,
-};
-use {
-    chrono::Utc,
-    sdk::errors::RepoError,
-    sea_orm::{ActiveModelTrait, ActiveValue::Set, DbErr, EntityTrait},
 };
 
 #[async_trait]
@@ -26,16 +29,24 @@ pub trait UserRepository {
         id: Uuid,
         request_id: Uuid,
     ) -> Result<Model, RepoError>;
+
     async fn get_by_email(
         &self,
         request_id: Uuid,
         mail: String,
     ) -> Result<Model, RepoError>;
+
     async fn soft_delete(
         &self,
         request_id: Uuid,
         id: Uuid,
     ) -> Result<(), RepoError>;
+
+    async fn update(
+        &self,
+        request_id: Uuid,
+        user: UpdateUserRequest,
+    ) -> Result<Model, RepoError>;
 }
 
 pub struct UserRepo<'a>(&'a DB);
@@ -170,5 +181,31 @@ impl UserRepository for UserRepo {
         }
 
         Ok(())
+    }
+
+    #[tracing::instrument(
+    name = "UserRepository::update",
+    skip(self),
+    error=(level = Level::ERROR),
+    level=Level::DEBUG,
+    )]
+    async fn update(
+        &self,
+        request_id: Uuid,
+        user: UpdateUserRequest,
+    ) -> Result<Model, RepoError> {
+        debug!("Updating user by id: {:?}, request_id {}", user, request_id);
+
+        let model: user::ActiveModel = user.into();
+
+        let result = model.update(&*self.0.connection).await;
+
+        if let Err(DbErr::Exec(err)) = &result {
+            error!(error = &err.to_string(), "Failed to update user");
+
+            return Err(RepoError::FailedToUpdate);
+        }
+
+        Ok(result.unwrap())
     }
 }

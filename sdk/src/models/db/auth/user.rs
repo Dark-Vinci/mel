@@ -3,7 +3,7 @@ use {
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
 };
-use crate::models::others::auth::create::CreateUserRequest;
+use crate::models::others::auth::create::{CreateUserRequest, UpdateUserRequest};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -47,6 +47,21 @@ impl From<CreateUserRequest> for ActiveModel {
             updated_at: Default::default(),
             deleted_at: Default::default(),
         }
+    }
+}
+
+impl From<UpdateUserRequest> for ActiveModel {
+    fn from(fro: UpdateUserRequest) -> Self {
+        let mut val: ActiveModel = Self::default();
+
+        if let Some(first_name) = &fro.first_name {
+            val.first_name = Set(first_name.into());
+        }
+
+        // todo: fill other fields
+
+
+        val
     }
 }
 

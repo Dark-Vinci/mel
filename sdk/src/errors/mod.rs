@@ -23,4 +23,6 @@ pub enum RepoError {
 
     #[error("something went wrong")]
     SomethingWentWrong,
+
+    FailedToUpdate,
 }
