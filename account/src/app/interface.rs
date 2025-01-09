@@ -1,24 +1,24 @@
-use {async_trait::async_trait, uuid::Uuid};
+use async_trait::async_trait;
 
-struct CTX {
-    request_id: Uuid,
-    user_id: Option<Uuid>,
-    time_zone: String,
-    auth_token: String,
-    language: String,
-}
+// struct CTX {
+//     request_id: Uuid,
+//     user_id: Option<Uuid>,
+//     time_zone: String,
+//     auth_token: String,
+//     language: String,
+// }
 
-pub struct CreateUserRequest {
-    pub first_name: String,
-    pub last_name: String,
-    pub date_of_birth: String,
-    pub email: String,
-    pub password: String,
-}
+// pub struct CreateUserRequest {
+//     pub first_name: String,
+//     pub last_name: String,
+//     pub date_of_birth: String,
+//     pub email: String,
+//     pub password: String,
+// }
 
-pub struct User {
-    pub name: String,
-}
+// pub struct User {
+//     pub name: String,
+// }
 
 pub trait Auth {
     // async fn create_user(&self, ctx: &CTX, user: CreateUserRequest) -> User;

@@ -31,7 +31,7 @@ pub async fn handle_print_request_response(
 async fn get_bytes<B>(
     typ: &'static str,
     body: B,
-    id: &str
+    id: &str,
 ) -> Result<Bytes, (StatusCode, String)>
 where
     B: axum::body::HttpBody<Data = Bytes>,

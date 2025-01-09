@@ -14,7 +14,7 @@ pub struct App {
 impl App {
     async fn new() -> Self {
         let r = MyRedis::new("url".into(), "".to_string()).await;
-        
+
         Self {
             config: Default::default(),
             downstream: Downstream::new(),

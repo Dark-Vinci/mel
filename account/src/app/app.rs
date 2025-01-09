@@ -10,23 +10,23 @@ use {
     uuid::Uuid,
 };
 
-#[derive(Debug)]
+// #[derive(Debug)]
 pub struct App {
     pub db: DB,
     pub config: Config,
     // pub downstream: Box<dyn Downstream>,
     // pub redis: Box<dyn RedisInterface>,
     // pub kafka: Box<dyn KafkaInterface>,
-    pub user_repo: Box<dyn UserRepository>,
+    pub user_repo: Box<dyn UserRepository + Sync + Send>,
 }
 
 impl App {
     pub async fn delete_user(&self, r: Uuid) {
-        let res = self.user_repo.soft_delete(r, r).await;
+        let _res = self.user_repo.soft_delete(r, r).await;
     }
 
     pub async fn new(c: &Config) -> Self {
-        let db = DB::new(&c).await;
+        let db = DB::new(&c).await.unwrap();
 
         // let redis = MyRedis::new(
         //     &c.redis.username,
@@ -48,9 +48,7 @@ impl App {
         //     &c.kafka.port,
         // );
 
-        let db = db.unwrap();
-
-        let u = UserRepo::new(&db);
+        let u = UserRepo::new(db.clone());
 
         Self {
             db,

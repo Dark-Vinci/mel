@@ -1,5 +1,5 @@
 use {
-    crate::app::app::{AccountInterface, App},
+    crate::app::app::AccountInterface,
     sdk::generated_proto_rs::{
         mel_account::{
             account_service_server::AccountService, PingResponse,
@@ -14,7 +14,7 @@ use {
 pub struct Account<A: AccountInterface>(A);
 
 impl<A: AccountInterface> Account<A> {
-    pub fn new(a: App) -> Self {
+    pub fn new(a: A) -> Self {
         Self(a)
     }
 }

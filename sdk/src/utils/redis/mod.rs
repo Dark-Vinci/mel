@@ -13,6 +13,7 @@ pub struct MyRedis {
 pub trait RedisInterface {
     async fn subscribe(&self, sender: Sender<Vec<u8>>, channel: &str);
     async fn publish(&self, chan: String, message: String);
+    async fn delete(&self, key: String) -> bool;
     async fn get_value(&self, key: String) -> &[u8];
     async fn set_value(
         &self,
@@ -109,5 +110,21 @@ impl RedisInterface for MyRedis {
         }
 
         Ok(())
+    }
+
+    async fn delete(&self, key: String) -> bool {
+        let mut result = self
+            .client
+            .get_multiplexed_async_connection()
+            .await
+            .unwrap();
+
+        let res = result.del(key).await;
+
+        if let Err(err) = res {
+            return false;
+        }
+
+        true
     }
 }

@@ -24,17 +24,17 @@ case $1 in
   "reactions")
     echo "about to cd into reactions service to generate migration"
     cd ./reactions/src
-    sea-orm-cli migrate generate "$2";;
+    sea migrate generate "$2";;
 
   "posts")
     echo "about to cd into posts service to generate migration"
     cd ./posts/src
-    sea-orm-cli migrate generate "$2";;
+    sea migrate generate "$2";;
 
   "utils")
     echo "about to cd into utils service to generate migration"
     cd ./utils/src
-    sea-orm-cli migrate generate "$2";;
+    sea migrate generate "$2";;
 
   *)
     echo "No known service was chosen";;

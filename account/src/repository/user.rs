@@ -1,28 +1,35 @@
+use sea_orm::IntoActiveModel;
 use {
     crate::connections::db::DB,
     async_trait::async_trait,
-    chrono::Utc,
+    chrono::Local,
     sdk::{
         errors::RepoError,
         models::{
-            db::{
-                auth,
-                auth::{
-                    user,
-                    user::{Entity as User, Model},
-                },
-            },
+            db::auth::user::{self, Entity as User, Model},
             others::auth::create::{CreateUserRequest, UpdateUserRequest},
         },
     },
-    sea_orm::{ActiveModelTrait, ActiveValue::Set, DbErr, EntityTrait},
+    sea_orm::{
+        ActiveModelTrait,
+        ActiveValue::Set,
+        ColumnTrait,
+        DbErr,
+        EntityTrait,
+        QueryFilter,
+        // prelude::DeriveIntoActiveModel
+    },
     tracing::{debug, error, Level},
     uuid::Uuid,
 };
 
 #[async_trait]
 pub trait UserRepository {
-    async fn create(&self, user: CreateUserRequest, request_id: Uuid) -> Model;
+    async fn create(
+        &self,
+        user: CreateUserRequest,
+        request_id: Uuid,
+    ) -> Result<Model, RepoError>;
 
     async fn get_by_id(
         &self,
@@ -49,10 +56,10 @@ pub trait UserRepository {
     ) -> Result<Model, RepoError>;
 }
 
-pub struct UserRepo<'a>(&'a DB);
+pub struct UserRepo(DB);
 
 impl UserRepo {
-    pub fn new(db: &DB) -> Self {
+    pub fn new(db: DB) -> Self {
         Self(db)
     }
 }
@@ -74,12 +81,12 @@ impl UserRepository for UserRepo {
 
         let a: user::ActiveModel = user.into();
 
-        let result = a.insert(&*self.0.connection).await;
+        let result = a.insert(&self.0.connection).await;
 
         if let Err(DbErr::Exec(err)) = result {
             error!(error = &err.to_string(), "Failed to insert user record");
 
-            if &err.to_string().contains("duplicate key") {
+            if err.to_string().contains("duplicate key") {
                 return Err(RepoError::DuplicateKey);
             }
 
@@ -102,7 +109,7 @@ impl UserRepository for UserRepo {
     ) -> Result<Model, RepoError> {
         debug!("Getting user by id: {}, with request id: {}", id, request_id);
 
-        let result = User::find_by_id(id).one(&*self.0.connection).await;
+        let result = User::find_by_id(id).one(&self.0.connection).await;
 
         if let Err(DbErr::Exec(err)) = &result {
             error!(error = &err.to_string(), "Failed to find user by id");
@@ -111,7 +118,7 @@ impl UserRepository for UserRepo {
 
         let user = result.unwrap();
 
-        if &user.is_none() {
+        if user.is_none() {
             error!("User not found");
             return Err(RepoError::NotFound);
         }
@@ -137,7 +144,7 @@ impl UserRepository for UserRepo {
 
         let result = User::find()
             .filter(user::Column::Email.eq(mail))
-            .one(&*self.0.connection)
+            .one(&self.0.connection)
             .await;
 
         if let Err(DbErr::Exec(err)) = &result {
@@ -147,7 +154,7 @@ impl UserRepository for UserRepo {
 
         let user = result.unwrap();
 
-        if &user.is_none() {
+        if user.is_none() {
             error!("User not found");
             return Err(RepoError::NotFound);
         }
@@ -168,12 +175,12 @@ impl UserRepository for UserRepo {
     ) -> Result<(), RepoError> {
         debug!("Deleting user by id: {}, request_id {}", id, request_id);
 
-        let mut user: user::ActiveModel =
-            self.get_by_id(request_id, id).await?.into()?;
+        let mut user =
+            self.get_by_id(request_id, id).await?.into_active_model();
 
-        user.deleted_at = Set(Some(Utc::now()));
+        user.deleted_at = Set(Some(Local::now()));
 
-        let res = user.update(&*self.0.connection).await;
+        let res = user.update(&self.0.connection).await;
 
         if let Err(DbErr::Exec(err)) = &res {
             error!(error = &err.to_string(), "Failed to find user by mail");
@@ -198,11 +205,10 @@ impl UserRepository for UserRepo {
 
         let model: user::ActiveModel = user.into();
 
-        let result = model.update(&*self.0.connection).await;
+        let result = model.update(&self.0.connection).await;
 
         if let Err(DbErr::Exec(err)) = &result {
             error!(error = &err.to_string(), "Failed to update user");
-
             return Err(RepoError::FailedToUpdate);
         }
 

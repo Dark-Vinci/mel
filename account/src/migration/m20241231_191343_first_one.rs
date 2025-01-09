@@ -31,6 +31,7 @@ impl MigrationTrait for Migration {
                             .default(Expr::current_timestamp())
                             .not_null(),
                     )
+                    .col(ColumnDef::new(User::DeletedAt).timestamp().null())
                     .col(ColumnDef::new(User::DateOfBirth).date().not_null())
                     .col(
                         ColumnDef::new(User::Email)

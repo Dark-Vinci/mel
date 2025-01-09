@@ -1,5 +1,8 @@
+use serde::Deserialize;
+use serde_json::json;
+// use uuid::Uuid;
 use {
-    // crate::constants::types::E,
+    uuid::Uuid,
     argon2::{
         password_hash::SaltString, Algorithm, Argon2, Params, PasswordHash,
         PasswordVerifier, Version,
@@ -42,28 +45,42 @@ pub fn compare_password(expected: &str, password: String) -> bool {
     true
 }
 
-// pub use tokio::{select, signal::{ctrl_c, unix}};
+pub fn sqlite_test_document(id: Uuid) -> String {
+    return format!("sqlite://tests/sqlite/tests-{id}.sqlite?mode=rwc");
+}
 
-pub async fn graceful_shutdown() {}
+pub use tokio::{select, signal::{ctrl_c, unix}};
 
-//     let ctr_l =
-//         async { ctrl_c().await.expect("FAILED TO HANDLE CONTROL C") };
+pub async fn graceful_shutdown() {
 
-//     #[cfg(unix)]
-//     let terminate = async {
-//         unix::signal(unix::SignalKind::terminate())
-//             .expect("FAILED TO INSTALL SIGNAL HANDLER")
-//             .recv()
-//             .await
-//     };
+    let ctr_l =
+        async { ctrl_c().await.expect("FAILED TO HANDLE CONTROL C") };
 
-//     #[cfg(not(unix))]
-//     let terminate = future::pending::<()>();
+    #[cfg(unix)]
+    let terminate = async {
+        unix::signal(unix::SignalKind::terminate())
+            .expect("FAILED TO INSTALL SIGNAL HANDLER")
+            .recv()
+            .await
+    };
 
-//     tokio::select! {
-//         _ = ctr_l => {},
-//         _ = terminate => {},
-//     }
+    #[cfg(not(unix))]
+    let terminate = future::pending::<()>();
 
-//     println!("SIGNAL RECEIVED🚨: Handling graceful shutdown🛑 server🦾")
-// }
+    tokio::select! {
+        _ = ctr_l => {},
+        _ = terminate => {},
+    }
+
+    println!("SIGNAL RECEIVED🚨: Handling graceful shutdown🛑 server🦾")
+}
+
+pub fn deserialize<T: Deserialize>(msg: Vec<u8>) -> T {
+    let str = String::from_utf8(msg).unwrap();
+
+    let j = json!(str);
+
+    let message: T = serde_json::from_value(j).unwrap();
+
+    message
+}

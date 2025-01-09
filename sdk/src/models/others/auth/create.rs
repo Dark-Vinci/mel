@@ -1,6 +1,7 @@
 use chrono::Utc;
 use sea_orm::prelude::DateTime;
 
+#[derive(Debug)]
 pub struct CreateUserRequest {
     pub first_name: String,
     pub last_name: String,

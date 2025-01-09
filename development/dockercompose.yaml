@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+  postgres:
+    build: ./postgres
+    ports:
+      - "5420:5432"
+    volumes:
+      - ./postgres/pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=melon
+      - POSTGRES_PASSWORD=melon
+      - PGDATA=/temp

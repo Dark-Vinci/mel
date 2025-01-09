@@ -11,8 +11,9 @@ use {
     },
     std::{env, net::SocketAddr, panic},
     tonic::transport::Server,
-    tracing::{debug, log::LevelFilter},
+    tracing::{debug, info},
     tracing_appender::rolling,
+    tracing_core::LevelFilter,
     tracing_subscriber::{fmt::writer::MakeWriterExt, EnvFilter},
 };
 
@@ -27,7 +28,7 @@ async fn main() -> Result<(), AppError> {
     let file_writer = debug_logger.and(warning_error_logger);
 
     let filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::Info.into())
+        .with_default_directive(LevelFilter::INFO.into())
         .from_env()?
         .add_directive("account=debug".parse()?);
 
@@ -69,7 +70,7 @@ async fn main() -> Result<(), AppError> {
     // bootstrap service controller
     let account_server = Account::new(app);
 
-    debug!(
+    info!(
         "🚀{0} for {1} is listening on address {2} 🚀",
         app_name, service_name, addr
     );

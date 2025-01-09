@@ -27,14 +27,14 @@ struct WsRequest<T: Clone> {
 struct Message {
     pub content: String,
     pub to: Type,
-    pub files: Vec<&str>
+    pub files: Vec<&str>,
 }
 
 enum Type {
     // user id
     Private(String),
     // channel id
-    Channel(String)
+    Channel(String),
 }
 
 struct WsResponse {
@@ -42,9 +42,7 @@ struct WsResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Response<
-    T: serde::ser::Serialize
-> {
+pub struct Response<T: serde::ser::Serialize> {
     data: Option<T>,
     message: String,
     status_code: http::StatusCode,

@@ -1,5 +1,11 @@
 use {
-    crate::{handlers::AppState, middleware::{request_id::append_request_id, request_response::{self, handle_print_request_response}}},
+    crate::{
+        handlers::AppState,
+        middleware::{
+            request_id::append_request_id,
+            request_response::{self, handle_print_request_response},
+        },
+    },
     axum::{middleware::from_fn, Router},
 };
 

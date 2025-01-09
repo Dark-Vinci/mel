@@ -25,13 +25,13 @@ pub struct Model {
     pub password: String,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub created_at: DateTime,
+    pub created_at: DateTimeLocal,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub updated_at: DateTime,
+    pub updated_at: DateTimeLocal,
 
     #[sea_orm(nullable)]
-    pub deleted_at: Option<DateTime>,
+    pub deleted_at: Option<DateTimeLocal>,
 }
 
 impl From<CreateUserRequest> for ActiveModel {
@@ -52,7 +52,7 @@ impl From<CreateUserRequest> for ActiveModel {
 
 impl From<UpdateUserRequest> for ActiveModel {
     fn from(fro: UpdateUserRequest) -> Self {
-        let mut val: ActiveModel = Self::default();
+        let mut val: ActiveModel = Self{..Default::default()};
 
         if let Some(first_name) = &fro.first_name {
             val.first_name = Set(first_name.into());

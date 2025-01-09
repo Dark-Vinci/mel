@@ -12,7 +12,14 @@ pub enum GrpcError {
 }
 
 #[derive(Debug, Error)]
+pub enum ConnectionError {
+    #[error("DB connection error")]
+    DB(String),
+}
+
+#[derive(Debug, Error)]
 pub enum RepoError {
+    #[error("Duplicate key")]
     DuplicateKey,
 
     #[error("invalid model")]
@@ -24,5 +31,6 @@ pub enum RepoError {
     #[error("something went wrong")]
     SomethingWentWrong,
 
+    #[error("Fail to update")]
     FailedToUpdate,
 }

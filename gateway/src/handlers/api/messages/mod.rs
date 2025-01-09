@@ -5,7 +5,7 @@ use {
         response::IntoResponse,
         routing::{get, post},
         Router,
-    }
+    },
 };
 
 pub fn router(state: &AppState) -> Router {
