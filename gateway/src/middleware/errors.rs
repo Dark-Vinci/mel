@@ -1,6 +1,7 @@
 use {
-    axum::{http::StatusCode, response::IntoResponse},
+    axum::http::StatusCode,
     serde::Serialize,
+    uuid::Uuid,
 };
 
 #[derive(Clone, Debug, Serialize)]
@@ -26,13 +27,5 @@ impl ApiError {
             request_id,
             timestamp: ts,
         }
-    }
-}
-
-impl IntoResponse for ApiError {
-    fn into_response(self) -> axum::response::Response {
-        let serialized = serde_json::to_string(&self).unwrap(); // todo: solve the lint error
-
-        (self.status_code, axum::Json(payload)).into_response()
     }
 }

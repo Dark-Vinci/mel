@@ -3,7 +3,7 @@ use {
         body::{Body, Bytes},
         extract::Request,
         http::StatusCode,
-        middleware::{self, Next},
+        middleware::Next,
         response::{IntoResponse, Response},
     },
     sdk::constants::REQUEST_ID,
