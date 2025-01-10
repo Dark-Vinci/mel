@@ -11,7 +11,7 @@ use {
     },
     std::{env, net::SocketAddr, panic},
     tonic::transport::Server,
-    tracing::{debug, info},
+    tracing::info,
     tracing_appender::rolling,
     tracing_core::LevelFilter,
     tracing_subscriber::{fmt::writer::MakeWriterExt, EnvFilter},

@@ -3,9 +3,8 @@ use {
     sdk::{constants::Environment, errors::ConnectionError, utils::utility},
     sea_orm::{ConnectOptions, Database, DatabaseConnection},
     sea_orm_migration::MigratorTrait,
-    std::{rc::Rc, time::Duration},
-    tokio::{runtime, task},
-    tracing::{debug, error, info, log::LevelFilter},
+    std::time::Duration,
+    tracing::{debug, error, log::LevelFilter},
     uuid::Uuid,
 };
 
