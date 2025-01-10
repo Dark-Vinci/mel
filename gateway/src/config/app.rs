@@ -1,5 +1,4 @@
-use std::env;
-use sdk::constants::constant::PORT;
+use {sdk::constants::constant::PORT, std::env};
 
 #[derive(Debug, Clone)]
 pub struct App {

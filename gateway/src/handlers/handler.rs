@@ -1,6 +1,6 @@
 use {
     crate::{
-        app::{App, AppInterface},
+        app::{app::App, interfaces::AppInterface},
         handlers::{api, ws::ws::WebsocketHandler},
     },
     axum::{http::Method, Router},

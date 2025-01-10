@@ -1,9 +1,10 @@
-use sea_orm::ActiveValue::Set;
 use {
-    sea_orm::entity::prelude::*,
+    crate::models::others::auth::create::{
+        CreateUserRequest, UpdateUserRequest,
+    },
+    sea_orm::{entity::prelude::*, ActiveValue::Set},
     serde::{Deserialize, Serialize},
 };
-use crate::models::others::auth::create::{CreateUserRequest, UpdateUserRequest};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -52,14 +53,15 @@ impl From<CreateUserRequest> for ActiveModel {
 
 impl From<UpdateUserRequest> for ActiveModel {
     fn from(fro: UpdateUserRequest) -> Self {
-        let mut val: ActiveModel = Self{..Default::default()};
+        let mut val: ActiveModel = Self {
+            ..Default::default()
+        };
 
         if let Some(first_name) = &fro.first_name {
             val.first_name = Set(first_name.into());
         }
 
         // todo: fill other fields
-
 
         val
     }

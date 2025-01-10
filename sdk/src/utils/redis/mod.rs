@@ -1,8 +1,8 @@
-use mockall::automock;
-use tonic::async_trait;
 use {
+    mockall::automock,
     redis::{AsyncCommands, Client},
     tokio::sync::mpsc::Sender,
+    tonic::async_trait,
 };
 
 pub struct MyRedis {

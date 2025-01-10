@@ -1,12 +1,17 @@
-use serde::Deserialize;
-use serde_json::json;
-// use uuid::Uuid;
 use {
-    uuid::Uuid,
     argon2::{
         password_hash::SaltString, Algorithm, Argon2, Params, PasswordHash,
         PasswordVerifier, Version,
     },
+    serde::Deserialize,
+    serde_json::json,
+    std::time::Duration,
+    tokio::{
+        select,
+        signal::{ctrl_c, unix},
+        time,
+    },
+    uuid::Uuid,
 };
 
 pub fn compute_password_hash(password: String) -> Result<String, String> {
@@ -46,15 +51,11 @@ pub fn compare_password(expected: &str, password: String) -> bool {
 }
 
 pub fn sqlite_test_document(id: Uuid) -> String {
-    return format!("sqlite://tests/sqlite/tests-{id}.sqlite?mode=rwc");
+    format!("sqlite://tests/sqlite/tests-{id}.sqlite?mode=rwc")
 }
 
-pub use tokio::{select, signal::{ctrl_c, unix}};
-
 pub async fn graceful_shutdown() {
-
-    let ctr_l =
-        async { ctrl_c().await.expect("FAILED TO HANDLE CONTROL C") };
+    let ctr_l = async { ctrl_c().await.expect("FAILED TO HANDLE CONTROL C") };
 
     #[cfg(unix)]
     let terminate = async {
@@ -67,9 +68,12 @@ pub async fn graceful_shutdown() {
     #[cfg(not(unix))]
     let terminate = future::pending::<()>();
 
-    tokio::select! {
+    select! {
         _ = ctr_l => {},
         _ = terminate => {},
+        _ = time::sleep(Duration::from_secs(30)) => {
+            println!("Timed out waiting for shutdown signal, forcing shutdown...");
+        }
     }
 
     println!("SIGNAL RECEIVED🚨: Handling graceful shutdown🛑 server🦾")

@@ -1,5 +1,4 @@
-use chrono::Utc;
-use sea_orm::prelude::DateTime;
+use {chrono::Utc, sea_orm::prelude::DateTime};
 
 #[derive(Debug)]
 pub struct CreateUserRequest {

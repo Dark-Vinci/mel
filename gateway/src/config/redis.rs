@@ -1,5 +1,9 @@
-use std::env;
-use sdk::constants::constant::{REDIS_HOST, REDIS_NAME, REDIS_PASSWORD, REDIS_PORT, REDIS_USERNAME};
+use {
+    sdk::constants::constant::{
+        REDIS_HOST, REDIS_NAME, REDIS_PASSWORD, REDIS_PORT, REDIS_USERNAME,
+    },
+    std::env,
+};
 
 #[derive(Debug, Clone)]
 pub struct Redis {

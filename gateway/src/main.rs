@@ -3,21 +3,34 @@ use {
         app::app::App, config::config::Config, handlers::handler::Handlers,
     },
     panic::set_hook,
-    sdk::constants::constant::LOCAL_HOST,
-    std::{net::SocketAddr, panic},
+    sdk::{
+        constants::constant::{
+            LAGOS_TIME, LOCAL_HOST, LOG_DIR, LOG_FILE_NAME,
+            LOG_WARNING_FILE_NAME, TIME_ZONE,
+        },
+        errors::AppError,
+        utils::utility::graceful_shutdown,
+    },
+    std::{env, net::SocketAddr, panic},
     tokio::net::TcpListener,
     tracing::level_filters::LevelFilter,
-    tracing_subscriber::EnvFilter,
+    tracing_appender::rolling,
+    tracing_subscriber::{fmt::writer::MakeWriterExt, EnvFilter},
 };
 
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), AppError> {
+    env::set_var(TIME_ZONE, LAGOS_TIME);
+
+    let debug_logger = rolling::never(LOG_DIR, LOG_FILE_NAME);
+    let warning_error_logger = rolling::never(LOG_DIR, LOG_WARNING_FILE_NAME);
+
     let file_writer = debug_logger.and(warning_error_logger);
 
     let filter = EnvFilter::builder()
         .with_default_directive(LevelFilter::INFO.into())
         .from_env()?
-        .add_directive("auth=debug".parse()?);
+        .add_directive("gateway=debug".parse()?);
 
     tracing_subscriber::fmt()
         .pretty()
@@ -55,7 +68,13 @@ async fn main() {
 
     let listener = TcpListener::bind(addr).await.unwrap();
 
-    if let Ok(res) = axum::serve(listener, handlers).await {
+    if let Ok(_res) = axum::serve(listener, handlers)
+        .with_graceful_shutdown(graceful_shutdown())
+        .await
+    {
         tracing::info!("Application listening on {}", addr);
+        return Ok(());
     }
+
+    Err("Server failed to start.".into())
 }

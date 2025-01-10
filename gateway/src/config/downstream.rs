@@ -1,5 +1,7 @@
-use std::env;
-use sdk::constants::constant::{ACCOUNT_URL, MESSAGE_URL};
+use {
+    sdk::constants::constant::{ACCOUNT_URL, MESSAGE_URL},
+    std::env,
+};
 
 #[derive(Debug, Clone)]
 pub struct Downstream {

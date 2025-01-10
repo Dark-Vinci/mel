@@ -19,6 +19,7 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 uuid = { version = "1.11.0", features = ["v4"] }
 sdk ={ path = "../sdk" }
+tracing-appender = "0.2.3"
 
 [[bin]]
 name = "gateway"

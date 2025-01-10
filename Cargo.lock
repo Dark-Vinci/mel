@@ -1001,6 +1001,7 @@ dependencies = [
  "tokio-tungstenite",
  "tower-http",
  "tracing",
+ "tracing-appender",
  "tracing-subscriber",
  "uuid",
 ]
