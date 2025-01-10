@@ -1,5 +1,4 @@
 use {
-    crate::errors::GatewayError,
     axum::http,
     serde::{Deserialize, Serialize},
 };

@@ -9,7 +9,6 @@ use {
         routing::any,
         Router,
     },
-    futures_util::StreamExt,
     sdk::utils::redis::MyRedis,
     uuid::Uuid,
 };

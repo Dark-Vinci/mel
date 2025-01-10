@@ -7,7 +7,6 @@ use {
     sdk::utils::redis::{MyRedis, RedisInterface},
 };
 
-#[derive(Clone, Debug)]
 pub struct App {
     config: Config,
     downstream: Box<dyn DownstreamOperations>,

@@ -7,7 +7,6 @@ use {
     tower_http::cors::{Any, CorsLayer},
 };
 
-#[derive(Clone)]
 pub struct AppState {
     pub app: Box<dyn AppInterface + Send + Sync>,
 }

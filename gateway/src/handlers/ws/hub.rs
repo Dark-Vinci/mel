@@ -10,11 +10,10 @@ use {
     },
     serde_json::json,
     std::collections::HashMap,
-    tokio::sync::{broadcast, mpsc, Mutex},
+    tokio::sync::{broadcast, mpsc},
     uuid::Uuid,
 };
 
-#[derive(Debug)]
 pub struct Hub<'a> {
     pub users: HashMap<String, &'a Client>, // userid, client
     pub app: Box<dyn AppInterface>,
@@ -91,7 +90,7 @@ impl<'a> Hub<'a> {
 
             let message: MessageType = serde_json::from_value(j).unwrap();
 
-            self.broadcast.send(message).await;
+            self.broadcast.send(message);
         }
     }
 
@@ -100,6 +99,6 @@ impl<'a> Hub<'a> {
         self.users.remove(&id.to_string());
 
         // remove from redis //todo: implement exponential backoff
-        self.redis.delete(id.to_string())
+        self.redis.delete(id.to_string()).await;
     }
 }

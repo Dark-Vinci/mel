@@ -5,13 +5,12 @@ use {
         SinkExt, StreamExt,
     },
     serde::{Deserialize, Serialize},
-    std::any::Any,
     tokio::sync::{broadcast, mpsc},
     tracing::info,
     uuid::Uuid,
 };
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct MessageType {
     content: String,
     to_user: String,
@@ -59,12 +58,12 @@ impl Client {
     pub async fn read_pump(&mut self) {
         while let Some(Ok(message)) = self.receiver.next().await {
             match message {
-                Message::Ping(()) => {
-                    info!("Received a Ping from user socket");
+                Message::Ping(a) => {
+                    info!("Received a Ping from user socket, {:?}", a);
                 },
 
-                Message::Pong(()) => {
-                    info!("Received a Pong from user socket");
+                Message::Pong(a) => {
+                    info!("Received a Pong from user socket, {:?}", a);
                 },
 
                 Message::Text(text) => {
