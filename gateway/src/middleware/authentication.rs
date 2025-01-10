@@ -1,16 +1,16 @@
 use {
     super::errors::ApiError,
     axum::{
-        extract::Extension,
         http::{Request, StatusCode},
         middleware::Next,
         response::Response,
     },
 };
+use sdk::constants::REQUEST_ID;
 
 async fn auth_middleware<B>(
     mut req: Request<B>,
-    next: Next<B>,
+    next: Next,
 ) -> Result<Response, ApiError> {
     let id = req.headers().get(REQUEST_ID).unwrap().to_str().unwrap();
 
@@ -50,10 +50,14 @@ async fn auth_middleware<B>(
         }
     }
 
-    return Err(ApiError::new(
+    Err(ApiError::new(
         StatusCode::BAD_REQUEST,
         "token invalid".into(),
         id,
         "ts".into(),
-    ));
+    ))
+}
+
+fn decode_jwt(token: &str) -> Result<String, ApiError> {
+    todo!()
 }

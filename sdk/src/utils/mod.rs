@@ -4,3 +4,4 @@
 // pub mod redis;
 pub mod redis;
 pub mod utility;
+pub mod error;

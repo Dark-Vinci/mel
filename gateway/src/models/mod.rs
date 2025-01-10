@@ -24,12 +24,13 @@ struct WsRequest<T: Clone> {
 }
 
 #[derive(Debug, Clone)]
-struct Message {
+struct Message<'a> {
     pub content: String,
     pub to: Type,
-    pub files: Vec<&str>,
+    pub files: Vec<&'a str>,
 }
 
+#[derive(Debug, Clone)]
 enum Type {
     // user id
     Private(String),
@@ -42,7 +43,7 @@ struct WsResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Response<T: serde::ser::Serialize> {
+pub struct Response<T: Serialize> {
     data: Option<T>,
     message: String,
     status_code: http::StatusCode,
@@ -50,13 +51,12 @@ pub struct Response<T: serde::ser::Serialize> {
     timestamp: std::time::SystemTime,
 }
 
-impl<T> Response<T> {
+impl<T: Serialize> Response<T> {
     fn new(
         data: Option<T>,
         stat_code: http::StatusCode,
         request_id: uuid::Uuid,
         message: String,
-        error: Option<GatewayError>,
     ) -> Self<T> {
         if data.is_none() {
             return Self {
@@ -70,7 +70,6 @@ impl<T> Response<T> {
 
         Self {
             data,
-            // error: None,
             message,
             status_code: stat_code,
             request_id: request_id.to_string(),

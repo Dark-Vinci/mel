@@ -3,11 +3,9 @@ use {
         password_hash::SaltString, Algorithm, Argon2, Params, PasswordHash,
         PasswordVerifier, Version,
     },
-    serde::Deserialize,
-    serde_json::json,
-    std::time::Duration,
+    serde::{de, Deserialize, Deserializer},
+    std::{fmt, str::FromStr, time::Duration},
     tokio::{
-        select,
         signal::{ctrl_c, unix},
         time,
     },
@@ -68,7 +66,7 @@ pub async fn graceful_shutdown() {
     #[cfg(not(unix))]
     let terminate = future::pending::<()>();
 
-    select! {
+    tokio::select! {
         _ = ctr_l => {},
         _ = terminate => {},
         _ = time::sleep(Duration::from_secs(30)) => {
@@ -79,12 +77,15 @@ pub async fn graceful_shutdown() {
     println!("SIGNAL RECEIVED🚨: Handling graceful shutdown🛑 server🦾")
 }
 
-pub fn deserialize<T: Deserialize>(msg: Vec<u8>) -> T {
-    let str = String::from_utf8(msg).unwrap();
-
-    let j = json!(str);
-
-    let message: T = serde_json::from_value(j).unwrap();
-
-    message
+pub fn empty_string_as_none<'de, D, T>(de: D) -> Result<Option<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: FromStr,
+    T::Err: fmt::Display,
+{
+    let opt = Option::<String>::deserialize(de)?;
+    match opt.as_deref() {
+        None | Some("") => Ok(None),
+        Some(s) => FromStr::from_str(s).map_err(de::Error::custom).map(Some),
+    }
 }

@@ -1,6 +1,6 @@
 use {
     crate::{
-        app::AppInterface,
+        app::interfaces::AppInterface,
         handlers::{handler::AppState, ws::hub::Hub},
     },
     axum::{
@@ -19,7 +19,7 @@ pub struct WebsocketHandler<'a> {
     state: AppState,
 }
 
-impl WebsocketHandler {
+impl<'a> WebsocketHandler<'a> {
     pub fn new(
         app: Box<dyn AppInterface>,
         red: MyRedis,

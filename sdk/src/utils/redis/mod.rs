@@ -1,6 +1,7 @@
+use tokio::task;
+use tonic::codegen::tokio_stream::StreamExt;
 use {
-    mockall::automock,
-    redis::{AsyncCommands, Client},
+    redis::{AsyncCommands, Client, RedisResult},
     tokio::sync::mpsc::Sender,
     tonic::async_trait,
 };
@@ -12,9 +13,13 @@ pub struct MyRedis {
 #[async_trait]
 pub trait RedisInterface {
     async fn subscribe(&self, sender: Sender<Vec<u8>>, channel: &str);
-    async fn publish(&self, chan: String, message: String);
+    async fn publish(
+        &self,
+        chan: String,
+        message: String,
+    ) -> Result<(), String>;
     async fn delete(&self, key: String) -> bool;
-    async fn get_value(&self, key: String) -> &[u8];
+    async fn get_value(&self, key: String) -> Result<String, String>;
     async fn set_value(
         &self,
         key: String,
@@ -35,23 +40,32 @@ impl MyRedis {
             username, password, host, port, db
         );
 
-        let mut conn = redis::Client::open(connection_string).unwrap();
+        let conn = Client::open(connection_string).unwrap();
+
+        // let pool = r2d2::Pool::builder().build(conn).unwrap();
+
+        // let mut r2_conn = pool.get().unwrap();
 
         Self { client: conn }
     }
 }
 
+#[async_trait]
 impl RedisInterface for MyRedis {
     async fn subscribe(&self, sender: Sender<Vec<u8>>, channel: &str) {
-        let config =
-            redis::AsyncConnectionConfig::new().set_push_sender(sender);
-        let mut con = self
-            .client
-            .get_multiplexed_async_connection_with_config(&config)
-            .await
-            .unwrap();
+        let mut pub_sub = self.client.get_async_pubsub().await.unwrap();
 
-        con.subscribe(channel).await.unwrap();
+        pub_sub.subscribe(channel).await.expect("TODO: panic message");
+
+        task::spawn(async move {
+            let mut message_stream = pub_sub.on_message();
+
+            while let Some(msg) = message_stream.next().await {
+                let payload = msg.get_payload().unwrap();
+                println!("Received message: {:?}", payload);
+                sender.send(payload).await.unwrap();
+            }
+        });
     }
 
     async fn publish(
@@ -59,22 +73,30 @@ impl RedisInterface for MyRedis {
         chan: String,
         message: String,
     ) -> Result<(), String> {
-        let mut con = self
+        let mut connection = self.client.get_multiplexed_async_connection().await.unwrap();
+
+        let _result: usize = connection.publish(chan, message).await.unwrap();
+
+        Ok(())
+    }
+
+    async fn delete(&self, key: String) -> bool {
+        let mut result = self
             .client
             .get_multiplexed_async_connection()
             .await
             .unwrap();
 
-        let res = con.publish(chan, message).await;
+        let res: RedisResult<()> = result.del(key).await;
 
-        if let Err(e) = res {
-            return Err(e.to_string());
+        if let Err(_err) = res {
+            return false;
         }
 
-        Ok(())
+        true
     }
 
-    async fn get_value(&self, key: String) -> String {
+    async fn get_value(&self, key: String) -> Result<String, String> {
         let mut result = self
             .client
             .get_multiplexed_async_connection()
@@ -85,10 +107,10 @@ impl RedisInterface for MyRedis {
 
         if let Err(err) = res {
             println!("Failed to get value: {}", err);
-            return err.to_string();
+            return Err(err.to_string());
         }
 
-        res.unwrap()
+        Ok(res.unwrap())
     }
 
     async fn set_value(
@@ -102,29 +124,13 @@ impl RedisInterface for MyRedis {
             .await
             .unwrap();
 
-        let res = result.set(key, message).await;
+        let res: RedisResult<()> = result.set(key, message).await;
 
-        if let Err(err) = result {
+        if let Err(err) = res {
             println!("Failed to get value: {}", err);
-            return Err("failed".into());
+            return Err(err.to_string());
         }
 
         Ok(())
-    }
-
-    async fn delete(&self, key: String) -> bool {
-        let mut result = self
-            .client
-            .get_multiplexed_async_connection()
-            .await
-            .unwrap();
-
-        let res = result.del(key).await;
-
-        if let Err(err) = res {
-            return false;
-        }
-
-        true
     }
 }

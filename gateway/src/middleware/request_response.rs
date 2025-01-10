@@ -1,12 +1,15 @@
-use axum::{
-    body::{Body, Bytes},
-    extract::Request,
-    http::StatusCode,
-    middleware::{self, Next},
-    response::IntoResponse,
+use {
+    axum::{
+        body::{Body, Bytes},
+        extract::Request,
+        http::StatusCode,
+        middleware::{self, Next},
+        response::{IntoResponse, Response},
+    },
+    sdk::constants::REQUEST_ID,
 };
 
-const REQUEST: &'static str = "requesst";
+const REQUEST: &'static str = "request";
 const RESPONSE: &'static str = "response";
 
 pub async fn handle_print_request_response(
@@ -17,7 +20,7 @@ pub async fn handle_print_request_response(
     let (part, body) = req.into_parts();
 
     let bytes = get_bytes(REQUEST, body, id).await;
-    let req = Request::from_parts(parts, Body::from(bytes));
+    let req = Request::from_parts(part, Body::from(bytes));
 
     let res = next.run(req).await;
 

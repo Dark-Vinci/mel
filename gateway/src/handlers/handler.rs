@@ -9,7 +9,7 @@ use {
 
 #[derive(Clone)]
 pub struct AppState {
-    pub app: Box<dyn AppInterface>,
+    pub app: Box<dyn AppInterface + Send + Sync>,
 }
 
 impl AppState {

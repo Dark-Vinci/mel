@@ -1,17 +1,14 @@
 use {
     crate::{
-        app::AppInterface,
+        app::interfaces::AppInterface,
         handlers::ws::client::{Client, MessageType},
     },
     axum::extract::ws::WebSocket,
     sdk::{
         constants::constant::WS_CHANNEL,
-        utils::{
-            redis::{MyRedis, RedisInterface},
-            utility::deserialize,
-        },
+        utils::redis::{MyRedis, RedisInterface},
     },
-    serde::Deserialize,
+    serde_json::json,
     std::collections::HashMap,
     tokio::sync::{broadcast, mpsc, Mutex},
     uuid::Uuid,
@@ -29,7 +26,7 @@ pub struct Hub<'a> {
     pub client_listener_receiver: mpsc::Receiver<MessageType>,
 }
 
-impl Hub {
+impl<'a> Hub<'a> {
     pub fn new(red: MyRedis, app: Box<dyn AppInterface>) -> Self {
         let (tx_message, mut rx_message) = broadcast::channel(10000);
         let (abc, mut bca) = mpsc::channel(10000);
@@ -88,7 +85,12 @@ impl Hub {
         self.redis.subscribe(a, WS_CHANNEL).await;
 
         while let Some(msg) = b.recv().await {
-            let message = deserialize::<MessageType>(msg);
+            let str = String::from_utf8(msg).unwrap();
+
+            let j = json!(str);
+
+            let message: MessageType = serde_json::from_value(j).unwrap();
+
             self.broadcast.send(message).await;
         }
     }

@@ -2,7 +2,7 @@
 resolver = "2"
 members = [ "account",
     "gateway",
-    "sdk", "ui",
+    "sdk",
 ]
 
 #[workspace]

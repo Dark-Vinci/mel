@@ -2,12 +2,12 @@ use {
     super::errors::ApiError,
     axum::{
         async_trait,
-        extract::{FromRequestParts, Query},
+        extract::{FromRequest, FromRequestParts, Path, Query, Request},
         http::{request::Parts, StatusCode},
         response::Json as Rson,
         Json,
     },
-    sdk::utils::error::collect_error,
+    sdk::{constants::REQUEST_ID, utils::error::collect_error},
     serde::de::DeserializeOwned,
     std::str::FromStr,
     uuid::Uuid,
@@ -29,7 +29,7 @@ where
         parts: &mut Parts,
         state: &K,
     ) -> Result<Self, Self::Rejection> {
-        let id = req.headers().get(REQUEST_ID).unwrap().to_str().unwrap();
+        let id = parts.headers.get(REQUEST_ID).unwrap().to_str().unwrap();
         let id = Uuid::from_str(id).unwrap();
 
         let query_res = Query::<T>::from_request_parts(parts, state).await;
@@ -42,7 +42,7 @@ where
                 id,
                 "2025".into(),
             ); //todo: update
-            return Err(apiError);
+            return Err(api_error);
         }
 
         let Query(query_res) = query_res.unwrap();
@@ -55,7 +55,7 @@ where
                 id,
                 "2025".into(),
             ); //todo: same here
-            return Err(apiError);
+            return Err(api_error);
         }
 
         Ok(QueryValidator(query_res))
@@ -76,7 +76,7 @@ where
         parts: &mut Parts,
         state: &K,
     ) -> Result<Self, Self::Rejection> {
-        let id = req.headers().get(REQUEST_ID).unwrap().to_str().unwrap();
+        let id = parts.headers.get(REQUEST_ID).unwrap().to_str().unwrap();
         let id = Uuid::from_str(id).unwrap();
 
         let param_res = Path::<T>::from_request_parts(parts, state).await;
@@ -89,7 +89,7 @@ where
                 id,
                 "2025".into(),
             ); //todo: same here
-            return Err(apiError);
+            return Err(api_error);
         }
 
         let Path(param_res) = param_res.unwrap();
@@ -102,7 +102,7 @@ where
                 id,
                 "2025".into(),
             ); //todo: same here
-            return Err(apiError);
+            return Err(api_error);
         }
 
         Ok(ParamValidator(param_res))
