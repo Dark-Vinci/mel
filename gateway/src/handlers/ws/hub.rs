@@ -41,9 +41,9 @@ impl<'a> Hub<'a> {
             app,
         };
 
-        tokio::spawn(Box::pin(async move {
+        tokio::spawn(async move {
             hub.subscribe().await;
-        }));
+        });
 
         hub
     }

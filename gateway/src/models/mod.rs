@@ -1,7 +1,4 @@
-use {
-    axum::http,
-    serde::{Deserialize, Serialize},
-};
+pub mod response;
 
 #[derive(Debug)]
 pub struct LoginStruct {
@@ -39,40 +36,4 @@ enum Type {
 
 struct WsResponse {
     message: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Response<T: Serialize> {
-    data: Option<T>,
-    message: String,
-    status_code: http::StatusCode,
-    request_id: String,
-    timestamp: std::time::SystemTime,
-}
-
-impl<T: Serialize> Response<T> {
-    fn new(
-        data: Option<T>,
-        stat_code: http::StatusCode,
-        request_id: uuid::Uuid,
-        message: String,
-    ) -> Self<T> {
-        if data.is_none() {
-            return Self {
-                data: None,
-                message,
-                status_code: stat_code,
-                request_id: request_id.into(),
-                timestamp: std::time::SystemTime::now(),
-            };
-        }
-
-        Self {
-            data,
-            message,
-            status_code: stat_code,
-            request_id: request_id.to_string(),
-            timestamp: std::time::SystemTime::now(),
-        }
-    }
 }

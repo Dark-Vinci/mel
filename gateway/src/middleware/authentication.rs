@@ -5,8 +5,8 @@ use {
         middleware::Next,
         response::Response,
     },
+    sdk::constants::REQUEST_ID,
 };
-use sdk::constants::REQUEST_ID;
 
 async fn auth_middleware<B>(
     mut req: Request<B>,
