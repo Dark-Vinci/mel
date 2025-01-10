@@ -1,56 +1,52 @@
 use {
-    crate::handlers::{ws::hub::Hub, AppState},
+    crate::{
+        app::AppInterface,
+        handlers::ws::hub::Hub,
+    },
     axum::{
         extract::{
-            ws::{Message, WebSocket},
-            State, WebSocketUpgrade,
+            ws::WebSocket,
+            WebSocketUpgrade,
         },
         response::IntoResponse,
         routing::any,
         Router,
     },
-    futures_util::{SinkExt, StreamExt},
-    serde::{Deserialize, Serialize},
-    std::collections::HashMap,
-    tokio::sync::broadcast,
+    futures_util::StreamExt,
+    sdk::utils::redis::MyRedis,
     uuid::Uuid,
 };
+use crate::handlers::handler::AppState;
 
-#[derive(Debug, Clone)]
-enum Actions {
-    Scream,
-    Chat,
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone)]
-struct UserMessage {
-    user_id: String,
-    to_user: String,
-    content: String,
-    action: Actions,
-}
-
-pub fn handler(state: &AppState) -> Router {
-    Router::new().route("/", any(ws_handler)).with_state(state)
-}
-
-pub struct WebsocketHandler {
-    hub: Hub,
+pub struct WebsocketHandler<'a> {
+    hub: Hub<'a>,
+    state: AppState,
 }
 
 impl WebsocketHandler {
-    pub fn new() -> Self {
-        Self { hub: Hub::new() }
+    pub fn new(
+        app: Box<dyn AppInterface>,
+        red: MyRedis,
+        state: AppState,
+    ) -> Self {
+        Self {
+            hub: Hub::new(red, app),
+            state,
+        }
     }
 
-    // async fn ws_handler(&self, ws: WebSocketUpgrade, State(app): State<AppState>) -> impl IntoResponse {
-    //
-    //     let a = self.c
-    //
-    //     ws.on_upgrade(move |socket| {
-    //
-    //     })
-    // }
+    fn w_handler(&mut self, ws: WebSocketUpgrade) -> impl IntoResponse {
+        ws.on_upgrade(|ws| {
+            async move {
+                self.handle_message(ws).await;
+            }
+        })
+    }
+
+    pub fn build(&mut self) -> Router {
+        Router::new()
+            .route("/", any(Self::w_handler).with_state(self.state.clone()))
+    }
 
     async fn handle_message(&mut self, ws: WebSocket) {
         self.hub.register_client(ws, Uuid::new_v4()).await;

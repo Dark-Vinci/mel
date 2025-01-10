@@ -1,4 +1,4 @@
-mod app;
+pub mod app;
 mod config;
 mod downstream;
 pub mod errors;

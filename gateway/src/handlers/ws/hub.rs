@@ -1,6 +1,6 @@
 use {
     crate::{
-        app::App,
+        app::AppInterface,
         handlers::ws::client::{Client, MessageType},
     },
     axum::extract::ws::WebSocket,
@@ -12,16 +12,15 @@ use {
         },
     },
     serde::Deserialize,
-    serde_json::json,
     std::collections::HashMap,
     tokio::sync::{broadcast, mpsc, Mutex},
     uuid::Uuid,
 };
 
 #[derive(Debug)]
-pub struct Hub {
-    pub users: Mutex<HashMap<String, Client>>, // userid, client
-    pub app: App,
+pub struct Hub<'a> {
+    pub users: HashMap<String, &'a Client>, // userid, client
+    pub app: Box<dyn AppInterface>,
     pub broadcast: broadcast::Sender<MessageType>,
     pub broadcast_receiver: broadcast::Receiver<MessageType>,
     pub register: mpsc::Receiver<Client>,
@@ -35,7 +34,7 @@ pub struct Hub {
 }
 
 impl Hub {
-    pub fn new(red: MyRedis, app: App) -> Self {
+    pub fn new(red: MyRedis, app: Box<dyn AppInterface>) -> Self {
         let (tx_register, mut rx_register) = mpsc::channel(100);
         let (tx_un_register, mut rx_un_register) = mpsc::channel(100);
         let (tx_message, mut rx_message) =
@@ -43,7 +42,7 @@ impl Hub {
         let (abc, mut bca) = mpsc::channel(10000);
 
         let n = Self {
-            users: Mutex::new(HashMap::new()),
+            users: HashMap::new(),
             redis: Box::new(red),
             server_name: Uuid::new_v4(),
             register: rx_register,
@@ -73,10 +72,7 @@ impl Hub {
         );
 
         // insert into memory DB
-        self.users
-            .lock()
-            .await
-            .insert(client.user_id.to_string(), client);
+        self.users.insert(client.user_id.to_string(), &client);
 
         let server_name = self.server_name.clone().to_string();
 
@@ -87,18 +83,14 @@ impl Hub {
             .unwrap();
 
         // start reading message from the client
-        tokio::spawn(async move {
+        tokio::spawn(async {
             client.read_pump().await;
-        })
-        .await
-        .expect("TODO: panic message");
+        });
 
         // start writing message to the client
-        tokio::spawn(async move {
+        tokio::spawn(async {
             client.write_pump().await;
-        })
-        .await
-        .expect("TODO: panic message");
+        });
     }
 
     async fn subscribe(&self) {
@@ -112,9 +104,9 @@ impl Hub {
         }
     }
 
-    async fn remove_client(&self, id: &Uuid) {
+    async fn remove_client(&mut self, id: &Uuid) {
         // remove from connection hub
-        self.users.lock().await.remove(&id.to_string());
+        self.users.remove(&id.to_string());
 
         // remove from redis //todo: implement exponential backoff
         self.redis.delete(id.to_string())

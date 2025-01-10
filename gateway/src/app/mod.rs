@@ -1,18 +1,18 @@
 use {
     crate::{config, downstream::Downstream},
     axum::async_trait,
-    sdk::utils::redis::{MyRedis, MyRedisImpl},
+    sdk::utils::redis::{MyRedis, RedisInterface},
 };
 
 #[derive(Clone, Debug)]
 pub struct App {
     config: config::ApplicationConfig,
     downstream: Downstream,
-    redis: Box<dyn MyRedisImpl>,
+    redis: Box<dyn RedisInterface>,
 }
 
 impl App {
-    async fn new() -> Self {
+    pub async fn new() -> Self {
         let r = MyRedis::new("url".into(), "".to_string()).await;
 
         Self {
@@ -23,25 +23,9 @@ impl App {
     }
 }
 
-impl Account for App {
-    async fn get_user_by_id(&self, id: String) -> Self {
-        let a = self.redis.get_value(id).await;
+impl Account for App {}
 
-        "this is the string".into()
-    }
-}
+pub trait AppInterface: Account {}
 
 #[async_trait]
-pub trait Account {
-    async fn get_user_by_id(&self, id: String) -> String;
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn app() {
-        let app = App::new();
-        app.get_user_by_id("21".into())
-    }
-}
+pub trait Account {}

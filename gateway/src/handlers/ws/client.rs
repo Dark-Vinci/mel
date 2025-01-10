@@ -1,12 +1,11 @@
 use {
-    crate::handlers::ws::UserMessage,
     axum::extract::ws::{Message, WebSocket},
     futures_util::{
         stream::{SplitSink, SplitStream},
         SinkExt, StreamExt,
     },
     serde::{Deserialize, Serialize},
-    std::{any::Any, ascii::AsciiExt},
+    std::any::Any,
     tokio::sync::{broadcast, mpsc},
     tracing::info,
     uuid::Uuid,
@@ -59,9 +58,15 @@ impl Client {
     // read from client, the will be sent to hub to be broadcasted
     pub async fn read_pump(&mut self) {
         while let Some(Ok(message)) = self.receiver.next().await {
-            info!("Received a message from user socket");
-
             match message {
+                Message::Ping(()) => {
+                    info!("Received a Ping from user socket");
+                },
+
+                Message::Pong(()) => {
+                    info!("Received a Pong from user socket");
+                },
+
                 Message::Text(text) => {
                     let ser_msg =
                         serde_json::from_str::<MessageType>(&text).unwrap();
