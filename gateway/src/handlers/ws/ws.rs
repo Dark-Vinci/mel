@@ -1,13 +1,10 @@
 use {
     crate::{
         app::AppInterface,
-        handlers::ws::hub::Hub,
+        handlers::{handler::AppState, ws::hub::Hub},
     },
     axum::{
-        extract::{
-            ws::WebSocket,
-            WebSocketUpgrade,
-        },
+        extract::{ws::WebSocket, WebSocketUpgrade},
         response::IntoResponse,
         routing::any,
         Router,
@@ -16,7 +13,6 @@ use {
     sdk::utils::redis::MyRedis,
     uuid::Uuid,
 };
-use crate::handlers::handler::AppState;
 
 pub struct WebsocketHandler<'a> {
     hub: Hub<'a>,

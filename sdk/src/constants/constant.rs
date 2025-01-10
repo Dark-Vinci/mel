@@ -19,5 +19,9 @@ pub const REDIS_PORT: &str = "REDIS_PORT";
 pub const REDIS_NAME: &str = "REDIS_NAME";
 
 pub const ACCOUNT_PORT: &str = "ACCOUNT_PORT";
+pub const PORT: &str = "PORT";
 pub const ACCOUNT: &str = "ACCOUNT";
 pub const WS_CHANNEL: &str = "WS_CHANNEL";
+
+pub const ACCOUNT_URL: &str = "ACCOUNT_URL";
+pub const MESSAGE_URL: &str = "MESSAGE_URL";

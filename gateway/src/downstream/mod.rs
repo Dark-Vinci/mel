@@ -6,3 +6,7 @@ impl Downstream {
         Downstream {}
     }
 }
+
+impl DownstreamOperations for Downstream {}
+
+pub trait DownstreamOperations {}

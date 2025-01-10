@@ -1,5 +1,5 @@
 pub mod app;
-mod config;
+pub mod config;
 mod downstream;
 pub mod errors;
 pub mod handlers;

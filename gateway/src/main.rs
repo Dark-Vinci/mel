@@ -1,7 +1,11 @@
 use {
-    gateway::{app::App, handlers::handler::Handlers},
+    gateway::{
+        app::app::App, config::config::Config, handlers::handler::Handlers,
+    },
     panic::set_hook,
+    sdk::constants::constant::LOCAL_HOST,
     std::{net::SocketAddr, panic},
+    tokio::net::TcpListener,
     tracing::level_filters::LevelFilter,
     tracing_subscriber::EnvFilter,
 };
@@ -39,13 +43,17 @@ async fn main() {
         }
     }));
 
-    let app = App::new().await;
+    let config = Config::new();
+
+    let app = App::new(config.clone()).await;
 
     let handlers = Handlers::build(app);
 
-    let addr = format!("0.0.0.0:{}", 3000).parse::<SocketAddr>().unwrap();
+    let addr = format!("{}:{}", LOCAL_HOST, config.app.port)
+        .parse::<SocketAddr>()
+        .unwrap();
 
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    let listener = TcpListener::bind(addr).await.unwrap();
 
     if let Ok(res) = axum::serve(listener, handlers).await {
         tracing::info!("Application listening on {}", addr);

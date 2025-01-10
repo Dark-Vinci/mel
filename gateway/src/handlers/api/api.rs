@@ -2,7 +2,7 @@ use {
     crate::{
         handlers::{
             api::{auth, messages},
-            AppState,
+            handler::AppState,
         },
         middleware::{
             request_id::append_request_id,

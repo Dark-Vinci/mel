@@ -23,10 +23,6 @@ pub struct Hub<'a> {
     pub app: Box<dyn AppInterface>,
     pub broadcast: broadcast::Sender<MessageType>,
     pub broadcast_receiver: broadcast::Receiver<MessageType>,
-    pub register: mpsc::Receiver<Client>,
-    pub register_sender: mpsc::Sender<Client>,
-    pub unregister: mpsc::Receiver<Client>, //change to uuid string
-    pub unregister_sender: mpsc::Sender<Client>,
     pub redis: Box<dyn RedisInterface>,
     pub server_name: Uuid,
     pub client_listener_sender: mpsc::Sender<MessageType>,
@@ -35,20 +31,13 @@ pub struct Hub<'a> {
 
 impl Hub {
     pub fn new(red: MyRedis, app: Box<dyn AppInterface>) -> Self {
-        let (tx_register, mut rx_register) = mpsc::channel(100);
-        let (tx_un_register, mut rx_un_register) = mpsc::channel(100);
-        let (tx_message, mut rx_message) =
-            broadcast::channel::<MessageType>(10000);
+        let (tx_message, mut rx_message) = broadcast::channel(10000);
         let (abc, mut bca) = mpsc::channel(10000);
 
-        let n = Self {
+        let hub = Self {
             users: HashMap::new(),
             redis: Box::new(red),
             server_name: Uuid::new_v4(),
-            register: rx_register,
-            register_sender: tx_register,
-            unregister: rx_un_register,
-            unregister_sender: tx_un_register,
             broadcast: tx_message,
             broadcast_receiver: rx_message,
             client_listener_receiver: bca,
@@ -57,10 +46,10 @@ impl Hub {
         };
 
         tokio::spawn(Box::pin(async move {
-            n.subscribe().await;
+            hub.subscribe().await;
         }));
 
-        n
+        hub
     }
 
     pub async fn register_client(&mut self, socket: WebSocket, id: Uuid) {
