@@ -11,7 +11,7 @@ use {
     },
     std::{env, net::SocketAddr, panic},
     tonic::transport::Server,
-    tracing::info,
+    tracing::{info, error},
     tracing_appender::rolling,
     tracing_core::LevelFilter,
     tracing_subscriber::{fmt::writer::MakeWriterExt, EnvFilter},
@@ -76,10 +76,12 @@ async fn main() -> Result<(), AppError> {
     );
 
     // start service and listen to shut down hooks;
-    Server::builder()
+    if let Err(err) = Server::builder()
         .add_service(AccountServiceServer::new(account_server))
         .serve_with_shutdown(addr, graceful_shutdown())
-        .await?;
+        .await {
+        error!("error:{}", err);
+    }
 
     Ok(())
 }

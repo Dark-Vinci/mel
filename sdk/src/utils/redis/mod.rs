@@ -11,7 +11,7 @@ pub struct MyRedis {
 }
 
 #[async_trait]
-pub trait RedisInterface {
+pub trait RedisInterface: Send + Sync {
     async fn subscribe(&self, sender: Sender<Vec<u8>>, channel: &str);
     async fn publish(
         &self,

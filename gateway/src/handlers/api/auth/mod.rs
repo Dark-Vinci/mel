@@ -1,15 +1,11 @@
 use {
     crate::handlers::handler::AppState,
-    axum::{extract::State, response::IntoResponse, routing::get, Router},
+    axum::{routing::get, Router},
 };
 
-pub fn router(state: &AppState) -> Router {
+pub fn router(_state: AppState) -> Router {
     Router::new()
-        .route("/login", get(login))
-        .route("/sign-up", get(signup))
-        .with_state(state)
+        .route("/login", get(|| async { "login failed" }))
+        .route("/sign-up", get(|| async { "sign-up failed" }))
+    // .with_state(state)
 }
-
-fn signup(State(app): State<AppState>) -> impl IntoResponse {}
-
-fn login(State(app): State<AppState>) -> impl IntoResponse {}

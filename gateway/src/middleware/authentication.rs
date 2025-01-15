@@ -1,13 +1,16 @@
 use {
-    super::errors::ApiError, axum::{
-        http::{Request, StatusCode},
-        middleware::Next,
+    crate::models::error_response::ApiError,
+    axum::{
+        extract::Request, http::StatusCode, middleware::Next,
         response::Response,
-    }, sdk::constants::REQUEST_ID, std::str::FromStr, uuid::Uuid
+    },
+    sdk::constants::REQUEST_ID,
+    std::str::FromStr,
+    uuid::Uuid,
 };
 
-async fn auth_middleware<B>(
-    mut req: Request<B>,
+async fn auth_middleware(
+    mut req: Request,
     next: Next,
 ) -> Result<Response, ApiError> {
     let id = req.headers().get(REQUEST_ID).unwrap().to_str().unwrap();
@@ -20,24 +23,24 @@ async fn auth_middleware<B>(
 
     if auth_header.is_none() {
         return Err(ApiError::new(
-            StatusCode::UNAUTHORIZED,
-            "no token provided".into(),
+            StatusCode::BAD_REQUEST,
             Uuid::from_str(id).unwrap(),
-            "ts".into(),
+            "no token provided".into(),
+            "".into(),
         ));
     }
-    
+
     let auth_header = auth_header.unwrap().to_string();
 
     if !auth_header.starts_with("Bearer ") {
         return Err(ApiError::new(
             StatusCode::BAD_REQUEST,
-            "token invalid".into(),
             Uuid::from_str(id).unwrap(),
-            "ts".into(),
+            "no token provided".into(),
+            "".into(),
         ));
     }
-    
+
     let token = &auth_header[7..];
 
     // Decode and validate the JWT
@@ -45,19 +48,19 @@ async fn auth_middleware<B>(
         Ok(claims) => {
             // Attach claims to the request extensions
             req.extensions_mut().insert(claims);
-            return Ok(next.run(req).await);
+            Ok(next.run(req).await)
         },
         Err(_) => {
-            return Err(ApiError::new(
+            Err(ApiError::new(
                 StatusCode::BAD_REQUEST,
-                "token invalid".into(),
-                id,
-                "ts".into(),
-            ));
+                Uuid::from_str(id).unwrap(),
+                "no token provided".into(),
+                "".into(),
+            ))
         },
     }
 }
 
-fn decode_jwt(token: &str) -> Result<String, ApiError> {
+fn decode_jwt(_token: &str) -> Result<String, ApiError> {
     todo!()
 }

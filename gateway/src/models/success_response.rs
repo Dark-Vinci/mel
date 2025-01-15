@@ -1,8 +1,7 @@
 use {
-    axum::http::StatusCode,
-    serde:: Serialize,
+    axum::{http::StatusCode, response::IntoResponse, Json},
+    serde::Serialize,
     uuid::Uuid,
-    axum::{response::IntoResponse, Json},
 };
 
 #[derive(Serialize, Debug, Clone)]
@@ -32,7 +31,8 @@ impl<T: Serialize + Clone> SuccessResponse<T> {
 impl<T: Serialize + Clone> IntoResponse for SuccessResponse<T> {
     fn into_response(self) -> axum::response::Response {
         let serialized = Json(self.clone());
-        let status_code = StatusCode::from_u16(self.status_code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
+        let status_code = StatusCode::from_u16(self.status_code)
+            .unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
 
         (status_code, serialized).into_response()
     }

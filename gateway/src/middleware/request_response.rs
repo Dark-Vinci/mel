@@ -1,6 +1,6 @@
 use {
     axum::{
-        body::{Body, Bytes},
+        body::{Body, Bytes, HttpBody},
         extract::Request,
         http::StatusCode,
         middleware::Next,
@@ -8,6 +8,7 @@ use {
     },
     sdk::constants::REQUEST_ID,
 };
+use http_body_util::BodyExt;
 
 const REQUEST: &'static str = "request";
 const RESPONSE: &'static str = "response";
@@ -16,28 +17,34 @@ pub async fn handle_print_request_response(
     req: Request,
     next: Next,
 ) -> Result<impl IntoResponse, (StatusCode, String)> {
-    let id = req.headers().get(REQUEST_ID).unwrap().to_str().unwrap();
+    let id = req
+        .headers()
+        .get(REQUEST_ID)
+        .and_then(|value| value.to_str().ok())
+        .map(|s| s.to_owned()) // Clone the value to own it
+        .unwrap();
+
     let (part, body) = req.into_parts();
 
-    let bytes = get_bytes(REQUEST, body, id).await;
+    let bytes = get_bytes(REQUEST, body, &id).await.unwrap();
     let req = Request::from_parts(part, Body::from(bytes));
 
     let res = next.run(req).await;
 
     let (parts, body) = res.into_parts();
-    let bytes = get_bytes(RESPONSE, body, id).await?;
+    let bytes = get_bytes(RESPONSE, body, &id).await?;
     let res = Response::from_parts(parts, Body::from(bytes));
 
     Ok(res)
 }
 
 async fn get_bytes<B>(
-    typ: &'static str,
+    typ: &str,
     body: B,
     id: &str,
 ) -> Result<Bytes, (StatusCode, String)>
 where
-    B: axum::body::HttpBody<Data = Bytes>,
+    B: HttpBody<Data = Bytes>,
     B::Error: std::fmt::Display,
 {
     let bytes = match body.collect().await {
@@ -45,13 +52,13 @@ where
         Err(err) => {
             return Err((
                 StatusCode::BAD_REQUEST,
-                format!("failed to read {direction} body: {err}"), //todo: update later
+                format!("failed to read body: {err}"), //todo: update later
             ));
         },
     };
 
     if let Ok(body) = std::str::from_utf8(&bytes) {
-        tracing::debug!("{direction} body = {body:?}, id={id}");
+        tracing::debug!("Type {typ} body = {body:?}, id={id}");
     }
 
     Ok(bytes)

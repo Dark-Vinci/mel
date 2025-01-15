@@ -1,6 +1,6 @@
 use {
     crate::{
-        app::interfaces::AppInterface,
+        app::{app::App, interfaces::AppInterface},
         handlers::ws::client::{Client, MessageType},
     },
     axum::extract::ws::WebSocket,
@@ -9,15 +9,15 @@ use {
         utils::redis::{MyRedis, RedisInterface},
     },
     serde_json::json,
-    std::collections::HashMap,
-    tokio::sync::{broadcast, mpsc},
+    std::{collections::HashMap, ops::Deref, sync::Arc},
+    tokio::sync::{broadcast, mpsc, Mutex},
     uuid::Uuid,
 };
 
-pub struct Hub<'a> {
-    pub users: HashMap<String, &'a Client>, // userid, client
-    pub app: Box<dyn AppInterface>,
-    pub broadcast: broadcast::Sender<MessageType>,
+pub struct Hub {
+    pub users: Mutex<HashMap<Uuid, Client>>, // userid, client
+    pub app: Arc<dyn AppInterface>,
+    pub broadcast_transmitter: broadcast::Sender<MessageType>,
     pub broadcast_receiver: broadcast::Receiver<MessageType>,
     pub redis: Box<dyn RedisInterface>,
     pub server_name: Uuid,
@@ -25,27 +25,26 @@ pub struct Hub<'a> {
     pub client_listener_receiver: mpsc::Receiver<MessageType>,
 }
 
-impl<'a> Hub<'a> {
-    pub fn new(red: MyRedis, app: Box<dyn AppInterface>) -> Self {
-        let (tx_message, mut rx_message) = broadcast::channel(10000);
-        let (abc, mut bca) = mpsc::channel(10000);
+impl Hub {
+    pub async fn new(red: MyRedis, app: App) -> Result<Self, String> {
+        let (broadcast_transmitter, broadcast_receiver) =
+            broadcast::channel(10000);
+        let (abc, bca) = mpsc::channel(10000);
 
-        let hub = Self {
-            users: HashMap::new(),
+        let this = Self {
+            users: Mutex::new(HashMap::new()),
             redis: Box::new(red),
             server_name: Uuid::new_v4(),
-            broadcast: tx_message,
-            broadcast_receiver: rx_message,
+            broadcast_transmitter,
+            broadcast_receiver,
             client_listener_receiver: bca,
             client_listener_sender: abc,
-            app,
+            app: Arc::new(app),
         };
 
-        tokio::spawn(async move {
-            hub.subscribe().await;
-        });
+        this.subscribe().await;
 
-        hub
+        Ok(this)
     }
 
     pub async fn register_client(&mut self, socket: WebSocket, id: Uuid) {
@@ -56,47 +55,62 @@ impl<'a> Hub<'a> {
             self.broadcast_receiver.resubscribe(),
         );
 
-        // insert into memory DB
-        self.users.insert(client.user_id.to_string(), &client);
+        {
+            let mut users = self.users.lock().unwrap();
+            client = users.insert(client.user_id, client).unwrap();
+        }
 
-        let server_name = self.server_name.clone().to_string();
+        let server_name = &self.server_name.to_string();
 
         // insert into redis
-        self.redis
-            .set_value(id.to_string(), server_name)
+        self.redis // user-id is connected to server-id
+            .set_value(id.to_string(), server_name.into())
             .await
             .unwrap();
 
+        let l1 = Arc::new(&client);
+        let l2 = Arc::clone(&l1);
+
         // start reading message from the client
         tokio::spawn(async {
-            client.read_pump().await;
+            l1.deref().read_pump().await;
         });
 
         // start writing message to the client
         tokio::spawn(async {
-            client.write_pump().await;
+            l2.deref().write_pump().await;
         });
     }
 
     async fn subscribe(&self) {
-        let (a, mut b) = mpsc::channel(1000);
+        let (sender, mut receiver) = mpsc::channel(1000);
 
-        self.redis.subscribe(a, WS_CHANNEL).await;
+        let redis = self.redis.clone();
+        let broadcast_transmitter = self.broadcast_transmitter.clone();
 
-        while let Some(msg) = b.recv().await {
-            let str = String::from_utf8(msg).unwrap();
+        redis.subscribe(sender, WS_CHANNEL).await;
 
-            let j = json!(str);
+        tokio::spawn(async move {
+            while let Some(msg) = receiver.recv().await {
+                let str = String::from_utf8(msg).unwrap();
 
-            let message: MessageType = serde_json::from_value(j).unwrap();
+                let j = json!(str);
 
-            self.broadcast.send(message);
-        }
+                let message: MessageType = serde_json::from_value(j).unwrap();
+
+                broadcast_transmitter
+                    .send(message)
+                    .expect("Failed to send message to broadcast transmitter");
+            }
+        });
     }
 
     async fn remove_client(&mut self, id: &Uuid) {
         // remove from connection hub
-        self.users.remove(&id.to_string());
+        {
+            let mut users = self.users.lock().unwrap();
+            users.remove(id);
+        }
 
         // remove from redis //todo: implement exponential backoff
         self.redis.delete(id.to_string()).await;

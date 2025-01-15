@@ -2,25 +2,30 @@ use {
     crate::{
         app::interfaces::{Account, AppInterface},
         config::config::Config,
-        downstream::{Downstream, DownstreamOperations},
+        downstream::{Downstream, DownstreamInterface},
     },
     sdk::utils::redis::{MyRedis, RedisInterface},
+    std::sync::Arc,
 };
 
 pub struct App {
     config: Config,
-    downstream: Box<dyn DownstreamOperations>,
-    redis: Box<dyn RedisInterface>,
+    downstream: Arc<dyn DownstreamInterface + Sync + Send>,
+    redis: Arc<dyn RedisInterface + Send + Sync>,
 }
+
+// impl Account for App {}
+//
+// impl AppInterface for App {}
 
 impl App {
     pub async fn new(c: Config) -> Self {
-        let r = MyRedis::new("url".into(), "".to_string()).await;
+        let r = MyRedis::new("url", "", "", "", "").await;
 
         Self {
             config: c,
-            downstream: Box::new(Downstream::new()),
-            redis: Box::new(r),
+            downstream: Arc::new(Downstream::new()),
+            redis: Arc::new(r),
         }
     }
 }

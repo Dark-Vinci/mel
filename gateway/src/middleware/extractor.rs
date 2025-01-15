@@ -1,10 +1,9 @@
 use {
-    super::errors::ApiError,
+    crate::models::error_response::ApiError,
     axum::{
         async_trait,
         extract::{FromRequest, FromRequestParts, Path, Query, Request},
         http::{request::Parts, StatusCode},
-        response::Json as Rson,
         Json,
     },
     sdk::{constants::REQUEST_ID, utils::error::collect_error},
@@ -36,12 +35,10 @@ where
 
         if let Err(e) = query_res {
             let message = e.to_string().as_str().parse().unwrap();
-            let api_error = ApiError::new(
-                StatusCode::BAD_REQUEST,
-                message,
-                id,
-                "2025".into(),
-            ); //todo: update
+
+            let api_error =
+                ApiError::new(StatusCode::BAD_REQUEST, id, message, "".into());
+
             return Err(api_error);
         }
 
@@ -49,12 +46,10 @@ where
 
         if let Err(err) = query_res.validate() {
             let message = collect_error(err);
-            let api_error = ApiError::new(
-                StatusCode::BAD_REQUEST,
-                message,
-                id,
-                "2025".into(),
-            ); //todo: same here
+
+            let api_error =
+                ApiError::new(StatusCode::BAD_REQUEST, id, message, "".into());
+
             return Err(api_error);
         }
 
@@ -62,6 +57,7 @@ where
     }
 }
 
+#[derive(Debug, Clone, Copy, Default)]
 pub struct ParamValidator<T: Validate>(pub T);
 
 #[async_trait]
@@ -83,12 +79,10 @@ where
 
         if let Err(e) = param_res {
             let message = e.to_string();
-            let api_error = ApiError::new(
-                StatusCode::BAD_REQUEST,
-                message,
-                id,
-                "2025".into(),
-            ); //todo: same here
+
+            let api_error =
+                ApiError::new(StatusCode::BAD_REQUEST, id, message, "".into());
+
             return Err(api_error);
         }
 
@@ -96,12 +90,10 @@ where
 
         if let Err(e) = param_res.validate() {
             let message = collect_error(e);
-            let api_error = ApiError::new(
-                StatusCode::BAD_REQUEST,
-                message,
-                id,
-                "2025".into(),
-            ); //todo: same here
+
+            let api_error =
+                ApiError::new(StatusCode::BAD_REQUEST, id, message, "".into());
+
             return Err(api_error);
         }
 
@@ -109,6 +101,7 @@ where
     }
 }
 
+#[derive(Debug, Clone, Copy, Default)]
 pub struct BodyValidator<T: Validate>(pub T);
 
 #[async_trait]
@@ -131,10 +124,10 @@ where
         if let Err(e) = b {
             let api_error = ApiError::new(
                 StatusCode::BAD_REQUEST,
-                e.to_string(),
                 id,
-                "2025".into(),
-            ); //todo: same here
+                e.to_string(),
+                "".into(),
+            );
             return Err(api_error);
         }
 
@@ -142,12 +135,8 @@ where
 
         if let Err(e) = custom.validate() {
             let message = collect_error(e);
-            let api_error = ApiError::new(
-                StatusCode::BAD_REQUEST,
-                e.to_string(),
-                id,
-                "2025".into(),
-            ); //todo: same here
+            let api_error =
+                ApiError::new(StatusCode::BAD_REQUEST, id, message, "".into());
 
             return Err(api_error);
         }

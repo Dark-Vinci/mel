@@ -60,7 +60,7 @@ async fn main() -> Result<(), AppError> {
 
     let app = App::new(config.clone()).await;
 
-    let handlers = Handlers::build(app);
+    let handlers = Handlers::build(app).await?;
 
     let addr = format!("{}:{}", LOCAL_HOST, config.app.port)
         .parse::<SocketAddr>()
@@ -68,13 +68,8 @@ async fn main() -> Result<(), AppError> {
 
     let listener = TcpListener::bind(addr).await.unwrap();
 
-    if let Ok(_res) = axum::serve(listener, handlers)
-        .with_graceful_shutdown(graceful_shutdown())
-        .await
-    {
-        tracing::info!("Application listening on {}", addr);
-        return Ok(());
-    }
+    axum::serve(listener, handlers)
+        .with_graceful_shutdown(graceful_shutdown()).await.unwrap();
 
     Err("Server failed to start.".into())
 }

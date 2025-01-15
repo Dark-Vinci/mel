@@ -1,20 +1,24 @@
+use axum::Json;
+use serde_json::json;
 use {
-    axum::http::StatusCode,
+    axum::{
+        http::StatusCode,
+        response::{IntoResponse, Response},
+    },
     sdk::errors::AppError,
-    serde:: Serialize,
+    serde::Serialize,
     uuid::Uuid,
-    axum::{response::IntoResponse, Json},
 };
 
 #[derive(Serialize, Clone)]
-pub struct ErrorResponse {
+pub struct ApiError {
     status_code: u16,
     request_id: Uuid,
     message: String,
     error_message: String,
 }
 
-impl ErrorResponse {
+impl ApiError {
     pub fn new(
         status_code: StatusCode,
         request_id: Uuid,
@@ -30,11 +34,15 @@ impl ErrorResponse {
     }
 }
 
-impl IntoResponse for ErrorResponse {
-    fn into_response(self) -> axum::response::Response {
-        let serialized = Json(self.clone());
-        let status_code = StatusCode::from_u16(self.status_code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR);
+impl IntoResponse for ApiError {
+    fn into_response(self) -> Response {
+        let sts = self.status_code;
+        let payload = json!({
+            "message": self.message,
+            "status_code": self.status_code,
+            "request_id": self.request_id.to_string(),
+        });
 
-        (status_code, serialized).into_response()
+        (StatusCode::from_u16(sts).unwrap(), Json(payload)).into_response()
     }
 }

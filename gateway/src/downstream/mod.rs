@@ -7,6 +7,6 @@ impl Downstream {
     }
 }
 
-impl DownstreamOperations for Downstream {}
+pub(crate) trait DownstreamInterface {}
 
-pub trait DownstreamOperations {}
+impl DownstreamInterface for Downstream {}
