@@ -1,8 +1,5 @@
 use {
-    crate::{
-        app::{app::App},
-        handlers::{ws::hub::Hub},
-    },
+    crate::{app::app::App, handlers::ws::hub::Hub},
     axum::{
         extract::{ws::WebSocket, WebSocketUpgrade},
         response::IntoResponse,
@@ -10,7 +7,8 @@ use {
         Router,
     },
     sdk::utils::redis::MyRedis,
-    std::sync::{Arc, Mutex},
+    std::sync::Arc,
+    tokio::sync::Mutex,
     uuid::Uuid,
 };
 
@@ -29,14 +27,15 @@ impl WebsocketHandler {
 
     fn w_handler(self: Arc<Self>, ws: WebSocketUpgrade) -> impl IntoResponse {
         ws.on_upgrade(move |ws| {
-            let mut handler = self.clone();
+            let handler = self.clone();
             async move {
                 handler.handle_message(ws).await;
             }
         })
     }
 
-    pub async fn build(self: Arc<Self>) -> Router {
+    pub fn build(&self) -> Router {
+        // let this =  Arc::clone(self);
         Router::new().route("/", get(move |ws| self.clone().w_handler(ws)))
     }
 
@@ -44,9 +43,9 @@ impl WebsocketHandler {
         let client_id = Uuid::new_v4();
         let hub = self.hub.clone();
 
-        tokio::spawn(async move {
-            let mut hub = hub.lock().unwrap();
+        tokio::spawn(Box::pin(async move {
+            let mut hub = hub.lock().await;
             let _ = hub.register_client(ws, client_id).await;
-        });
+        }));
     }
 }

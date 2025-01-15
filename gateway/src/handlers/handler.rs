@@ -1,7 +1,7 @@
 use {
     crate::{
         app::{app::App, interfaces::AppInterface},
-        handlers::api,
+        handlers::{api, ws::ws::WebsocketHandler},
         middleware::{
             request_id::RequestID,
             request_response::handle_print_request_response,
@@ -12,6 +12,7 @@ use {
         middleware::{from_extractor, from_fn},
         Router,
     },
+    sdk::utils::redis::MyRedis,
     std::{sync::Arc, time::Duration},
     tower::ServiceBuilder,
     tower_http::{
@@ -37,12 +38,12 @@ pub struct Handlers;
 
 impl Handlers {
     pub async fn build(app: App) -> Result<Router, String> {
-        let state = AppState::new(app);
+        let state = AppState::new(app.clone());
 
         let rest = api::api::endpoints(state);
 
-        // let redid = MyRedis::new("", "", "", "", "").await;
-        // let mut real_time = WebsocketHandler::new(app, redid).await?;
+        let redis = MyRedis::new("", "", "", "", "").await;
+        let real_time = WebsocketHandler::new(app, redis).await?;
 
         let cors = CorsLayer::new()
             .allow_methods([
@@ -56,7 +57,7 @@ impl Handlers {
 
         Ok(Router::new()
             .nest("/api", rest)
-            // .nest("/ws", real_time.build())
+            .nest("/ws", real_time.build())
             .route_layer(from_extractor::<RequestID>())
             .layer(
                 ServiceBuilder::new()

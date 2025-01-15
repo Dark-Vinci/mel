@@ -5,7 +5,8 @@ use {
         SinkExt, StreamExt,
     },
     serde::{Deserialize, Serialize},
-    tokio::sync::{broadcast, mpsc},
+    std::sync::Arc,
+    tokio::sync::{broadcast, mpsc, Mutex},
     tracing::info,
     uuid::Uuid,
 };
@@ -51,6 +52,22 @@ impl Client {
                 self.sender.send(Message::Text(msg)).await.unwrap();
             }
         }
+    }
+
+    pub async fn pump(&self) {
+        let this = Arc::new(Mutex::new(self)); // Wrap self in Arc<Mutex>
+
+        let this_clone = Arc::clone(&this);
+        tokio::spawn(async move {
+            let mut this = this_clone.lock().await; // Lock the mutex to access `self`
+            this.read_pump().await;
+        });
+
+        let this_clone = Arc::clone(&this);
+        tokio::spawn(async move {
+            let mut this = this_clone.lock().await;
+            this.write_pump().await;
+        });
     }
 
     // this would be called by the hub

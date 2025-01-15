@@ -9,7 +9,7 @@ use {
         utils::redis::{MyRedis, RedisInterface},
     },
     serde_json::json,
-    std::{collections::HashMap, ops::Deref, sync::Arc},
+    std::{collections::HashMap, sync::Arc},
     tokio::sync::{broadcast, mpsc, Mutex},
     uuid::Uuid,
 };
@@ -19,7 +19,7 @@ pub struct Hub {
     pub app: Arc<dyn AppInterface>,
     pub broadcast_transmitter: broadcast::Sender<MessageType>,
     pub broadcast_receiver: broadcast::Receiver<MessageType>,
-    pub redis: Box<dyn RedisInterface>,
+    pub redis: Arc<dyn RedisInterface>,
     pub server_name: Uuid,
     pub client_listener_sender: mpsc::Sender<MessageType>,
     pub client_listener_receiver: mpsc::Receiver<MessageType>,
@@ -33,7 +33,7 @@ impl Hub {
 
         let this = Self {
             users: Mutex::new(HashMap::new()),
-            redis: Box::new(red),
+            redis: Arc::new(red),
             server_name: Uuid::new_v4(),
             broadcast_transmitter,
             broadcast_receiver,
@@ -56,7 +56,7 @@ impl Hub {
         );
 
         {
-            let mut users = self.users.lock().unwrap();
+            let mut users = self.users.lock().await;
             client = users.insert(client.user_id, client).unwrap();
         }
 
@@ -68,17 +68,8 @@ impl Hub {
             .await
             .unwrap();
 
-        let l1 = Arc::new(&client);
-        let l2 = Arc::clone(&l1);
-
-        // start reading message from the client
-        tokio::spawn(async {
-            l1.deref().read_pump().await;
-        });
-
-        // start writing message to the client
-        tokio::spawn(async {
-            l2.deref().write_pump().await;
+        tokio::spawn(async move {
+            client.pump().await;
         });
     }
 
@@ -108,7 +99,7 @@ impl Hub {
     async fn remove_client(&mut self, id: &Uuid) {
         // remove from connection hub
         {
-            let mut users = self.users.lock().unwrap();
+            let mut users = self.users.lock().await;
             users.remove(id);
         }
 

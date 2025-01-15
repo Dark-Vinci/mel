@@ -8,6 +8,7 @@ use {
     std::sync::Arc,
 };
 
+#[derive(Clone)]
 pub struct App {
     config: Config,
     downstream: Arc<dyn DownstreamInterface + Sync + Send>,
