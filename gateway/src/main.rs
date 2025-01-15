@@ -69,7 +69,9 @@ async fn main() -> Result<(), AppError> {
     let listener = TcpListener::bind(addr).await.unwrap();
 
     axum::serve(listener, handlers)
-        .with_graceful_shutdown(graceful_shutdown()).await.unwrap();
+        .with_graceful_shutdown(graceful_shutdown())
+        .await
+        .unwrap();
 
     Err("Server failed to start.".into())
 }

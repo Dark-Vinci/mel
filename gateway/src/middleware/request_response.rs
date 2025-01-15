@@ -6,9 +6,9 @@ use {
         middleware::Next,
         response::{IntoResponse, Response},
     },
+    http_body_util::BodyExt,
     sdk::constants::REQUEST_ID,
 };
-use http_body_util::BodyExt;
 
 const REQUEST: &'static str = "request";
 const RESPONSE: &'static str = "response";

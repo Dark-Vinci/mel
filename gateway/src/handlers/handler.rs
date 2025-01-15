@@ -1,7 +1,7 @@
 use {
     crate::{
         app::{app::App, interfaces::AppInterface},
-        handlers::{api},
+        handlers::api,
         middleware::{
             request_id::RequestID,
             request_response::handle_print_request_response,

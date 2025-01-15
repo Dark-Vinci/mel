@@ -48,10 +48,7 @@ where
         _state: &B,
     ) -> Result<Self, Self::Rejection> {
         // we can control this, so no need for error handling, we'll always generate a UUID
-        let id = req
-            .headers()
-            .get(REQUEST_ID)
-            .unwrap().to_str().unwrap();
+        let id = req.headers().get(REQUEST_ID).unwrap().to_str().unwrap();
 
         // we can also still control here too;
         let k = Uuid::from_str(id).unwrap();
