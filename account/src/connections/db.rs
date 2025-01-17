@@ -1,9 +1,14 @@
 use {
     crate::{config::config::Config, migration::migrator::Migrator},
-    sdk::{constants::Environment, errors::ConnectionError, utils::utility},
-    sea_orm::{ConnectOptions, Database, DatabaseConnection},
+    sdk::{
+        constants::{constant::DB_TEARDOWN_QUERY, Environment},
+        errors::ConnectionError,
+        utils::utility,
+    },
+    sea_orm::{ConnectOptions, ConnectionTrait, Database, DatabaseConnection},
     sea_orm_migration::MigratorTrait,
     std::time::Duration,
+    tokio::runtime,
     tracing::{debug, error, log::LevelFilter},
     uuid::Uuid,
 };
@@ -58,22 +63,18 @@ impl DB {
     }
 }
 
-// impl Drop for DB {
-//     fn drop(&mut self) {
-//         task::block_in_place(move || {
-//             let runtime = runtime::Handle::current();
-//             let connection = *Rc::clone(&self.connection);
-//
-//             runtime.block_on(async {
-//                 if let Err(err) = connection.close().await {
-//                     eprintln!(
-//                         "Failed to close the database connection: {}",
-//                         err
-//                     );
-//                 } else {
-//                     info!("Database connection closed successfully.");
-//                 }
-//             });
-//         });
-//     }
-// }
+impl Drop for DB {
+    fn drop(&mut self) {
+        let db = self.connection.clone();
+        let runtime = runtime::Handle::current();
+
+        runtime.block_on(async {
+            db.execute(sea_orm::Statement::from_string(
+                db.get_database_backend(),
+                DB_TEARDOWN_QUERY,
+            ))
+            .await
+            .unwrap();
+        });
+    }
+}

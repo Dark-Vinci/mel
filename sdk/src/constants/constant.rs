@@ -25,3 +25,11 @@ pub const WS_CHANNEL: &str = "WS_CHANNEL";
 
 pub const ACCOUNT_URL: &str = "ACCOUNT_URL";
 pub const MESSAGE_URL: &str = "MESSAGE_URL";
+
+pub const DB_TEARDOWN_QUERY: &str = "
+                    SELECT pg_terminate_backend(pg_stat_activity.pid)
+                    FROM pg_stat_activity
+                    WHERE
+                        pg_stat_activity.datname = current_database() AND
+                        pid <> pg_backend_pid();
+                ";

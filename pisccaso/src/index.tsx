@@ -1,6 +1,6 @@
 import React from 'react';
-
 import ReactDOM from 'react-dom/client';
+
 import './index.css';
 import App from './startup/App';
 import reportWebVitals from './startup/reportWebVitals';
@@ -8,6 +8,7 @@ import reportWebVitals from './startup/reportWebVitals';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
 root.render(
   <React.StrictMode>
     <App />
