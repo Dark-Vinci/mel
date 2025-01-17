@@ -1,8 +1,7 @@
-use axum::extract::State;
 use {
-    crate::{handlers::ws::hub::Hub},
+    crate::handlers::ws::hub::Hub,
     axum::{
-        extract::{WebSocketUpgrade},
+        extract::{State, WebSocketUpgrade},
         response::IntoResponse,
         routing::get,
         Router,
@@ -18,7 +17,7 @@ pub fn build(state: Hub) -> Router {
 
 async fn websocket_handler(
     ws: WebSocketUpgrade,
-    State(mut hub): State<Hub>
+    State(mut hub): State<Hub>,
 ) -> impl IntoResponse {
     ws.on_upgrade(move |ws| {
         async move {

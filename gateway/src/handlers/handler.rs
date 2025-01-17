@@ -1,14 +1,20 @@
-use axum::handler::Handler;
 use {
     crate::{
         app::{app::App, interfaces::AppInterface},
-        handlers::{api, ws::ws::WebsocketHandler},
+        handlers::{
+            api,
+            ws::{
+                hub::Hub,
+                ws::{build, WebsocketHandler},
+            },
+        },
         middleware::{
             request_id::RequestID,
             request_response::handle_print_request_response,
         },
     },
     axum::{
+        handler::Handler,
         http::Method,
         middleware::{from_extractor, from_fn},
         Router,
@@ -23,8 +29,6 @@ use {
         timeout::TimeoutLayer,
     },
 };
-use crate::handlers::ws::hub::Hub;
-use crate::handlers::ws::ws::build;
 
 #[derive(Clone)]
 pub struct AppState {
