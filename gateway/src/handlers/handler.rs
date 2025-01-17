@@ -1,3 +1,4 @@
+use axum::handler::Handler;
 use {
     crate::{
         app::{app::App, interfaces::AppInterface},
@@ -22,6 +23,8 @@ use {
         timeout::TimeoutLayer,
     },
 };
+use crate::handlers::ws::hub::Hub;
+use crate::handlers::ws::ws::build;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -39,11 +42,11 @@ pub struct Handlers;
 impl Handlers {
     pub async fn build(app: App) -> Result<Router, String> {
         let state = AppState::new(app.clone());
-
         let rest = api::api::endpoints(state);
 
         let redis = MyRedis::new("", "", "", "", "").await;
-        let real_time = WebsocketHandler::new(app, redis).await?;
+
+        let hub = Hub::new(redis, app).await?;
 
         let cors = CorsLayer::new()
             .allow_methods([
@@ -57,7 +60,7 @@ impl Handlers {
 
         Ok(Router::new()
             .nest("/api", rest)
-            .nest("/ws", real_time.build())
+            .nest("/ws", build(hub))
             .route_layer(from_extractor::<RequestID>())
             .layer(
                 ServiceBuilder::new()

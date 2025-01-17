@@ -14,15 +14,16 @@ use {
     uuid::Uuid,
 };
 
+#[derive(Clone)]
 pub struct Hub {
-    pub users: Mutex<HashMap<Uuid, Client>>, // userid, client
+    pub users: Arc<Mutex<HashMap<Uuid, Client>>>, // userid, client
     pub app: Arc<dyn AppInterface>,
     pub broadcast_transmitter: broadcast::Sender<MessageType>,
-    pub broadcast_receiver: broadcast::Receiver<MessageType>,
+    pub broadcast_receiver: Arc<broadcast::Receiver<MessageType>>,
     pub redis: Arc<dyn RedisInterface>,
     pub server_name: Uuid,
     pub client_listener_sender: mpsc::Sender<MessageType>,
-    pub client_listener_receiver: mpsc::Receiver<MessageType>,
+    pub client_listener_receiver: Arc<mpsc::Receiver<MessageType>>,
 }
 
 impl Hub {
@@ -32,12 +33,12 @@ impl Hub {
         let (abc, bca) = mpsc::channel(10000);
 
         let this = Self {
-            users: Mutex::new(HashMap::new()),
+            users: Arc::new(Mutex::new(HashMap::new())),
             redis: Arc::new(red),
             server_name: Uuid::new_v4(),
             broadcast_transmitter,
-            broadcast_receiver,
-            client_listener_receiver: bca,
+            broadcast_receiver: Arc::new(broadcast_receiver),
+            client_listener_receiver: Arc::new(bca),
             client_listener_sender: abc,
             app: Arc::new(app),
         };
