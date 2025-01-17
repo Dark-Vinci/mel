@@ -45,14 +45,14 @@ async fn main() -> Result<(), AppError> {
 
     panic::set_hook(Box::new(|info| {
         if let Some(location) = info.location() {
-            tracing::error!(
+            error!(
                 message = %info,
                 panic.file = location.file(),
                 panic.line = location.line(),
                 panic.column = location.column(),
             );
         } else {
-            tracing::error!(message = %info);
+            error!(message = %info);
         }
     }));
 

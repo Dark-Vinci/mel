@@ -15,10 +15,6 @@ pub struct App {
     redis: Arc<dyn RedisInterface + Send + Sync>,
 }
 
-// impl Account for App {}
-//
-// impl AppInterface for App {}
-
 impl App {
     pub async fn new(c: Config) -> Self {
         let r = MyRedis::new("url", "", "", "", "").await;
