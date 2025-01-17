@@ -1,21 +1,14 @@
 use axum::extract::State;
 use {
-    crate::{app::app::App, handlers::ws::hub::Hub},
+    crate::{handlers::ws::hub::Hub},
     axum::{
-        extract::{ws::WebSocket, WebSocketUpgrade},
+        extract::{WebSocketUpgrade},
         response::IntoResponse,
         routing::get,
         Router,
     },
-    sdk::utils::redis::MyRedis,
-    std::sync::Arc,
-    tokio::sync::Mutex,
     uuid::Uuid,
 };
-
-pub struct WebsocketHandler {
-    hub: Arc<Mutex<Hub>>,
-}
 
 pub fn build(state: Hub) -> Router {
     Router::new()
