@@ -73,5 +73,5 @@ async fn main() -> Result<(), AppError> {
         .await
         .unwrap();
 
-    Err("Server failed to start.".into())
+    Ok(())
 }

@@ -22,7 +22,7 @@ impl DB {
     pub async fn new(e: &Config) -> Result<Self, ConnectionError> {
         let conn_string = if e.environment == Environment::Testing {
             let id = Uuid::new_v4();
-            debug!("sqlite_test_id: {}", id.to_string());
+            debug!("sqlite_test_id: {}", id);
             utility::sqlite_test_document(id)
         } else {
             format!(
