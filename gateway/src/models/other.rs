@@ -31,7 +31,3 @@ enum Type {
     // channel id
     Channel(String),
 }
-
-struct WsResponse {
-    message: String,
-}

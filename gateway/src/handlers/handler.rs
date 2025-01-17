@@ -3,10 +3,7 @@ use {
         app::{app::App, interfaces::AppInterface},
         handlers::{
             api,
-            ws::{
-                hub::Hub,
-                ws::{build, WebsocketHandler},
-            },
+            ws::{hub::Hub, ws::build},
         },
         middleware::{
             request_id::RequestID,
@@ -14,7 +11,6 @@ use {
         },
     },
     axum::{
-        handler::Handler,
         http::Method,
         middleware::{from_extractor, from_fn},
         Router,

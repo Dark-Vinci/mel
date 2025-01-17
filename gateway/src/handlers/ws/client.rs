@@ -44,66 +44,68 @@ impl Client {
         }
     }
 
-    // write message to client socket connection
-    pub async fn write_pump(&mut self) {
-        while let Ok(msg) = self.hub_sender.recv().await {
-            if msg.to_user == self.user_id.to_string() {
-                let msg = serde_json::to_string(&msg).unwrap(); // todo; handle graciously
-                self.sender.send(Message::Text(msg)).await.unwrap();
-            }
-        }
-    }
-
-    pub async fn pump(&self) {
-        let this = Arc::new(Mutex::new(self)); // Wrap self in Arc<Mutex>
-
-        let this_clone = Arc::clone(&this);
-        tokio::spawn(async move {
-            let mut this = this_clone.lock().await; // Lock the mutex to access `self`
-            this.read_pump().await;
-        });
-
-        let this_clone = Arc::clone(&this);
-        tokio::spawn(async move {
-            let mut this = this_clone.lock().await;
-            this.write_pump().await;
-        });
-    }
-
     // this would be called by the hub
     // read from client, the will be sent to hub to be broadcasted
-    pub async fn read_pump(&mut self) {
-        while let Some(Ok(message)) = self.receiver.next().await {
-            match message {
-                Message::Ping(a) => {
-                    info!("Received a Ping from user socket, {:?}", a);
-                },
+    pub async fn pumper(&mut self) {
+        loop {
+            tokio::select! {
+                res = self.hub_sender.recv() => {
+                    match res {
+                        Ok(msg) => {
+                            if msg.to_user == self.user_id.to_string() {
+                                let msg = serde_json::to_string(&msg).unwrap(); // todo; handle graciously
+                                self.sender.send(Message::Text(msg)).await.unwrap();
+                            }
+                        }
 
-                Message::Pong(a) => {
-                    info!("Received a Pong from user socket, {:?}", a);
-                },
+                        Err(e) => {
+                            tracing::debug!("client disconnected abruptly: {e}"); // todo; disconnect user
+                            break; // break the loop
+                        },
+                    }
+                }
 
-                Message::Text(text) => {
-                    let ser_msg =
-                        serde_json::from_str::<MessageType>(&text).unwrap();
+                // Tokio guarantees that `broadcast::Receiver::recv` is cancel-safe.
+                resa = self.receiver.next() => {
+                    match resa {
+                        Some(Ok(message)) => {
+                            match message {
+                                Message::Text(msg) => {}
 
-                    info!("Receive text message: {:?}", ser_msg);
+                                Message::Ping(a) => {
+                                    info!("Received a Ping from user socket, {:?}", a);
+                                },
 
-                    self.hub_listener.send(ser_msg).await.unwrap(); //todo : handle
-                },
+                                Message::Pong(a) => {
+                                    info!("Received a Pong from user socket, {:?}", a);
+                                },
 
-                Message::Binary(bin) => {
-                    let str = String::from_utf8(bin).unwrap();
+                                Message::Binary(bin) => {
+                                    let str = String::from_utf8(bin).unwrap();
 
-                    info!("Receive text message: {:?}", str);
+                                    info!("Receive text message: {:?}", str);
 
-                    let ser_msg =
-                        serde_json::from_str::<MessageType>(&str).unwrap();
+                                    let ser_msg =
+                                        serde_json::from_str::<MessageType>(&str).unwrap();
 
-                    self.hub_listener.send(ser_msg).await.unwrap(); //todo : handle
-                },
+                                    self.hub_listener.send(ser_msg).await.unwrap(); //todo : handle -> disconnect the user
+                                },
 
-                _ => println!("Unhandled message: {:?}", message),
+                                _ => {
+                                    println!("receive message from user socket: {:?}", message);
+                                }
+                            }
+                        }
+
+                        Some(Err(err)) => {
+                            println!("ERROR");
+                        }
+
+                        None => {
+                            println!("THENE");
+                        }
+                    }
+                }
             }
         }
     }
