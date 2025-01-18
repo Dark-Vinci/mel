@@ -46,6 +46,9 @@
       "@startup": ["./startup"],
       "@router": ["./router"],
       "@utils": ["./utils"],
+      "@hooks": ["./hooks"],
+      "@store": ["./store"],
+      "@types": ["./types"],
       "@": ["./*"],
     }
   },
