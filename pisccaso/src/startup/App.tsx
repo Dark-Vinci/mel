@@ -2,8 +2,8 @@ import "./App.css";
 import { useDocumentTitle } from "@uidotdev/usehooks";
 
 export function App() {
-  useDocumentTitle("melon");
-  return <div className="App">the content</div>;
+  useDocumentTitle("belon");
+  return <div className="App">SLACK APPLICATION IN BARE MINIMUM</div>;
 }
 
 export default App;
