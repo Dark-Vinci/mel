@@ -80,7 +80,7 @@ impl KafkaInterface for Kafka {
             .producer
             .send(
                 FutureRecord::to(&self.topic_name)
-                    .payload(&format!("Message {}", payload.into()))
+                    .payload(&format!("Message {}", <Vec<u8> as Into<u8>>::into(payload)))
                     .key(&format!("Key {}", id))
                     .headers(OwnedHeaders::new().insert(Header {
                         key: "header_key",
@@ -93,7 +93,7 @@ impl KafkaInterface for Kafka {
         delivery_status.is_ok()
     }
 
-    async fn consume(&self, sender: Sender<&BorrowedMessage>) {
+    async fn consume<'a>(&self, sender: Sender<&BorrowedMessage<'a>>) {
         self.consumer
             .subscribe(&[""])
             .expect("Can't subscribe to specified topics");

@@ -1,12 +1,16 @@
-use crate::repository::user::{UserRepo, UserRepository};
+#[cfg(test)]
+use mockall::automock;
+
 use {
     crate::{
         app::interface::{Account, Auth, Settings},
         config::config::Config,
         connections::db::DB,
+        repository::user::{UserRepo, UserRepository},
         // downstream::downstream::Downstream,
         // repository::user::UserRepository,
     },
+    async_trait::async_trait,
     uuid::Uuid,
 };
 
@@ -60,12 +64,45 @@ impl App {
     }
 }
 
+
+
 impl App {
     pub fn ping(&self, id: Uuid) -> String {
         format!("PING FROM ACCOUNT SERVICE: {}", id)
     }
 }
 
+#[async_trait]
+#[cfg_attr(test, automock)]
 pub trait AccountInterface: Auth + Account + Settings {}
 
 impl AccountInterface for App {}
+
+#[cfg(test)]
+mod test {
+    use mockall::predicate::eq;
+    use mockall::{automock, predicate::*};
+    use tracing_subscriber::layer::SubscriberExt;
+    use super::*;
+
+    #[test]
+    fn first() {
+        #[automock]
+        trait MyTrait {
+            fn foo(&self, x: u32) -> u32;
+        }
+
+        fn call_with_four(x: &dyn MyTrait) -> u32 {
+            x.foo(4)
+        }
+
+        let mut mock = MockMyTrait::new();
+
+        mock.expect_foo()
+            .with(eq(4))
+            .times(1)
+            .returning(|x| x + 1);
+
+        assert_eq!(5, call_with_four(&mock));
+    }
+}
