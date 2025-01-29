@@ -1,3 +1,3 @@
-mod context;
+mod event;
 pub mod kafka;
-mod util;
+pub mod util;

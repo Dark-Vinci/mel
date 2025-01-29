@@ -1,106 +1,92 @@
-use rdkafka::producer::BaseRecord;
 use {
-    crate::utils::kafka::{
-        context::CustomContext,
-        util::{KafkaError, KafkaMessage},
-    },
+    crate::utils::kafka::util::{KafkaError, KafkaMessage},
     log::{error, info, warn},
-    mockall::automock,
     rdkafka::{
         config::RDKafkaLogLevel,
         consumer::{stream_consumer::StreamConsumer, CommitMode, Consumer},
-        message::{
-            BorrowedMessage, Header, Headers, OwnedHeaders, OwnedMessage,
-        },
+        message::{Headers, OwnedMessage},
         producer::{FutureProducer, FutureRecord},
         ClientConfig, Message,
     },
     std::time::Duration,
-    tokio::sync::mpsc::{self, Receiver, Sender},
+    tokio::sync::mpsc::Sender,
+    tonic::{async_trait, codegen::tokio_stream::StreamExt},
 };
 
-pub type SdkConsumer = StreamConsumer<CustomContext>;
-
 pub struct Kafka {
-    topic: Vec<String>,
-    // topic_name: String,
-    // host: String,
-    // password: String,
-    // username: String,
     producer: FutureProducer,
-    consumer: SdkConsumer,
+    consumer: StreamConsumer,
 }
 
+#[async_trait]
 pub trait KafkaInterface {
     async fn log_event<T: KafkaMessage>(
         &self,
         payload: T,
     ) -> Result<(), KafkaError>;
-    async fn consume(&self, topic: &str, sender: Sender<OwnedMessage>);
+    async fn consume(
+        &self,
+        topic: &str,
+        sender: Sender<OwnedMessage>,
+    ) -> Result<(), KafkaError>;
 }
 
 impl Kafka {
     pub fn new(
-        brokers: &str,
-        topic: Vec<String>,
         group_id: &str,
         username: &str,
         password: &str,
         host: &str,
         port: &str,
-    ) -> Self {
-        let context = CustomContext;
-
-        let client = ClientConfig::new()
-            .set("group.id", group_id)
-            .set("bootstrap.servers", brokers)
-            .set("bootstrap.servers", format!("{}:{}", host, port))
+    ) -> Result<Self, KafkaError> {
+        let consumer: StreamConsumer = ClientConfig::new()
+            .set("bootstrap.servers", format!("{}:{}", host, port)) // Kafka broker address
+            .set("group.id", group_id) // Consumer group ID
+            .set("auto.offset.reset", "earliest")
             .set("sasl.username", username)
             .set("sasl.password", password)
-            .set("message.timeout.ms", "5000")
-            .set("enable.partition.eof", "false")
-            .set("session.timeout.ms", "6000")
-            .set("enable.auto.commit", "true")
-            .set("statistics.interval.ms", "30000")
-            .set("auto.offset.reset", "smallest")
             .set_log_level(RDKafkaLogLevel::Debug)
-            .create_with_context(context);
+            .create()
+            .map_err(|_err| KafkaError::Connection)?;
 
-        let producer: &FutureProducer = client.create().clone().unwrap();
-        let consumer: &SdkConsumer = client.create().unwrap();
+        let producer: FutureProducer = ClientConfig::new()
+            .set("bootstrap.servers", format!("{}:{}", host, port)) // Kafka broker address
+            .set("message.timeout.ms", "5000")
+            .set("sasl.username", username)
+            .set("sasl.password", password)
+            .set_log_level(RDKafkaLogLevel::Debug) // Message timeout
+            .create()
+            .map_err(|_err| KafkaError::Connection)?;
 
-        Self {
-            topic,
-            producer,
-            consumer,
-            // topic_name: "".to_string(),
-            // host: "localhost".to_string(),
-            // password: "".to_string(),
-            // username: "".to_string(),
-        }
+        Ok(Self { producer, consumer })
     }
 }
 
+#[async_trait]
 impl KafkaInterface for Kafka {
     async fn log_event<T: KafkaMessage>(
         &self,
         payload: T,
     ) -> Result<(), KafkaError> {
+        let load = &payload.get_value()?;
+        let topic = payload.event_type();
+        let key = &payload.get_key();
+
+        let new_payload = FutureRecord::to(topic)
+            .key(key)
+            .payload(load)
+            .timestamp(payload.get_timestamp());
+
         self.producer
-            .send(
-                BaseRecord::to(&payload.event_type().to_string())
-                    .payload(&payload)
-                    .key(&payload.get_key())
-                    .payload(&payload.get_value())
-                    .timestamp(payload.get_timestamp()),
-                Duration::from_secs(0),
-            )
+            .send(new_payload, Duration::from_secs(1))
             .await
             .map_err(|err| {
                 error!("Failed to produce message: {:?}", err);
 
                 return KafkaError::Generic;
-            })
+            })?;
+
+        Ok(())
     }
 
     async fn consume(
@@ -117,8 +103,10 @@ impl KafkaInterface for Kafka {
             return connection;
         }
 
-        loop {
-            match self.consumer.recv().await {
+        let mut message_stream = self.consumer.stream();
+
+        while let Some(message) = message_stream.next().await {
+            match message {
                 Err(e) => warn!("Kafka error: {}", e),
 
                 Ok(received_message) => {
@@ -151,5 +139,7 @@ impl KafkaInterface for Kafka {
                 },
             };
         }
+
+        Ok(())
     }
 }
