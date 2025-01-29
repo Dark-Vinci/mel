@@ -1,11 +1,17 @@
-use mockall::automock;
+use rdkafka::producer::BaseRecord;
 use {
-    crate::utils::kafka::context::CustomContext,
-    log::{info, warn},
+    crate::utils::kafka::{
+        context::CustomContext,
+        util::{KafkaError, KafkaMessage},
+    },
+    log::{error, info, warn},
+    mockall::automock,
     rdkafka::{
         config::RDKafkaLogLevel,
         consumer::{stream_consumer::StreamConsumer, CommitMode, Consumer},
-        message::{BorrowedMessage, Header, Headers, OwnedHeaders},
+        message::{
+            BorrowedMessage, Header, Headers, OwnedHeaders, OwnedMessage,
+        },
         producer::{FutureProducer, FutureRecord},
         ClientConfig, Message,
     },
@@ -17,17 +23,20 @@ pub type SdkConsumer = StreamConsumer<CustomContext>;
 
 pub struct Kafka {
     topic: Vec<String>,
-    topic_name: String,
-    host: String,
-    password: String,
-    username: String,
+    // topic_name: String,
+    // host: String,
+    // password: String,
+    // username: String,
     producer: FutureProducer,
     consumer: SdkConsumer,
 }
 
 pub trait KafkaInterface {
-    async fn produce(&self, payload: Vec<u8>, id: String) -> bool;
-    async fn consume(&self, sender: Sender<&BorrowedMessage>);
+    async fn log_event<T: KafkaMessage>(
+        &self,
+        payload: T,
+    ) -> Result<(), KafkaError>;
+    async fn consume(&self, topic: &str, sender: Sender<OwnedMessage>);
 }
 
 impl Kafka {
@@ -64,44 +73,56 @@ impl Kafka {
             topic,
             producer,
             consumer,
-            topic_name: "".to_string(),
-            host: "localhost".to_string(),
-            password: "".to_string(),
-            username: "".to_string(),
+            // topic_name: "".to_string(),
+            // host: "localhost".to_string(),
+            // password: "".to_string(),
+            // username: "".to_string(),
         }
     }
 }
 
 impl KafkaInterface for Kafka {
-    async fn produce(&self, payload: Vec<u8>, id: String) -> bool {
-        let delivery_status = self
-            .producer
+    async fn log_event<T: KafkaMessage>(
+        &self,
+        payload: T,
+    ) -> Result<(), KafkaError> {
+        self.producer
             .send(
-                FutureRecord::to(&self.topic_name)
-                    .payload(&format!("Message {}", <Vec<u8> as Into<u8>>::into(payload)))
-                    .key(&format!("Key {}", id))
-                    .headers(OwnedHeaders::new().insert(Header {
-                        key: "header_key",
-                        value: Some("header_value"),
-                    })),
+                BaseRecord::to(&payload.event_type().to_string())
+                    .payload(&payload)
+                    .key(&payload.get_key())
+                    .payload(&payload.get_value())
+                    .timestamp(payload.get_timestamp()),
                 Duration::from_secs(0),
             )
-            .await;
+            .await
+            .map_err(|err| {
+                error!("Failed to produce message: {:?}", err);
 
-        delivery_status.is_ok()
+                return KafkaError::Generic;
+            })
     }
 
-    async fn consume<'a>(&self, sender: Sender<&BorrowedMessage<'a>>) {
-        self.consumer
-            .subscribe(&[""])
-            .expect("Can't subscribe to specified topics");
+    async fn consume(
+        &self,
+        topic: &str,
+        sender: Sender<OwnedMessage>,
+    ) -> Result<(), KafkaError> {
+        let connection = self.consumer.subscribe(&[topic]).map_err(|err| {
+            error!("Failed to subscribe to topic: {:?}", err);
+            return KafkaError::Generic;
+        });
+
+        if let Err(_) = connection {
+            return connection;
+        }
 
         loop {
             match self.consumer.recv().await {
                 Err(e) => warn!("Kafka error: {}", e),
 
-                Ok(m) => {
-                    let payload = match m.payload_view::<str>() {
+                Ok(received_message) => {
+                    let payload = match received_message.payload_view::<str>() {
                         None => "",
                         Some(Ok(s)) => s,
                         Some(Err(e)) => {
@@ -111,9 +132,9 @@ impl KafkaInterface for Kafka {
                     };
 
                     info!("key: '{:?}', payload: '{}', topic: {}, partition: {}, offset: {}, timestamp: {:?}",
-                      m.key(), payload, m.topic(), m.partition(), m.offset(), m.timestamp());
+                      received_message.key(), payload, received_message.topic(), received_message.partition(), received_message.offset(), received_message.timestamp());
 
-                    if let Some(headers) = m.headers() {
+                    if let Some(headers) = received_message.headers() {
                         for header in headers.iter() {
                             info!(
                                 "  Header {:#?}: {:?}",
@@ -123,10 +144,10 @@ impl KafkaInterface for Kafka {
                     }
 
                     self.consumer
-                        .commit_message(&m, CommitMode::Async)
+                        .commit_message(&received_message, CommitMode::Async)
                         .unwrap();
 
-                    sender.send(&m).await.unwrap();
+                    sender.send(received_message.detach()).await.unwrap();
                 },
             };
         }
