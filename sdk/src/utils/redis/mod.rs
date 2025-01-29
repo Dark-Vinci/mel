@@ -1,9 +1,7 @@
-use tokio::task;
-use tonic::codegen::tokio_stream::StreamExt;
 use {
     redis::{AsyncCommands, Client, RedisResult},
-    tokio::sync::mpsc::Sender,
-    tonic::async_trait,
+    tokio::{sync::mpsc::Sender, task},
+    tonic::{async_trait, codegen::tokio_stream::StreamExt},
 };
 
 pub struct MyRedis {
@@ -42,10 +40,6 @@ impl MyRedis {
 
         let conn = Client::open(connection_string).unwrap();
 
-        // let pool = r2d2::Pool::builder().build(conn).unwrap();
-
-        // let mut r2_conn = pool.get().unwrap();
-
         Self { client: conn }
     }
 }
@@ -55,7 +49,10 @@ impl RedisInterface for MyRedis {
     async fn subscribe(&self, sender: Sender<Vec<u8>>, channel: &str) {
         let mut pub_sub = self.client.get_async_pubsub().await.unwrap();
 
-        pub_sub.subscribe(channel).await.expect("TODO: panic message");
+        pub_sub
+            .subscribe(channel)
+            .await
+            .expect("TODO: panic message");
 
         task::spawn(async move {
             let mut message_stream = pub_sub.on_message();
@@ -73,7 +70,11 @@ impl RedisInterface for MyRedis {
         chan: String,
         message: String,
     ) -> Result<(), String> {
-        let mut connection = self.client.get_multiplexed_async_connection().await.unwrap();
+        let mut connection = self
+            .client
+            .get_multiplexed_async_connection()
+            .await
+            .unwrap();
 
         let _result: usize = connection.publish(chan, message).await.unwrap();
 

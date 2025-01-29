@@ -56,8 +56,6 @@ impl Kafka {
             .set("auto.offset.reset", "smallest")
             .set_log_level(RDKafkaLogLevel::Debug)
             .create_with_context(context);
-        
-        // client.
 
         let producer: &FutureProducer = client.create().clone().unwrap();
         let consumer: &SdkConsumer = client.create().unwrap();

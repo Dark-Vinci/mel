@@ -72,8 +72,7 @@ impl App {
     }
 }
 
-#[async_trait]
-#[cfg_attr(test, automock)]
+
 pub trait AccountInterface: Auth + Account + Settings {}
 
 impl AccountInterface for App {}
