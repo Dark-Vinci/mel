@@ -6,7 +6,7 @@ use {
     },
     serde::{Deserialize, Serialize},
     std::sync::Arc,
-    tokio::sync::{broadcast, mpsc, Mutex},
+    tokio::sync::{broadcast, mpsc},
     tracing::info,
     uuid::Uuid,
 };
@@ -70,7 +70,7 @@ impl Client {
                     match resa {
                         Some(Ok(message)) => {
                             match message {
-                                Message::Text(msg) => {}
+                                Message::Text(_msg) => {}
 
                                 Message::Ping(a) => {
                                     info!("Received a Ping from user socket, {:?}", a);
@@ -97,7 +97,7 @@ impl Client {
                             }
                         }
 
-                        Some(Err(err)) => {
+                        Some(Err(_err)) => {
                             println!("ERROR");
                         }
 

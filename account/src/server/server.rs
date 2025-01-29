@@ -1,4 +1,5 @@
 use {
+    async_trait::async_trait,
     crate::app::app::AccountInterface,
     sdk::generated_proto_rs::{
         mel_account::{
@@ -19,7 +20,7 @@ impl<A: AccountInterface> Account<A> {
     }
 }
 
-#[async_trait::async_trait]
+#[async_trait]
 impl<A: AccountInterface + Send + Sync + 'static> AccountService
     for Account<A>
 {

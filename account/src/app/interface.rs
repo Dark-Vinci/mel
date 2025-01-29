@@ -11,9 +11,7 @@ pub trait Auth {
     // async fn create_user(&self, ctx: &CTX, user: CreateUserRequest) -> User;
 }
 
-pub trait Account {
-    async fn name(&self) -> Result<String, String>;
-}
+pub trait Account {}
 
 
 pub trait Settings {}
