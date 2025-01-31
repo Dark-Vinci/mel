@@ -11,7 +11,6 @@ use {
     DeriveEntityModel,
     Serialize,
     Deserialize,
-    DeriveActiveModel,
 )]
 #[sea_orm(table_name = "workspace_user", schema_name = "public")]
 pub struct Model {
@@ -32,5 +31,24 @@ pub struct Model {
 
 impl ActiveModelBehavior for ActiveModel {}
 
-#[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
-pub enum Relation {}
+#[derive(Copy, Clone, Debug, EnumIter)]
+pub enum Relation {
+    User,
+    Workspace,
+}
+
+impl RelationTrait for Relation {
+    fn def(&self) -> RelationDef {
+        match self {
+            Self::User => Entity::belongs_to(super::user::Entity)
+                .from(Column::UserId)
+                .to(super::user::Column::Id)
+                .into(),
+
+            Self::Workspace => Entity::belongs_to(super::workspace::Entity)
+                .from(Column::WorkspaceId)
+                .to(super::workspace::Column::Id)
+                .into(),
+        }
+    }
+}

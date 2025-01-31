@@ -11,7 +11,6 @@ use {
     DeriveEntityModel,
     Serialize,
     Deserialize,
-    DeriveActiveModel,
 )]
 #[sea_orm(table_name = "chat_media", schema_name = "public")]
 pub struct Model {

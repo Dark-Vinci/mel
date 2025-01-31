@@ -1,6 +1,5 @@
 #[cfg(test)]
 use mockall::automock;
-
 use {
     crate::{
         app::interface::{Account, Auth, Settings},
@@ -59,14 +58,11 @@ impl App {
     }
 }
 
-
-
 impl App {
     pub fn ping(&self, id: Uuid) -> String {
         format!("PING FROM ACCOUNT SERVICE: {}", id)
     }
 }
-
 
 pub trait AccountInterface: Auth + Account + Settings {}
 
@@ -74,10 +70,14 @@ impl AccountInterface for App {}
 
 #[cfg(test)]
 mod test {
-    use mockall::predicate::eq;
-    use mockall::{automock, predicate::*};
-    use tracing_subscriber::layer::SubscriberExt;
-    use super::*;
+    use {
+        super::*,
+        mockall::{
+            automock,
+            predicate::{eq, *},
+        },
+        tracing_subscriber::layer::SubscriberExt,
+    };
 
     #[test]
     fn first() {
@@ -92,10 +92,7 @@ mod test {
 
         let mut mock = MockMyTrait::new();
 
-        mock.expect_foo()
-            .with(eq(4))
-            .times(1)
-            .returning(|x| x + 1);
+        mock.expect_foo().with(eq(4)).times(1).returning(|x| x + 1);
 
         assert_eq!(5, call_with_four(&mock));
     }

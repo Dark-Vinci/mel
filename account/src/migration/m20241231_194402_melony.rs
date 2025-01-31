@@ -6,30 +6,29 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .create_table(
-                Table::create()
-                    .table(Post::Table)
-                    .if_not_exists()
-                    .col(pk_auto(Post::Id))
-                    .col(string(Post::Title))
-                    .col(string(Post::Text))
-                    .to_owned(),
-            )
-            .await
+        manager.get_connection()
+            .execute_unprepared(
+            "
+                CREATE TABLE `public`.`workspace` (
+                    `id` uuid NOT NULL PRIMARY KEY,
+                    `created_by` uuid NOT NULL,
+                    `description` varchar,
+                    `created_at` timestamp with time zone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+                    `updated_at` timestamp with time zone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+                    `deleted_at` timestamp with time zone
+                );
+            "
+        )
+            .await?;
+
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .drop_table(Table::drop().table(Post::Table).to_owned())
-            .await
-    }
-}
+        manager.get_connection()
+            .execute_unprepared("DELETE FROM public.`workspace`;")
+            .await?;
 
-#[derive(DeriveIden)]
-enum Post {
-    Table,
-    Id,
-    Title,
-    Text,
+        Ok(())
+    }
 }

@@ -1,4 +1,7 @@
-use sea_orm_migration::prelude::*;
+use {
+    sea_orm::{DbBackend, Statement},
+    sea_orm_migration::prelude::*,
+};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -6,64 +9,31 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .create_table(
-                Table::create()
-                    .table(User::Table)
-                    .if_not_exists()
-                    .col(
-                        ColumnDef::new(User::Id)
-                            .uuid()
-                            .not_null()
-                            .primary_key(),
-                    )
-                    .col(ColumnDef::new(User::FirstName).string().not_null())
-                    .col(ColumnDef::new(User::LastName).string().not_null())
-                    .col(
-                        ColumnDef::new(User::CreatedAt)
-                            .timestamp()
-                            .default(Expr::current_timestamp())
-                            .not_null(),
-                    )
-                    .col(
-                        ColumnDef::new(User::UpdatedAt)
-                            .timestamp()
-                            .default(Expr::current_timestamp())
-                            .not_null(),
-                    )
-                    .col(ColumnDef::new(User::DeletedAt).timestamp().null())
-                    .col(ColumnDef::new(User::DateOfBirth).date().not_null())
-                    .col(
-                        ColumnDef::new(User::Email)
-                            .string()
-                            .unique_key()
-                            .not_null(),
-                    )
-                    .col(ColumnDef::new(User::Password).text().not_null())
-                    .to_owned(),
-            )
-            .await
-    }
+        let db = manager.get_connection();
 
-    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .drop_table(Table::drop().table(User::Table).to_owned())
-            .await?;
+        db.execute_unprepared(
+            "CREATE TABLE `public`.`users` (
+                    `id` uuid NOT NULL PRIMARY KEY,
+                    `first_name` varchar NOT NULL,
+                    `last_name` varchar NOT NULL,
+                    `date_of_birth` datetime NOT NULL,
+                    `email` varchar NOT NULL UNIQUE,
+                    `password` varchar NOT NULL,
+                    `created_at` timestamp_with_timezone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+                    `updated_at` timestamp_with_timezone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+                    `deleted_at` timestamp_with_timezone
+                );
+            "
+        ).await?;
 
         Ok(())
     }
-}
 
-#[derive(DeriveIden)]
-enum User {
-    Table,
-    Id,
-    FirstName,
-    LastName,
-    DateOfBirth,
-    Email,
-    Password,
-    CreatedAt,
-    UpdatedAt,
-    DeletedAt,
+    async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        let db = manager.get_connection();
+
+        db.execute_unprepared("DROP TABLE public.users;").await?;
+
+        Ok(())
+    }
 }

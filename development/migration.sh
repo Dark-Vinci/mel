@@ -18,7 +18,7 @@ fi
 case $1 in
   "account")
     echo "about to cd into account service to generate migration"
-    cd ./account/src
+    cd ../account/src
     sea migrate generate "$2";;
 
   "reactions")

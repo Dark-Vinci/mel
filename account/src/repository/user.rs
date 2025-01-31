@@ -6,7 +6,7 @@ use {
     sdk::{
         errors::RepoError,
         models::{
-            db::auth::user::{self, Entity as User, Model},
+            db::account::user::{self, Entity as User, Model},
             others::auth::create::{CreateUserRequest, UpdateUserRequest},
         },
     },

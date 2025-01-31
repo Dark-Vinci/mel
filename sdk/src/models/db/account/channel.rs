@@ -1,5 +1,3 @@
-
-
 use {
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
@@ -13,7 +11,6 @@ use {
     DeriveEntityModel,
     Serialize,
     Deserialize,
-    DeriveActiveModel,
 )]
 #[sea_orm(table_name = "channel", schema_name = "public")]
 pub struct Model {

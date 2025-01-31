@@ -72,8 +72,6 @@ impl ActiveModelBehavior for ActiveModel {}
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}
 
-// // The final relation is Channel -> ChannelUser -> User [ reverse ]
-
 impl Related<super::channel::Entity> for Entity {
     fn to() -> RelationDef {
         super::channel_user::Relation::Channel.def()
@@ -81,5 +79,15 @@ impl Related<super::channel::Entity> for Entity {
 
     fn via() -> Option<RelationDef> {
         Some(super::channel_user::Relation::User.def().rev())
+    }
+}
+
+impl Related<super::workspace::Entity> for Entity {
+    fn to() -> RelationDef {
+        super::workspace_user::Relation::Workspace.def()
+    }
+
+    fn via() -> Option<RelationDef> {
+        Some(super::workspace_user::Relation::User.def().rev())
     }
 }
