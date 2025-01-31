@@ -13,18 +13,19 @@ impl MigrationTrait for Migration {
 
         db.execute_unprepared(
             "CREATE TABLE `public`.`users` (
-                    `id` uuid NOT NULL PRIMARY KEY,
-                    `first_name` varchar NOT NULL,
-                    `last_name` varchar NOT NULL,
-                    `date_of_birth` datetime NOT NULL,
-                    `email` varchar NOT NULL UNIQUE,
-                    `password` varchar NOT NULL,
-                    `created_at` timestamp_with_timezone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-                    `updated_at` timestamp_with_timezone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
-                    `deleted_at` timestamp_with_timezone
+                `id` uuid NOT NULL PRIMARY KEY,
+                `first_name` varchar NOT NULL,
+                `last_name` varchar NOT NULL,
+                `date_of_birth` datetime NOT NULL,
+                `email` varchar NOT NULL UNIQUE,
+                `password` varchar NOT NULL,
+                `created_at` timestamp_with_timezone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+                `updated_at` timestamp_with_timezone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+                `deleted_at` timestamp_with_timezone
                 );
             "
-        ).await?;
+        )
+            .await?;
 
         Ok(())
     }
