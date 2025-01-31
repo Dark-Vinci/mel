@@ -13,21 +13,19 @@ use {
     Deserialize,
     DeriveActiveModel,
 )]
-#[sea_orm(table_name = "profile_media", schema_name = "public")]
+#[sea_orm(table_name = "workspace_user", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
 
-    #[sea_orm(indexed)]
-    pub user_id: Uuid, // workspace_user_id
+    pub user_id: Uuid,
 
-    #[sea_orm(type = "TEXT")]
-    pub url: String,
+    pub workspace_id: Uuid,
+
+    pub invited_by: Option<Uuid>,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     pub created_at: DateTimeLocal,
-
-    pub is_last: bool,
 
     pub deleted_at: Option<DateTimeLocal>,
 }
