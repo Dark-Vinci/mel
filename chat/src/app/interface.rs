@@ -13,9 +13,7 @@ pub trait Auth {
 
 pub trait Account {}
 
-
 pub trait Settings {}
 
 #[cfg(test)]
-mod tests {
-}
+mod tests {}

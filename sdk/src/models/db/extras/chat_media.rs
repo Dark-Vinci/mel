@@ -1,9 +1,19 @@
-use uuid::Uuid;
-use sea_orm::entity::prelude::*;
-use serde::{Serialize, Deserialize};
+use {
+    sea_orm::entity::prelude::*,
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, DeriveActiveModel)]
-#[sea_orm(table_name = "chat_media", schema_name="public")]
+#[derive(
+    Clone,
+    Debug,
+    PartialEq,
+    DeriveEntityModel,
+    Serialize,
+    Deserialize,
+    DeriveActiveModel,
+)]
+#[sea_orm(table_name = "chat_media", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
@@ -29,4 +39,4 @@ pub struct Model {
 impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
-pub enum Relation{}
+pub enum Relation {}
