@@ -1,0 +1,24 @@
+[package]
+name = "chat"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "main"
+doc = false
+path= "src/bin/main.rs"
+
+[dependencies]
+async-trait = "0.1.83"
+chrono = "0.4.39"
+mockall = "0.13.1"
+sdk = {path = "../sdk"}
+sea-orm = { version= "1.1.1", features = ["sqlx-postgres", "runtime-tokio", "debug-print", "macros", "tests-cfg", "sqlx-sqlite"] }
+sea-orm-migration = "1.1.2"
+tokio = { version = "1.42.0", features = ["full"] }
+tonic = "0.10.2"
+tracing = "0.1.41"
+tracing-appender = "0.2.3"
+tracing-core = "0.1.33"
+tracing-subscriber = { version = "0.3.19", features = ["json"] }
+uuid = { version = "1.11.0", features = ["v4"] }

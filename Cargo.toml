@@ -3,6 +3,9 @@ resolver = "2"
 members = [ "account",
     "gateway",
     "sdk",
+    "chat",
+    "extras",
+    "channel",
 ]
 
 #[workspace]

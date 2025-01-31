@@ -12,7 +12,7 @@ use {
 #[sea_orm(table_name = "users", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    id: Uuid,
+    pub id: Uuid,
 
     pub first_name: String,
 

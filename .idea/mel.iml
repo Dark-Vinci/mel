@@ -9,6 +9,9 @@
       <sourceFolder url="file://$MODULE_DIR$/gateway/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/ui/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/mjk/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/channel/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/chat/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/extras/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
