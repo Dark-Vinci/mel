@@ -51,8 +51,6 @@ impl DB {
 
         let db = db.unwrap();
 
-
-
         #[cfg(not(test))]
         if e.environment != Environment::Production {
             // running for the first time;

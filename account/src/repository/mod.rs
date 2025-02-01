@@ -1,2 +1,3 @@
 pub mod user;
-mod workspace;
+pub mod workspace;
+pub mod workspace_user;

@@ -1,30 +1,40 @@
-#[cfg(test)]
-use mockall::automock;
 use {
     crate::{
-        app::interface::{Account, Auth, Settings},
+        app::interface::{Account, Auth, Settings, AccountInterface},
         config::config::Config,
         connections::db::DB,
-        repository::user::{UserRepo, UserRepository},
-        // downstream::downstream::Downstream,
-        // repository::user::UserRepository,
+        downstream::downstream::{Downstream, DownstreamImpl},
+        repository::{
+            user::{UserRepo, UserRepository},
+            workspace::{WorkspaceRepo, WorkspaceRepository},
+            workspace_user::{WorkspaceUserRepo, WorkspaceUserRepository},
+        },
     },
     uuid::Uuid,
+    std::fmt::Display,
 };
 
-// #[derive(Debug)]
 pub struct App {
     pub db: DB,
     pub config: Config,
-    // pub downstream: Box<dyn Downstream>,
+    pub downstream: Box<dyn Downstream + Sync + Send>,
     // pub redis: Box<dyn RedisInterface>,
     // pub kafka: Box<dyn KafkaInterface>,
     pub user_repo: Box<dyn UserRepository + Sync + Send>,
+    pub workspace_repo: Box<dyn WorkspaceRepository + Sync + Send>,
+    pub workspace_user_repo: Box<dyn WorkspaceUserRepository + Sync + Send>,
+}
+
+impl Display for App {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, format!("DB: {:?}\n; Config: {:?}", self.db, self.config))
+    }
 }
 
 impl App {
     pub async fn new(c: &Config) -> Self {
         let db = DB::new(&c).await.unwrap();
+        let downstream = DownstreamImpl::new();
 
         // let redis = MyRedis::new(
         //     &c.redis.username,
@@ -46,11 +56,16 @@ impl App {
         //     &c.kafka.port,
         // );
 
-        let u = UserRepo::new(db.clone());
+        let user = UserRepo::new(db.clone());
+        let workspace = WorkspaceRepo::new(db.clone());
+        let workspace_user = WorkspaceUserRepo::new(db.clone());
 
         Self {
             db,
-            user_repo: Box::new(u),
+            workspace_user_repo: Box::new(workspace_user),
+            workspace_repo: Box::new(workspace),
+            user_repo: Box::new(user),
+            downstream: Box::new(downstream),
             config: Config::new(),
             // redis: Box::new(redis),
             // kafka: Box::new(kafka),
@@ -63,8 +78,6 @@ impl App {
         format!("PING FROM ACCOUNT SERVICE: {}", id)
     }
 }
-
-pub trait AccountInterface: Auth + Account + Settings {}
 
 impl AccountInterface for App {}
 

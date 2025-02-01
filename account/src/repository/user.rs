@@ -1,5 +1,3 @@
-use chrono::Utc;
-use sea_orm::IntoActiveModel;
 use {
     crate::connections::db::DB,
     async_trait::async_trait,
@@ -23,6 +21,7 @@ use {
     tracing::{debug, error, Level},
     uuid::Uuid,
 };
+use {chrono::Utc, sea_orm::IntoActiveModel};
 
 #[async_trait]
 pub trait UserRepository {
@@ -67,12 +66,7 @@ impl UserRepo {
 
 #[async_trait]
 impl UserRepository for UserRepo {
-    #[tracing::instrument(
-    name = "UserRepository::create",
-    skip(self),
-    error=(level = Level::ERROR),
-    level=Level::DEBUG,
-    )]
+    #[tracing::instrument(name = "UserRepository::create", skip(self))]
     async fn create(
         &self,
         user: CreateUserRequest,
@@ -97,12 +91,7 @@ impl UserRepository for UserRepo {
         Ok(result.unwrap())
     }
 
-    #[tracing::instrument(
-    name = "UserRepository::get_by_id",
-    skip(self),
-    error=(level = Level::ERROR),
-    level=Level::DEBUG,
-    )]
+    #[tracing::instrument(name = "UserRepository::get_by_id", skip(self))]
     async fn get_by_id(
         &self,
         id: Uuid,
@@ -127,12 +116,7 @@ impl UserRepository for UserRepo {
         Ok(user.unwrap())
     }
 
-    #[tracing::instrument(
-    name = "UserRepository::get_by_email",
-    skip(self),
-    error=(level = Level::ERROR),
-    level=Level::DEBUG,
-    )]
+    #[tracing::instrument(name = "UserRepository::get_by_email", skip(self))]
     async fn get_by_email(
         &self,
         request_id: Uuid,
@@ -163,12 +147,7 @@ impl UserRepository for UserRepo {
         Ok(user.unwrap())
     }
 
-    #[tracing::instrument(
-    name = "UserRepository::soft_delete",
-    skip(self),
-    error=(level = Level::ERROR),
-    level=Level::DEBUG,
-    )]
+    #[tracing::instrument(name = "UserRepository::soft_delete", skip(self))]
     async fn soft_delete(
         &self,
         request_id: Uuid,
@@ -191,12 +170,7 @@ impl UserRepository for UserRepo {
         Ok(())
     }
 
-    #[tracing::instrument(
-    name = "UserRepository::update",
-    skip(self),
-    error=(level = Level::ERROR),
-    level=Level::DEBUG,
-    )]
+    #[tracing::instrument(name = "UserRepository::update", skip(self))]
     async fn update(
         &self,
         request_id: Uuid,

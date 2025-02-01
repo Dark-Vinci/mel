@@ -1,10 +1,8 @@
 use {
     super::{
-        m20250201_001938_create_user,
-        m20250201_001957_create_workspace,
+        m20250201_001938_create_user, m20250201_001957_create_workspace,
         m20250201_003049_create_workspace_user,
-        m20250201_003108_create_channel_user,
-        m20250201_003101_create_channel,
+        m20250201_003101_create_channel, m20250201_003108_create_channel_user,
     },
     sea_orm_migration::{MigrationTrait, MigratorTrait},
 };

@@ -1,14 +1,26 @@
-use chrono::Utc;
-use sea_orm::{ActiveModelTrait, DbErr, EntityTrait, IntoActiveModel};
-use sea_orm::ActiveValue::Set;
-use tracing::{debug, error};
-use uuid::Uuid;
-use sdk::errors::RepoError;
-use sdk::models::db::account::{user, workspace};
-use sdk::models::db::account::workspace::Model as Workspace;
-use sdk::models::db::account::workspace::Entity as WorkspaceEntity;
-use sdk::models::others::auth::workspace::{CreateWorkspaceRequest, UpdateWorkspaceRequest};
-use crate::connections::db::DB;
+use {
+    crate::connections::db::DB,
+    chrono::Utc,
+    sdk::{
+        errors::RepoError,
+        models::{
+            db::account::{
+                user,
+                workspace::{
+                    self, Entity as WorkspaceEntity, Model as Workspace,
+                },
+            },
+            others::auth::workspace::{
+                CreateWorkspaceRequest, UpdateWorkspaceRequest,
+            },
+        },
+    },
+    sea_orm::{
+        ActiveModelTrait, ActiveValue::Set, DbErr, EntityTrait, IntoActiveModel,
+    },
+    tracing::{debug, error},
+    uuid::Uuid,
+};
 
 #[async_trait::async_trait]
 pub trait WorkspaceRepository {
@@ -24,16 +36,13 @@ pub trait WorkspaceRepository {
         request_id: Uuid,
     ) -> Result<Workspace, RepoError>;
 
-    async fn delete(
-        &self,
-        request_id: Uuid,
-        id: Uuid,
-    ) -> Result<(), RepoError>;
+    async fn delete(&self, id: Uuid, request_id: Uuid)
+        -> Result<(), RepoError>;
 
     async fn update(
         &self,
-        request_id: Uuid,
         result: UpdateWorkspaceRequest,
+        request_id: Uuid,
     ) -> Result<Workspace, RepoError>;
 }
 
@@ -47,12 +56,20 @@ impl WorkspaceRepo {
 
 #[async_trait::async_trait]
 impl WorkspaceRepository for WorkspaceRepo {
-    async fn create(&self, workspace: CreateWorkspaceRequest, request_id: Uuid) -> Result<Workspace, RepoError> {
-        debug!("Creating workspace: {:?}, with request id: {}", workspace, request_id);
+    #[tracing::instrument(name = "WorkspaceRepository::create", skip(self))]
+    async fn create(
+        &self,
+        workspace: CreateWorkspaceRequest,
+        request_id: Uuid,
+    ) -> Result<Workspace, RepoError> {
+        debug!(
+            "Creating workspace: {:?}, with request id: {}",
+            workspace, request_id
+        );
 
-        let workActive: workspace::ActiveModel = workspace.into();
+        let work_active: workspace::ActiveModel = workspace.into();
 
-        let result = workActive.insert(&self.0.connection).await;
+        let result = work_active.insert(&self.0.connection).await;
 
         if let Err(DbErr::Exec(err)) = result {
             error!(error = &err.to_string(), "Failed to insert result record");
@@ -67,10 +84,20 @@ impl WorkspaceRepository for WorkspaceRepo {
         Ok(result.unwrap())
     }
 
-    async fn get_by_id(&self, id: Uuid, request_id: Uuid) -> Result<Workspace, RepoError> {
-        debug!("Getting workspace by id: {}, with request id: {}", id, request_id);
+    #[tracing::instrument(name = "WorkspaceRepository::get_by_id", skip(self))]
+    async fn get_by_id(
+        &self,
+        id: Uuid,
+        request_id: Uuid,
+    ) -> Result<Workspace, RepoError> {
+        debug!(
+            "Getting workspace by id: {}, with request id: {}",
+            id, request_id
+        );
 
-        let result = WorkspaceEntity::find_by_id(id).one(&self.0.connection).await;
+        let result = WorkspaceEntity::find_by_id(id)
+            .one(&self.0.connection)
+            .await;
 
         if let Err(DbErr::Exec(err)) = &result {
             error!(error = &err.to_string(), "Failed to find workspace by id");
@@ -87,7 +114,12 @@ impl WorkspaceRepository for WorkspaceRepo {
         Ok(result.unwrap())
     }
 
-    async fn delete(&self, request_id: Uuid, id: Uuid) -> Result<(), RepoError> {
+    #[tracing::instrument(name = "WorkspaceRepository::delete", skip(self))]
+    async fn delete(
+        &self,
+        id: Uuid,
+        request_id: Uuid,
+    ) -> Result<(), RepoError> {
         debug!("Deleting workspace by id: {}, request_id {}", id, request_id);
 
         let mut result =
@@ -105,8 +137,16 @@ impl WorkspaceRepository for WorkspaceRepo {
         Ok(())
     }
 
-    async fn update(&self, workspace: UpdateWorkspaceRequest, request_id: Uuid) -> Result<Workspace, RepoError> {
-        debug!("Updating workspace by id: {:?}, request_id {}", workspace, request_id);
+    #[tracing::instrument(name = "WorkspaceRepository::update", skip(self))]
+    async fn update(
+        &self,
+        workspace: UpdateWorkspaceRequest,
+        request_id: Uuid,
+    ) -> Result<Workspace, RepoError> {
+        debug!(
+            "Updating workspace by id: {:?}, request_id {}",
+            workspace, request_id
+        );
 
         let model: workspace::ActiveModel = workspace.into();
 
