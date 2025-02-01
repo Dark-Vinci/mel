@@ -1,9 +1,12 @@
+use sea_orm::ActiveValue::Set;
 use {
     chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::auth::create::{CreateUserRequest, UpdateUserRequest};
+use crate::models::others::auth::workspace::{CreateWorkspaceRequest, UpdateWorkspaceRequest};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -25,6 +28,35 @@ pub struct Model {
 
     #[sea_orm(nullable)]
     pub deleted_at: Option<chrono::DateTime<Utc>>,
+}
+
+impl From<CreateWorkspaceRequest> for ActiveModel {
+    fn from(val: CreateWorkspaceRequest) -> Self {
+        Self {
+            id: Set(Uuid::new_v4()),
+            created_by: Set(val.),
+            description: Set(Some(val.password)),
+            created_at: Set(Utc::now()),
+            updated_at: Set(Utc::now()),
+            deleted_at: Set(None),
+        }
+    }
+}
+
+impl From<UpdateWorkspaceRequest> for ActiveModel {
+    fn from(fro: UpdateWorkspaceRequest) -> Self {
+        let mut val: ActiveModel = Self {
+            ..Default::default()
+        };
+
+        if let Some(description) = &fro.description {
+            val.description = Set(Some(description.to_owned()));
+        }
+
+        // todo: fill other fields
+
+        val
+    }
 }
 
 impl ActiveModelBehavior for ActiveModel {}

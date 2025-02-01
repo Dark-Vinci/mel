@@ -1,3 +1,4 @@
+use chrono::Utc;
 use sea_orm::IntoActiveModel;
 use {
     crate::connections::db::DB,
@@ -178,7 +179,7 @@ impl UserRepository for UserRepo {
         let mut user =
             self.get_by_id(request_id, id).await?.into_active_model();
 
-        user.deleted_at = Set(Some(Local::now()));
+        user.deleted_at = Set(Some(Utc::now()));
 
         let res = user.update(&self.0.connection).await;
 
