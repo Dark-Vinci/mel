@@ -24,6 +24,7 @@ pub struct Model {
 
     pub is_last: bool,
 
+    #[sea_orm(nullable)]
     pub deleted_at: Option<chrono::DateTime<Utc>>,
 }
 

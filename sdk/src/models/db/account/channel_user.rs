@@ -22,6 +22,7 @@ pub struct Model {
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     pub created_at: chrono::DateTime<Utc>,
 
+    #[sea_orm(nullable)]
     pub deleted_at: Option<chrono::DateTime<Utc>>,
 }
 

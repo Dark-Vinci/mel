@@ -1,0 +1,15 @@
+@mixin rectangle($width: auto, $height: auto) {
+  width: $width;
+  height: $height;
+}
+
+@mixin square($length: auto) {
+  width: $length;
+  height: $length;
+}
+
+@mixin circle($length: auto) {
+  width: $length;
+  height: $length;
+  border-radius: 50%;
+}
