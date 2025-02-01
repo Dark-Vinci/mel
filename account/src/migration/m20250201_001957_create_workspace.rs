@@ -8,7 +8,7 @@ impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager.get_connection()
             .execute_unprepared(
-            "
+                "
                 CREATE TABLE `public`.`workspace` (
                     `id` uuid NOT NULL PRIMARY KEY,
                     `created_by` uuid NOT NULL,
@@ -18,7 +18,7 @@ impl MigrationTrait for Migration {
                     `deleted_at` timestamp with time zone
                 );
             "
-        )
+            )
             .await?;
 
         Ok(())
