@@ -6,29 +6,32 @@ pub struct Migration;
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!();
-
-        manager
-            .create_table(
-                Table::create()
-                    .table(Post::Table)
-                    .if_not_exists()
-                    .col(pk_auto(Post::Id))
-                    .col(string(Post::Title))
-                    .col(string(Post::Text))
-                    .to_owned(),
+        manager.get_connection()
+            .execute_unprepared(
+                "
+                    CREATE TABLE `public`.`channel` (
+                        `id` uuid NOT NULL PRIMARY KEY,
+                        `name` varchar NOT NULL,
+                        `description` varchar,
+                        `created_by` uuid NOT NULL,
+                        `created_at` timestamp with time zone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+                        `updated_at` timestamp with time zone NOT NULL DEFAULT 'CURRENT_TIMESTAMP',
+                        `deleted_at` timestamp with time zone
+                    );
+                "
             )
-            .await
+            .await?;
+
+        Ok(())
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        // Replace the sample below with your own migration scripts
-        todo!();
-
         manager
-            .drop_table(Table::drop().table(Post::Table).to_owned())
-            .await
+            .get_connection()
+            .execute_unprepared("DELETE FROM public.`channel`;")
+            .await?;
+
+        Ok(())
     }
 }
 

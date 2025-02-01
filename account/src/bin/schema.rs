@@ -1,5 +1,5 @@
 use {
-    sdk::models::db::account::workspace::Entity as WorkspaceUser,
+    sdk::models::db::account::channel_user::Entity as WorkspaceUser,
     sea_orm::{DbBackend, Schema},
 };
 
