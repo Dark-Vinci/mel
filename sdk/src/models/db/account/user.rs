@@ -2,6 +2,7 @@ use {
     crate::models::others::auth::create::{
         CreateUserRequest, UpdateUserRequest,
     },
+    chrono::Utc,
     sea_orm::{entity::prelude::*, ActiveValue::Set},
     serde::{Deserialize, Serialize},
 };
@@ -26,27 +27,27 @@ pub struct Model {
     pub password: String,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub created_at: DateTimeLocal,
+    pub created_at: chrono::DateTime<Utc>,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub updated_at: DateTimeLocal,
+    pub updated_at: chrono::DateTime<Utc>,
 
     #[sea_orm(nullable)]
-    pub deleted_at: Option<DateTimeLocal>,
+    pub deleted_at: Option<chrono::DateTime<Utc>>,
 }
 
 impl From<CreateUserRequest> for ActiveModel {
     fn from(val: CreateUserRequest) -> Self {
         Self {
-            id: Default::default(),
+            id: Set(Uuid::new_v4()),
             first_name: Set(val.first_name),
             last_name: Set(val.last_name),
             date_of_birth: Set(val.date_of_birth),
             email: Set(val.email),
             password: Set(val.password),
-            created_at: Default::default(),
-            updated_at: Default::default(),
-            deleted_at: Default::default(),
+            created_at: Set(Utc::now()),
+            updated_at: Set(Utc::now()),
+            deleted_at: Set(None),
         }
     }
 }
@@ -67,7 +68,21 @@ impl From<UpdateUserRequest> for ActiveModel {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {}
+impl ActiveModelBehavior for ActiveModel {
+    async fn before_save<C>(self, _db: &C, insert: bool) -> Result<Self, DbErr>
+    where
+        C: ConnectionTrait,
+    {
+        if insert || !self.password.is_unchanged() {
+            let mut this = self;
+            this.password = Set(format!("Pass{}", this.password.to_string()));
+
+            Ok(this)
+        } else {
+            Ok(self)
+        }
+    }
+}
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}

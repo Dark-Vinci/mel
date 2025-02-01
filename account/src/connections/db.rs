@@ -51,11 +51,17 @@ impl DB {
 
         let db = db.unwrap();
 
+
+
+        #[cfg(not(test))]
         if e.environment != Environment::Production {
             // running for the first time;
             Migrator::install(&db).await.unwrap();
             Migrator::up(&db, None).await.unwrap();
         }
+
+        #[cfg(test)]
+        Migrator::up(&db, None).await.unwrap();
 
         debug!("connected to the DB");
 

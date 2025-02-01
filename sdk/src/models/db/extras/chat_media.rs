@@ -1,16 +1,12 @@
 use {
+    chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
 
 #[derive(
-    Clone,
-    Debug,
-    PartialEq,
-    DeriveEntityModel,
-    Serialize,
-    Deserialize,
+    Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
 )]
 #[sea_orm(table_name = "chat_media", schema_name = "public")]
 pub struct Model {
@@ -30,9 +26,9 @@ pub struct Model {
     pub url: String,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub created_at: DateTimeLocal,
+    pub created_at: chrono::DateTime<Utc>,
 
-    pub deleted_at: Option<DateTimeLocal>,
+    pub deleted_at: Option<chrono::DateTime<Utc>>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

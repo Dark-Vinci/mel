@@ -1,16 +1,12 @@
 use {
+    chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
 
 #[derive(
-    Clone,
-    Debug,
-    PartialEq,
-    DeriveEntityModel,
-    Serialize,
-    Deserialize,
+    Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
 )]
 #[sea_orm(table_name = "channel_user", schema_name = "public")]
 pub struct Model {
@@ -24,9 +20,9 @@ pub struct Model {
     pub invited_by: Option<Uuid>,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub created_at: DateTimeLocal,
+    pub created_at: chrono::DateTime<Utc>,
 
-    pub deleted_at: Option<DateTimeLocal>,
+    pub deleted_at: Option<chrono::DateTime<Utc>>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}
@@ -40,15 +36,19 @@ pub enum Relation {
 impl RelationTrait for Relation {
     fn def(&self) -> RelationDef {
         match self {
-            Self::User => Entity::belongs_to(super::user::Entity)
-                .from(Column::UserId)
-                .to(super::user::Column::Id)
-                .into(),
+            Self::User => {
+                Entity::belongs_to(super::user::Entity)
+                    .from(Column::UserId)
+                    .to(super::user::Column::Id)
+                    .into()
+            },
 
-            Self::Channel => Entity::belongs_to(super::channel::Entity)
-                .from(Column::ChannelId)
-                .to(super::channel::Column::Id)
-                .into(),
+            Self::Channel => {
+                Entity::belongs_to(super::channel::Entity)
+                    .from(Column::ChannelId)
+                    .to(super::channel::Column::Id)
+                    .into()
+            },
         }
     }
 }
