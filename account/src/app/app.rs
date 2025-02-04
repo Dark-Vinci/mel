@@ -5,6 +5,8 @@ use {
         connections::db::DB,
         downstream::downstream::{Downstream, DownstreamImpl},
         repository::{
+            channel::{ChannelRepo, ChannelRepository},
+            channel_user::ChannelUserRepository,
             user::{UserRepo, UserRepository},
             workspace::{WorkspaceRepo, WorkspaceRepository},
             workspace_user::{WorkspaceUserRepo, WorkspaceUserRepository},
@@ -13,8 +15,6 @@ use {
     std::fmt::Display,
     uuid::Uuid,
 };
-use crate::repository::channel::{ChannelRepo, ChannelRepository};
-use crate::repository::channel_user::ChannelUserRepository;
 
 pub struct App {
     pub db: DB,

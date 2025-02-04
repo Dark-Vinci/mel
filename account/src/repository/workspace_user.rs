@@ -41,7 +41,7 @@ pub trait WorkspaceUserRepository {
     ) -> Result<WorkspaceUser, RepoError>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
-                    -> Result<(), RepoError>;
+        -> Result<(), RepoError>;
 
     async fn get(
         &self,
