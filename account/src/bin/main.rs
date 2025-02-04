@@ -1,5 +1,3 @@
-use tonic::{Request, Status};
-use tonic::metadata::MetadataValue;
 use {
     account::{app::app::App, config::config::Config, server::server::Account},
     sdk::{
@@ -9,16 +7,15 @@ use {
         },
         errors::AppError,
         generated_proto_rs::mel_account::account_service_server::AccountServiceServer,
-        utils::utility::graceful_shutdown,
+        utils::utility::{graceful_shutdown, service_auth},
     },
     std::{env, net::SocketAddr, panic},
-    tonic::transport::Server,
+    tonic::{metadata::MetadataValue, transport::Server, Request, Status},
     tracing::{error, info},
     tracing_appender::rolling,
     tracing_core::LevelFilter,
     tracing_subscriber::{fmt::writer::MakeWriterExt, EnvFilter},
 };
-use sdk::utils::utility::service_auth;
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
@@ -78,7 +75,8 @@ async fn main() -> Result<(), AppError> {
         app_name, service_name, addr
     );
 
-    let service = AccountServiceServer::with_interceptor(account_server, service_auth);
+    let service =
+        AccountServiceServer::with_interceptor(account_server, service_auth);
 
     Server::builder()
         .add_service(service)
@@ -87,4 +85,3 @@ async fn main() -> Result<(), AppError> {
 
     Ok(())
 }
-
