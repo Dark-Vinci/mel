@@ -73,7 +73,7 @@ impl App {
             channel_repo: Box::new(channel),
             user_repo: Box::new(user),
             downstream: Box::new(downstream),
-            config: Config::new(),
+            config: Config::new(), //todo; update this
             channel_user_repo: Box::new(channel_user),
             // redis: Box::new(redis),
             // kafka: Box::new(kafka),
