@@ -1,3 +1,5 @@
+use tonic::{Request, Status};
+use tonic::metadata::MetadataValue;
 use {
     account::{app::app::App, config::config::Config, server::server::Account},
     sdk::{
@@ -16,6 +18,7 @@ use {
     tracing_core::LevelFilter,
     tracing_subscriber::{fmt::writer::MakeWriterExt, EnvFilter},
 };
+use sdk::utils::utility::service_auth;
 
 #[tokio::main]
 async fn main() -> Result<(), AppError> {
@@ -75,14 +78,13 @@ async fn main() -> Result<(), AppError> {
         app_name, service_name, addr
     );
 
-    // start service and listen to shut down hooks;
-    if let Err(err) = Server::builder()
-        .add_service(AccountServiceServer::new(account_server))
+    let service = AccountServiceServer::with_interceptor(account_server, service_auth);
+
+    Server::builder()
+        .add_service(service)
         .serve_with_shutdown(addr, graceful_shutdown())
-        .await
-    {
-        error!("error:{}", err);
-    }
+        .await?;
 
     Ok(())
 }
+

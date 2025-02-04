@@ -1,3 +1,4 @@
+use tonic::{Request, Status};
 use {
     argon2::{
         password_hash::SaltString, Algorithm, Argon2, Params, PasswordHash,
@@ -87,5 +88,16 @@ where
     match opt.as_deref() {
         None | Some("") => Ok(None),
         Some(s) => FromStr::from_str(s).map_err(de::Error::custom).map(Some),
+    }
+}
+
+pub fn service_auth<T>(token: &str) -> T
+where T: FnMut(Request<()>) -> Result<Request<()>, Status>
+{
+    |mut req: Request<()>| -> Result<Request<()>, Status> {
+        match req.metadata().get("authorization") {
+            Some(t) if token == t => Ok(req),
+            _ => Err(Status::unauthenticated("No valid auth token")),
+        }
     }
 }
