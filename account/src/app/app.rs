@@ -1,6 +1,6 @@
 use {
     crate::{
-        app::interface::{Account, Auth, Settings, AccountInterface},
+        app::interface::{Account, AccountInterface, Auth, Settings},
         config::config::Config,
         connections::db::DB,
         downstream::downstream::{Downstream, DownstreamImpl},
@@ -10,8 +10,8 @@ use {
             workspace_user::{WorkspaceUserRepo, WorkspaceUserRepository},
         },
     },
-    uuid::Uuid,
     std::fmt::Display,
+    uuid::Uuid,
 };
 
 pub struct App {

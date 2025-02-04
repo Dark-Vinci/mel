@@ -1,9 +1,12 @@
+use sea_orm::ActiveValue::Set;
 use {
     chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::auth::channel::{UpdateChannel, CreateChannel};
+use crate::models::others::auth::create::UpdateUserRequest;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -30,6 +33,30 @@ pub struct Model {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
+
+impl From<CreateChannel> for ActiveModel {
+    fn from(fro: CreateChannel) -> Self {
+        let mut val: ActiveModel = Self {
+            ..Default::default()
+        };
+
+        // todo: fill other fields
+
+        val
+    }
+}
+
+impl From<UpdateChannel> for ActiveModel {
+    fn from(fro: UpdateChannel) -> Self {
+        let mut val: ActiveModel = Self {
+            ..Default::default()
+        };
+
+        // todo: fill other fields
+
+        val
+    }
+}
 
 #[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
 pub enum Relation {}

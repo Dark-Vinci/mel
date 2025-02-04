@@ -4,6 +4,7 @@ use {
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::auth::channel::{CreateChannel, CreateChannelUser, UpdateChannel};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -24,6 +25,30 @@ pub struct Model {
 
     #[sea_orm(nullable)]
     pub deleted_at: Option<chrono::DateTime<Utc>>,
+}
+
+impl From<CreateChannelUser> for ActiveModel {
+    fn from(fro: CreateChannel) -> Self {
+        let mut val: ActiveModel = Self {
+            ..Default::default()
+        };
+
+        // todo: fill other fields
+
+        val
+    }
+}
+
+impl From<CreateChannelUser> for ActiveModel {
+    fn from(fro: UpdateChannel) -> Self {
+        let mut val: ActiveModel = Self {
+            ..Default::default()
+        };
+
+        // todo: fill other fields
+
+        val
+    }
 }
 
 impl ActiveModelBehavior for ActiveModel {}
