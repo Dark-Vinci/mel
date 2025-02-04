@@ -59,6 +59,12 @@ pub trait ChannelUserRepository {
 
 pub struct ChannelUserRepo(DB);
 
+impl ChannelUserRepo {
+    pub fn new(db: DB) -> Self {
+        Self(db)
+    }
+}
+
 #[async_trait]
 impl ChannelUserRepository for ChannelUserRepo {
     #[tracing::instrument(name = "ChannelUserRepo::create", skip(self))]
@@ -67,7 +73,21 @@ impl ChannelUserRepository for ChannelUserRepo {
         payload: CreateChannelUser,
         request_id: Uuid,
     ) -> Result<ChannelUser, RepoError> {
-        todo!()
+        debug!(
+            "Creating channel_user by id: {:?}, request_id {}",
+            payload, request_id
+        );
+
+        let model: ActiveModel = payload.into();
+
+        let result = model.insert(&self.0.connection).await;
+
+        if let Err(DbErr::Exec(err)) = &result {
+            error!(error = &err.to_string(), "Failed to create channel_user");
+            return Err(RepoError::FailedToUpdate);
+        }
+
+        Ok(result.unwrap())
     }
 
     #[tracing::instrument(name = "ChannelUserRepo::update", skip(self))]

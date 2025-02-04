@@ -45,7 +45,7 @@ pub trait ChannelRepository {
 pub struct ChannelRepo(DB);
 
 impl ChannelRepo {
-    fn new(connection: DB) -> Self {
+    pub fn new(connection: DB) -> Self {
         Self(connection)
     }
 }

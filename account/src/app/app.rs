@@ -13,6 +13,8 @@ use {
     std::fmt::Display,
     uuid::Uuid,
 };
+use crate::repository::channel::{ChannelRepo, ChannelRepository};
+use crate::repository::channel_user::ChannelUserRepository;
 
 pub struct App {
     pub db: DB,
@@ -22,6 +24,8 @@ pub struct App {
     // pub kafka: Box<dyn KafkaInterface>,
     pub user_repo: Box<dyn UserRepository + Sync + Send>,
     pub workspace_repo: Box<dyn WorkspaceRepository + Sync + Send>,
+    pub channel_repo: Box<dyn ChannelRepository + Sync + Send>,
+    pub channel_user_repo: Box<dyn ChannelUserRepository + Sync + Send>,
     pub workspace_user_repo: Box<dyn WorkspaceUserRepository + Sync + Send>,
 }
 
@@ -57,6 +61,8 @@ impl App {
         // );
 
         let user = UserRepo::new(db.clone());
+        let channel = ChannelRepo::new(db.clone());
+        let channel_user = WorkspaceUserRepo::new(db.clone());
         let workspace = WorkspaceRepo::new(db.clone());
         let workspace_user = WorkspaceUserRepo::new(db.clone());
 
@@ -64,9 +70,11 @@ impl App {
             db,
             workspace_user_repo: Box::new(workspace_user),
             workspace_repo: Box::new(workspace),
+            channel_repo: Box::new(channel),
             user_repo: Box::new(user),
             downstream: Box::new(downstream),
             config: Config::new(),
+            channel_user_repo: Box::new(channel_user),
             // redis: Box::new(redis),
             // kafka: Box::new(kafka),
         }

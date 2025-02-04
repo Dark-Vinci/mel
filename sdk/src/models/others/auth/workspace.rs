@@ -19,3 +19,7 @@ pub struct UpdateWorkspaceRequest {
     pub password: Option<String>,
     pub date_of_birth: Option<chrono::DateTime<Utc>>,
 }
+
+pub struct CreateWorkspaceUser {}
+
+pub struct UpdateWorkspaceUser {}
