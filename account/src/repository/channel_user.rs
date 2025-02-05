@@ -6,11 +6,11 @@ use {
         errors::RepoError,
         models::{
             db::account::{
-                user,
-                workspace_user::{
+                channel_user::{
                     ActiveModel, Column, Entity as ChannelUserEntity,
                     Model as ChannelUser,
                 },
+                user,
             },
             others::{
                 auth::channel::{CreateChannelUser, UpdateChannelUser},

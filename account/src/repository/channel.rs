@@ -6,13 +6,14 @@ use {
         errors::RepoError,
         models::{
             db::account::channel::{
-                ActiveModel, Entity as ChannelEntity, Model as Channel,
+                ActiveModel, Column, Entity as ChannelEntity, Model as Channel,
             },
             others::auth::channel::{CreateChannel, UpdateChannel},
         },
     },
     sea_orm::{
-        ActiveModelTrait, ActiveValue::Set, DbErr, EntityTrait, IntoActiveModel,
+        ActiveModelTrait, ActiveValue::Set, DbErr, EntityTrait,
+        IntoActiveModel, QueryFilter,
     },
     tracing::{debug, error},
     uuid::Uuid,
@@ -40,6 +41,12 @@ pub trait ChannelRepository {
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
         -> Result<(), RepoError>;
+
+    async fn get_by_name(
+        &self,
+        name: &str,
+        request_id: Uuid,
+    ) -> Result<Channel, RepoError>;
 }
 
 pub struct ChannelRepo(DB);
@@ -150,5 +157,36 @@ impl ChannelRepository for ChannelRepo {
         }
 
         Ok(())
+    }
+
+    #[tracing::instrument(name = "ChannelRepo::get_by_name", skip(self))]
+    async fn get_by_name(
+        &self,
+        name: &str,
+        request_id: Uuid,
+    ) -> Result<Channel, RepoError> {
+        debug!(
+            "Getting channel by id: {}, with request id: {}",
+            name, request_id
+        );
+
+        let result = ChannelEntity::find()
+            .filter(Column::Name.eq(name))
+            .one(&self.0.connection)
+            .await;
+
+        if let Err(DbErr::Exec(err)) = &result {
+            error!(error = &err.to_string(), "Failed to find channel by id");
+            return Err(RepoError::SomethingWentWrong);
+        }
+
+        let chan = result.unwrap();
+
+        if chan.is_none() {
+            error!("channel not found");
+            return Err(RepoError::NotFound);
+        }
+
+        Ok(chan.unwrap())
     }
 }
