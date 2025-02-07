@@ -1,5 +1,7 @@
-use dioxus::prelude::*;
-use crate::views::{Blog, Home};
+use {
+    crate::views::{Blog, Home},
+    dioxus::prelude::*,
+};
 
 #[derive(Debug, Clone, Routable, PartialEq)]
 #[rustfmt::skip]

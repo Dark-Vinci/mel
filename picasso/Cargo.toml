@@ -3,11 +3,15 @@ name = "picasso"
 version = "0.1.0"
 edition = "2021"
 
+
+
+[workspace]
+
 [dependencies]
 dioxus = { version = "0.6.0", features = ["router"] }
 
 [features]
-default = ["desktop"]
+default = ["web"]
 web = ["dioxus/web"]
 mobile = ["dioxus/mobile"]
 desktop = ["dioxus/desktop"]

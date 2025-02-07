@@ -1,8 +1,10 @@
 #blog {
   margin-top: 50px;
+  font-family: 'fab_medium', serif;
 }
 
 #blog a {
-  color: #ffffff;
+  color: #fff;
   margin-top: 50px;
+  font-family: fab_medium, serif;
 }

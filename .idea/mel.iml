@@ -12,12 +12,12 @@
       <sourceFolder url="file://$MODULE_DIR$/channel/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/chat/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/extras/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/mellow/desktop/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/mellow/mobile/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/mellow/ui/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/mellow/web/src" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/mellow/target" />
+      <sourceFolder url="file://$MODULE_DIR$/picasso/desktop/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/picasso/mobile/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/picasso/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/picasso/ui/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/picasso/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

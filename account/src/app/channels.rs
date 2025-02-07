@@ -50,6 +50,16 @@ impl ChannelTrait for App {
         Ok(channel.unwrap())
     }
 
+    #[tracing::instrument(name = "App::update_channel", skip(self))]
+    async fn update_channel(
+        &self,
+        payload: CreateChannel,
+        request_id: Uuid,
+    ) -> Result<Channel, GrpcError> {
+        debug!("App::update_channel; Got Request to update channel");
+    }
+
+    #[tracing::instrument(name = "App::create_channel_user", skip(self))]
     async fn create_channel_user(
         &self,
         payload: CreateChannelUser,
@@ -109,7 +119,24 @@ impl ChannelTrait for App {
         Ok(())
     }
 
-    async fn remove_channel_user(&self, workspace_id: Uuid, channel_id: Uuid, request_id: Uuid) -> Result<(), GrpcError> {
-        todo!()
+    #[tracing::instrument(name = "App::remove_channel_user", skip(self))]
+    async fn remove_channel_user(&self, channel_user_id: Uuid, request_id: Uuid) -> Result<(), GrpcError> {
+        let _ = self.channel_user_repo
+            .get_by_id(channel_user_id, request_id)
+            .await
+            .map_err(|err| {
+                error!("Unable to find user by id: {channel_id}, err: {err}");
+                GrpcError::NotFound(format!("Channel {channel_id} not found"))
+            })?;
+
+        let _ = self.channel_user_repo
+            .delete(channel_user_id, request_id)
+            .await
+            .map_err(|err| {
+                error!("Unable to find user by id: {channel_id}, err: {err}");
+                GrpcError::Generic
+            })?;
+
+        Ok(())
     }
 }

@@ -125,7 +125,7 @@ impl ChannelUserRepository for ChannelUserRepo {
         );
 
         let mut channel_user =
-            self.get_by_id(request_id, id).await?.into_active_model();
+            self.get_by_id(id, request_id).await?.into_active_model();
 
         channel_user.deleted_at = Set(Some(Utc::now()));
 

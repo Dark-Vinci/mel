@@ -27,6 +27,12 @@ pub trait ChannelTrait {
         request_id: Uuid,
     ) -> Result<Channel, GrpcError>;
 
+    async fn update_channel(
+        &self,
+        payload: CreateChannel,
+        request_id: Uuid,
+    ) -> Result<Channel, GrpcError>;
+
     async fn create_channel_user(
         &self,
         payload: CreateChannelUser,
@@ -39,7 +45,7 @@ pub trait ChannelTrait {
         request_id: Uuid,
     ) -> Result<(), GrpcError>;
 
-    async fn remove_channel_user(&self, workspace_id: Uuid, channel_id: Uuid, request_id: Uuid) -> Result<(), GrpcError>;
+    async fn remove_channel_user(&self, channel_user_id: Uuid, request_id: Uuid) -> Result<(), GrpcError>;
 }
 
 pub trait AccountInterface: Auth + Account + Settings + ChannelTrait {}

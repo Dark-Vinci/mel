@@ -1,6 +1,10 @@
-use dioxus::prelude::*;
-use picasso::views::{Blog, Home};
-use picasso::router::Route;
+use {
+    dioxus::prelude::*,
+    picasso::{
+        router::Route,
+        views::{Blog, Home},
+    },
+};
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const MAIN_CSS: Asset = asset!("/assets/main.css");
