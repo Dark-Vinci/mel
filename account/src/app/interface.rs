@@ -38,6 +38,8 @@ pub trait ChannelTrait {
         id: Uuid,
         request_id: Uuid,
     ) -> Result<(), GrpcError>;
+
+    async fn remove_channel_user(&self, workspace_id: Uuid, channel_id: Uuid, request_id: Uuid) -> Result<(), GrpcError>;
 }
 
 pub trait AccountInterface: Auth + Account + Settings + ChannelTrait {}

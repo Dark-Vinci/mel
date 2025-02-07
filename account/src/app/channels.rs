@@ -108,4 +108,8 @@ impl ChannelTrait for App {
 
         Ok(())
     }
+
+    async fn remove_channel_user(&self, workspace_id: Uuid, channel_id: Uuid, request_id: Uuid) -> Result<(), GrpcError> {
+        todo!()
+    }
 }
