@@ -7,7 +7,12 @@ use {
             db::account::{
                 channel::Model as Channel, channel_user::Model as ChannelUser,
             },
-            others::auth::channel::{CreateChannel, CreateChannelUser},
+            others::{
+                auth::channel::{
+                    CreateChannel, CreateChannelUser, UpdateChannel,
+                },
+                Paginated, Pagination,
+            },
         },
     },
     tracing::{debug, error},
@@ -53,10 +58,62 @@ impl ChannelTrait for App {
     #[tracing::instrument(name = "App::update_channel", skip(self))]
     async fn update_channel(
         &self,
-        payload: CreateChannel,
+        payload: UpdateChannel,
         request_id: Uuid,
     ) -> Result<Channel, GrpcError> {
         debug!("App::update_channel; Got Request to update channel");
+
+        let _ = self
+            .channel_repo
+            .get_by_id(payload.id, request_id)
+            .await
+            .map_err(|err| {
+                error!(?request_id, ?err, "Unable to retrieve channel");
+
+                GrpcError::NotFound("Channel".into())
+            })?;
+
+        let updated_channel = self
+            .channel_repo
+            .update(payload, request_id)
+            .await
+            .map_err(|err| {
+                error!(?request_id, ?err, "Unable to update channel");
+
+                GrpcError::Generic
+            })?;
+
+        Ok(updated_channel)
+    }
+
+    #[tracing::instrument(name = "App::get_channel_user", skip(self))]
+    async fn get_channel_user(
+        &self,
+        channel_id: Uuid,
+        pagination: Pagination,
+        request_id: Uuid,
+    ) -> Result<Paginated<Vec<ChannelUser>>, GrpcError> {
+        let _ = self
+            .channel_repo
+            .get_by_id(channel_id, request_id)
+            .await
+            .map_err(|err| {
+                error!(?request_id, ?err, "Unable to retrieve channel");
+
+                GrpcError::NotFound("Channel".into())
+            })?;
+
+        let channel_users = self
+            .channel_user_repo
+            .get(channel_id, pagination, request_id)
+            .await
+            .map_err(|err| {
+                error!(?request_id, ?err, "Unable to retrieve channel users");
+
+                GrpcError::NotFound("Channel".into())
+            })?;
+
+        Ok(channel_users)
     }
 
     #[tracing::instrument(name = "App::create_channel_user", skip(self))]
@@ -120,8 +177,13 @@ impl ChannelTrait for App {
     }
 
     #[tracing::instrument(name = "App::remove_channel_user", skip(self))]
-    async fn remove_channel_user(&self, channel_user_id: Uuid, request_id: Uuid) -> Result<(), GrpcError> {
-        let _ = self.channel_user_repo
+    async fn remove_channel_user(
+        &self,
+        channel_user_id: Uuid,
+        request_id: Uuid,
+    ) -> Result<(), GrpcError> {
+        let _ = self
+            .channel_user_repo
             .get_by_id(channel_user_id, request_id)
             .await
             .map_err(|err| {
@@ -129,7 +191,8 @@ impl ChannelTrait for App {
                 GrpcError::NotFound(format!("Channel {channel_id} not found"))
             })?;
 
-        let _ = self.channel_user_repo
+        let _ = self
+            .channel_user_repo
             .delete(channel_user_id, request_id)
             .await
             .map_err(|err| {
