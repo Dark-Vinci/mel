@@ -1,15 +1,23 @@
-use crate::connections::db::DB;
-use async_trait::async_trait;
-use chrono::Utc;
-use sdk::errors::RepoError;
-use sdk::models::db::extras::profile_media::{
-    ActiveModel, Entity as ProfileMediaEntity, Model as ProfileMedia,
+use {
+    crate::connections::db::DB,
+    async_trait::async_trait,
+    chrono::Utc,
+    sdk::{
+        errors::RepoError,
+        models::{
+            db::extras::profile_media::{
+                ActiveModel, Entity as ProfileMediaEntity,
+                Model as ProfileMedia,
+            },
+            others::extras::CreateProfileMedia,
+        },
+    },
+    sea_orm::{
+        ActiveModelTrait, ActiveValue::Set, EntityTrait, IntoActiveModel,
+    },
+    tracing::{debug, error},
+    uuid::Uuid,
 };
-use sdk::models::others::extras::CreateProfileMedia;
-use sea_orm::{ActiveModelTrait, EntityTrait, IntoActiveModel};
-use sea_orm::ActiveValue::Set;
-use tracing::{debug, error};
-use uuid::Uuid;
 
 #[async_trait]
 pub trait ProfileMediaRepository {
@@ -69,18 +77,22 @@ impl ProfileMediaRepository for ProfileMediaRepo {
     ) -> Result<(), RepoError> {
         debug!("Received request to delete profile, id: {:?}, request_id:{request_id}", workspace_user_id);
 
-        let mut profile_media = self.get_by_id(workspace_user_id, request_id).await?.into_active_model();
+        let mut profile_media = self
+            .get_by_id(workspace_user_id, request_id)
+            .await?
+            .into_active_model();
 
         profile_media.deleted_at = Set(Some(Utc::now()));
 
-        let _ = profile_media
-            .save(&self.0.connection)
-            .await
-            .map_err(|err| {
-                error!("Failed to delete profile from database: {}", err);
+        let _ =
+            profile_media
+                .save(&self.0.connection)
+                .await
+                .map_err(|err| {
+                    error!("Failed to delete profile from database: {}", err);
 
-                return RepoError::FailedToUpdate;
-            })?;
+                    return RepoError::FailedToUpdate;
+                })?;
 
         Ok(())
     }
@@ -102,7 +114,9 @@ impl ProfileMediaRepository for ProfileMediaRepo {
                 RepoError::NotFound
             })?
             .ok_or_else(|| {
-                error!("ProfileMediaRepository::get_by_id.return_value not found");
+                error!(
+                    "ProfileMediaRepository::get_by_id.return_value not found"
+                );
 
                 return RepoError::NotFound;
             });

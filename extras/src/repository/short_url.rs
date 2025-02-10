@@ -1,15 +1,22 @@
-use crate::connections::db::DB;
-use async_trait::async_trait;
-use chrono::Utc;
-use sdk::errors::RepoError;
-use sdk::models::db::extras::short_url::{
-    ActiveModel, Entity as ShortUrlEntity, Model as ShortUrl,
+use {
+    crate::connections::db::DB,
+    async_trait::async_trait,
+    chrono::Utc,
+    sdk::{
+        errors::RepoError,
+        models::{
+            db::extras::short_url::{
+                ActiveModel, Entity as ShortUrlEntity, Model as ShortUrl,
+            },
+            others::extras::CreateShortUrl,
+        },
+    },
+    sea_orm::{
+        ActiveModelTrait, ActiveValue::Set, DbErr, EntityTrait, IntoActiveModel,
+    },
+    tracing::{debug, error},
+    uuid::Uuid,
 };
-use sdk::models::others::extras::CreateShortUrl;
-use sea_orm::ActiveValue::Set;
-use sea_orm::{ActiveModelTrait, DbErr, EntityTrait, IntoActiveModel};
-use tracing::{debug, error};
-use uuid::Uuid;
 
 #[async_trait]
 pub trait ShortUrlRepository {

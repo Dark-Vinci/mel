@@ -1,18 +1,20 @@
-use crate::downstream::downstream::DownstreamImpl;
-use crate::repository::short_url::{ShortUrlRepo, ShortUrlRepository};
-use crate::repository::short_url_track::{
-    ShortUrlTrackRepo, ShortUrlTrackRepository,
-};
 use {
     crate::{
         app::interface::{Account, Auth, Settings},
         config::config::Config,
         connections::db::DB,
-        downstream::downstream::Downstream,
-        repository::user::{UserRepo, UserRepository},
+        downstream::downstream::{Downstream, DownstreamImpl},
+        repository::{
+            profile_media::{ProfileMediaRepo, ProfileMediaRepository},
+            short_url::{ShortUrlRepo, ShortUrlRepository},
+            short_url_track::{ShortUrlTrackRepo, ShortUrlTrackRepository},
+            user::{UserRepo, UserRepository},
+            chat_media::ChatMediaRepository,
+        },
     },
     uuid::Uuid,
 };
+use crate::repository::chat_media::ChatMediaRepo;
 
 // #[derive(Debug)]
 pub struct App {
@@ -21,6 +23,8 @@ pub struct App {
     pub downstream: Box<dyn Downstream + Sync + Send>,
     // pub redis: Box<dyn RedisInterface>,
     // pub kafka: Box<dyn KafkaInterface>,
+    pub profile_media_repo: Box<dyn ProfileMediaRepository + Sync + Send>,
+    pub chat_media_repo: Box<dyn ChatMediaRepository + Sync + Send>,
     pub user_repo: Box<dyn UserRepository + Sync + Send>,
     pub short_url_repo: Box<dyn ShortUrlRepository + Sync + Send>,
     pub short_url_track_repo: Box<dyn ShortUrlTrackRepository + Send + Sync>,
@@ -53,6 +57,8 @@ impl App {
         let user = UserRepo::new(db.clone());
         let short_repo = ShortUrlRepo::new(db.clone());
         let short_track = ShortUrlTrackRepo::new(db.clone());
+        let profile_media_repo = ProfileMediaRepo::new(db.clone());
+        let chat_media_repo = ChatMediaRepo::new(db.clone());
 
         Self {
             db,
@@ -61,7 +67,8 @@ impl App {
             downstream: Box::new(DownstreamImpl::new()),
             short_url_repo: Box::new(short_repo),
             short_url_track_repo: Box::new(short_track), // redis: Box::new(redis),
-                                                         // kafka: Box::new(kafka),
+            profile_media_repo: Box::new(profile_media_repo), // kafka: Box::new(kafka),
+            chat_media_repo: Box::new(chat_media_repo),
         }
     }
 }

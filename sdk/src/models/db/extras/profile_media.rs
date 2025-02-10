@@ -21,6 +21,8 @@ pub struct Model {
 
     pub workspace_id: Uuid,
 
+    pub message_id: Uuid,
+
     #[sea_orm(type = "TEXT")]
     pub url: String,
 

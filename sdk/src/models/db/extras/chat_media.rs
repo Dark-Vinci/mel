@@ -6,6 +6,7 @@ use {
     uuid::Uuid,
 };
 use crate::models::others::auth::create::UpdateUserRequest;
+use crate::models::others::extras::{CreateChatMedia, CreateProfileMedia};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -38,3 +39,15 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
 pub enum Relation {}
+
+impl From<CreateChatMedia> for ActiveModel {
+    fn from(fro: UpdateUserRequest) -> Self {
+        let mut val: ActiveModel = Self {
+            ..Default::default()
+        };
+
+        // todo: fill other fields
+
+        val
+    }
+}
