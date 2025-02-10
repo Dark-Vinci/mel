@@ -1,6 +1,6 @@
 use {crate::router::Route, dioxus::prelude::*};
 
-const BLOG_CSS: Asset = asset!("/assets/blog.css");
+const BLOG_CSS: Asset = asset!("/assets/styles/blog.css");
 
 #[component]
 pub fn Blog(id: i32) -> Element {

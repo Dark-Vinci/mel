@@ -5,7 +5,6 @@ use {
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::auth::create::{CreateUserRequest, UpdateUserRequest};
 use crate::models::others::auth::workspace::{CreateWorkspaceRequest, UpdateWorkspaceRequest};
 
 #[derive(
@@ -34,7 +33,7 @@ impl From<CreateWorkspaceRequest> for ActiveModel {
     fn from(val: CreateWorkspaceRequest) -> Self {
         Self {
             id: Set(Uuid::new_v4()),
-            created_by: Set(val.),
+            created_by: Set(Uuid::new_v4()),
             description: Set(Some(val.password)),
             created_at: Set(Utc::now()),
             updated_at: Set(Utc::now()),

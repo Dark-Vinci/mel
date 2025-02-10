@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod extras;
 
 pub struct Pagination {
     pub page_size: u64,

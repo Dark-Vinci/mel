@@ -1,11 +1,9 @@
-use sea_orm::ActiveValue::Set;
 use {
     chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::auth::create::{CreateUserRequest, UpdateUserRequest};
 use crate::models::others::auth::workspace::{CreateWorkspaceUser, UpdateWorkspaceUser};
 
 #[derive(

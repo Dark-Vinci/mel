@@ -1,4 +1,3 @@
-use sea_orm::ActiveValue::Set;
 use {
     chrono::Utc,
     sea_orm::entity::prelude::*,
@@ -6,7 +5,6 @@ use {
     uuid::Uuid,
 };
 use crate::models::others::auth::channel::{UpdateChannel, CreateChannel};
-use crate::models::others::auth::create::UpdateUserRequest;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,

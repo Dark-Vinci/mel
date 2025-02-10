@@ -1,26 +1,27 @@
-#[cfg(test)]
-use mockall::automock;
-
 use {
     crate::{
         app::interface::{Account, Auth, Settings},
         config::config::Config,
         connections::db::DB,
         repository::user::{UserRepo, UserRepository},
-        // downstream::downstream::Downstream,
-        // repository::user::UserRepository,
+        downstream::downstream::Downstream,
     },
     uuid::Uuid,
 };
+use crate::downstream::downstream::DownstreamImpl;
+use crate::repository::short_url::{ShortUrlRepo, ShortUrlRepository};
+use crate::repository::short_url_track::{ShortUrlTrackRepo, ShortUrlTrackRepository};
 
 // #[derive(Debug)]
 pub struct App {
     pub db: DB,
     pub config: Config,
-    // pub downstream: Box<dyn Downstream>,
+    pub downstream: Box<dyn Downstream + Sync + Send>,
     // pub redis: Box<dyn RedisInterface>,
     // pub kafka: Box<dyn KafkaInterface>,
     pub user_repo: Box<dyn UserRepository + Sync + Send>,
+    pub short_url_repo: Box<dyn ShortUrlRepository + Sync + Send>,
+    pub short_url_track_repo: Box<dyn ShortUrlTrackRepository + Send + Sync>
 }
 
 impl App {
@@ -47,12 +48,17 @@ impl App {
         //     &c.kafka.port,
         // );
 
-        let u = UserRepo::new(db.clone());
+        let user = UserRepo::new(db.clone());
+        let short_repo = ShortUrlRepo::new(db.clone());
+        let short_track = ShortUrlTrackRepo::new(db.clone());
 
         Self {
             db,
-            user_repo: Box::new(u),
+            user_repo: Box::new(user),
             config: Config::new(),
+            downstream: Box::new(DownstreamImpl::new()),
+            short_url_repo: Box::new(short_repo),
+            short_url_track_repo: Box::new(short_track)
             // redis: Box::new(redis),
             // kafka: Box::new(kafka),
         }
@@ -71,32 +77,3 @@ impl App {
 pub trait AccountInterface: Auth + Account + Settings {}
 
 impl AccountInterface for App {}
-
-#[cfg(test)]
-mod test {
-    use mockall::predicate::eq;
-    use mockall::{automock, predicate::*};
-    use tracing_subscriber::layer::SubscriberExt;
-    use super::*;
-
-    #[test]
-    fn first() {
-        #[automock]
-        trait MyTrait {
-            fn foo(&self, x: u32) -> u32;
-        }
-
-        fn call_with_four(x: &dyn MyTrait) -> u32 {
-            x.foo(4)
-        }
-
-        let mut mock = MockMyTrait::new();
-
-        mock.expect_foo()
-            .with(eq(4))
-            .times(1)
-            .returning(|x| x + 1);
-
-        assert_eq!(5, call_with_four(&mock));
-    }
-}

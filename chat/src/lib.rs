@@ -10,3 +10,7 @@ pub mod server;
 // language
 // authToken
 // refresh Token
+
+// messages, emojis(reactions), pinned, files,
+
+// extras: emails, link

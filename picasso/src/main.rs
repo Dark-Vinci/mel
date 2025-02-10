@@ -7,7 +7,7 @@ use {
 };
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
-const MAIN_CSS: Asset = asset!("/assets/main.css");
+const MAIN_CSS: Asset = asset!("/assets/styles/main.css");
 
 fn main() {
     dioxus::launch(App);

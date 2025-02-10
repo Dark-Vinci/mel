@@ -1,12 +1,12 @@
 use {
-    account::{app::app::App, config::config::Config, server::server::Account},
+    extras::{app::app::App, config::config::Config, server::server::Account},
     sdk::{
         constants::constant::{
             LAGOS_TIME, LOCAL_HOST, LOG_DIR, LOG_FILE_NAME,
             LOG_WARNING_FILE_NAME, TIME_ZONE,
         },
         errors::AppError,
-        generated_proto_rs::mel_account::account_service_server::AccountServiceServer,
+        generated_proto_rs::mel_extras::extras_service_server::AccountServiceServer,
         utils::utility::graceful_shutdown,
     },
     std::{env, net::SocketAddr, panic},
@@ -30,7 +30,7 @@ async fn main() -> Result<(), AppError> {
     let filter = EnvFilter::builder()
         .with_default_directive(LevelFilter::INFO.into())
         .from_env()?
-        .add_directive("account=debug".parse()?);
+        .add_directive("extras=debug".parse()?);
 
     tracing_subscriber::fmt()
         .pretty()
@@ -68,7 +68,7 @@ async fn main() -> Result<(), AppError> {
     let app = App::new(&config).await;
 
     // bootstrap service controller
-    let account_server = Account::new(app);
+    let extras_server = Account::new(app);
 
     info!(
         "🚀{0} for {1} is listening on address {2} 🚀",
@@ -77,7 +77,7 @@ async fn main() -> Result<(), AppError> {
 
     // start service and listen to shut down hooks;
     if let Err(err) = Server::builder()
-        .add_service(AccountServiceServer::new(account_server))
+        .add_service(AccountServiceServer::new(extras_server))
         .serve_with_shutdown(addr, graceful_shutdown())
         .await
     {
