@@ -5,18 +5,16 @@ use {
         connections::db::DB,
         downstream::downstream::{Downstream, DownstreamImpl},
         repository::{
+            chat_media::{ChatMediaRepo, ChatMediaRepository},
             profile_media::{ProfileMediaRepo, ProfileMediaRepository},
             short_url::{ShortUrlRepo, ShortUrlRepository},
             short_url_track::{ShortUrlTrackRepo, ShortUrlTrackRepository},
             user::{UserRepo, UserRepository},
-            chat_media::ChatMediaRepository,
         },
     },
     uuid::Uuid,
 };
-use crate::repository::chat_media::ChatMediaRepo;
 
-// #[derive(Debug)]
 pub struct App {
     pub db: DB,
     pub config: Config,
