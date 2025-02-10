@@ -1,9 +1,11 @@
+use sea_orm::ActiveValue::Set;
 use {
     chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::auth::create::UpdateUserRequest;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -18,7 +20,7 @@ pub struct Model {
     pub message_id: Uuid,
 
     #[sea_orm(indexed)]
-    pub channel_id: Uuid,
+    pub channel_id: Uuid, // channel <-> user
 
     pub workspace_id: Uuid,
 

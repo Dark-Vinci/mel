@@ -1,16 +1,18 @@
+use crate::downstream::downstream::DownstreamImpl;
+use crate::repository::short_url::{ShortUrlRepo, ShortUrlRepository};
+use crate::repository::short_url_track::{
+    ShortUrlTrackRepo, ShortUrlTrackRepository,
+};
 use {
     crate::{
         app::interface::{Account, Auth, Settings},
         config::config::Config,
         connections::db::DB,
-        repository::user::{UserRepo, UserRepository},
         downstream::downstream::Downstream,
+        repository::user::{UserRepo, UserRepository},
     },
     uuid::Uuid,
 };
-use crate::downstream::downstream::DownstreamImpl;
-use crate::repository::short_url::{ShortUrlRepo, ShortUrlRepository};
-use crate::repository::short_url_track::{ShortUrlTrackRepo, ShortUrlTrackRepository};
 
 // #[derive(Debug)]
 pub struct App {
@@ -21,7 +23,7 @@ pub struct App {
     // pub kafka: Box<dyn KafkaInterface>,
     pub user_repo: Box<dyn UserRepository + Sync + Send>,
     pub short_url_repo: Box<dyn ShortUrlRepository + Sync + Send>,
-    pub short_url_track_repo: Box<dyn ShortUrlTrackRepository + Send + Sync>
+    pub short_url_track_repo: Box<dyn ShortUrlTrackRepository + Send + Sync>,
 }
 
 impl App {
@@ -58,21 +60,17 @@ impl App {
             config: Config::new(),
             downstream: Box::new(DownstreamImpl::new()),
             short_url_repo: Box::new(short_repo),
-            short_url_track_repo: Box::new(short_track)
-            // redis: Box::new(redis),
-            // kafka: Box::new(kafka),
+            short_url_track_repo: Box::new(short_track), // redis: Box::new(redis),
+                                                         // kafka: Box::new(kafka),
         }
     }
 }
-
-
 
 impl App {
     pub fn ping(&self, id: Uuid) -> String {
         format!("PING FROM ACCOUNT SERVICE: {}", id)
     }
 }
-
 
 pub trait AccountInterface: Auth + Account + Settings {}
 
