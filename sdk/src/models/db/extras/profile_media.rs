@@ -1,12 +1,12 @@
-use sea_orm::ActiveValue::Set;
 use {
+    crate::models::others::{
+        auth::create::UpdateUserRequest, extras::CreateProfileMedia,
+    },
     chrono::Utc,
-    sea_orm::entity::prelude::*,
+    sea_orm::{entity::prelude::*, ActiveValue::Set},
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::auth::create::UpdateUserRequest;
-use crate::models::others::extras::CreateProfileMedia;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,

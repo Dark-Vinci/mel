@@ -1,13 +1,16 @@
-use chrono::{DateTime, Utc};
-use sea_orm::DeriveEntityModel;
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
-use sea_orm::entity::prelude::*;
+use {
+    chrono::{DateTime, Utc},
+    sea_orm::{entity::prelude::*, DeriveEntityModel},
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel)]
+#[derive(
+    Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel,
+)]
 #[sea_orm(table_name = "pins", schema_name = "public")]
 pub struct Model {
-    #[sea_orm(primary_key, auto_incremet=false)]
+    #[sea_orm(primary_key, auto_incremet = false)]
     pub id: Uuid,
 
     pub message_id: Uuid,
@@ -27,4 +30,4 @@ pub struct Model {
 impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation{}
+pub enum Relation {}

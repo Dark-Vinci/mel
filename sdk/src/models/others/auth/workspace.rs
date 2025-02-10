@@ -1,5 +1,4 @@
-use uuid::Uuid;
-use {chrono::Utc, sea_orm::prelude::DateTime};
+use {chrono::Utc, sea_orm::prelude::DateTime, uuid::Uuid};
 
 #[derive(Debug)]
 pub struct CreateWorkspaceRequest {

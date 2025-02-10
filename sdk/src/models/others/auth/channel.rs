@@ -1,5 +1,7 @@
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use {
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateChannel {
@@ -10,7 +12,6 @@ pub struct CreateChannel {
 pub struct UpdateChannel {
     pub id: Uuid,
 }
-
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateChannelUser {}

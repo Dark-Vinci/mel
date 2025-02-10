@@ -1,10 +1,14 @@
-use chrono::{Utc, DateTime};
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
-use sea_orm::entity::prelude::*;
+use {
+    chrono::{DateTime, Utc},
+    sea_orm::entity::prelude::*,
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel)]
-#[sea_orm(table_name="bookmarks", schema_name="public")]
+#[derive(
+    Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel,
+)]
+#[sea_orm(table_name = "bookmarks", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,

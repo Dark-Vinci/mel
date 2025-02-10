@@ -5,12 +5,9 @@ use {
     sdk::{
         errors::RepoError,
         models::{
-            db::account::{
-                channel_user::{
-                    ActiveModel, Column, Entity as ChannelUserEntity,
-                    Model as ChannelUser,
-                },
-                user,
+            db::channel::channel_user::{
+                ActiveModel, Column, Entity as ChannelUserEntity,
+                Model as ChannelUser,
             },
             others::{
                 auth::channel::{CreateChannelUser, UpdateChannelUser},
@@ -41,7 +38,7 @@ pub trait ChannelUserRepository {
     ) -> Result<ChannelUser, RepoError>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
-                    -> Result<(), RepoError>;
+        -> Result<(), RepoError>;
 
     async fn get(
         &self,

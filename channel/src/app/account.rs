@@ -4,5 +4,4 @@ use {
     // sdk::errors::GrpcError,
 };
 
-impl Account for App {
-}
+impl Account for App {}

@@ -1,10 +1,12 @@
 use {
+    crate::models::others::auth::channel::{
+        CreateChannel, CreateChannelUser, UpdateChannel,
+    },
     chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::auth::channel::{CreateChannel, CreateChannelUser, UpdateChannel};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -68,7 +70,6 @@ impl RelationTrait for Relation {
             //         .to(super::user::Column::Id)
             //         .into()
             // },
-
             Self::Channel => {
                 Entity::belongs_to(super::channel::Entity)
                     .from(Column::ChannelId)

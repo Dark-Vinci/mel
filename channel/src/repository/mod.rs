@@ -1,5 +1,4 @@
-pub mod user;
-mod channel;
-mod channel_user;
-mod bookmarks;
-mod pins;
+pub mod bookmarks;
+pub mod channel;
+pub mod channel_user;
+pub mod pins;

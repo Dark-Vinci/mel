@@ -1,4 +1,3 @@
-use tonic::{Request, Status};
 use {
     argon2::{
         password_hash::SaltString, Algorithm, Argon2, Params, PasswordHash,
@@ -10,6 +9,7 @@ use {
         signal::{ctrl_c, unix},
         time,
     },
+    tonic::{Request, Status},
     uuid::Uuid,
 };
 
@@ -92,7 +92,8 @@ where
 }
 
 pub fn service_auth<T>(token: &str) -> T
-where T: FnMut(Request<()>) -> Result<Request<()>, Status>
+where
+    T: FnMut(Request<()>) -> Result<Request<()>, Status>,
 {
     |mut req: Request<()>| -> Result<Request<()>, Status> {
         match req.metadata().get("authorization") {

@@ -1,10 +1,12 @@
 use {
+    crate::models::others::auth::workspace::{
+        CreateWorkspaceUser, UpdateWorkspaceUser,
+    },
     chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::auth::workspace::{CreateWorkspaceUser, UpdateWorkspaceUser};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,

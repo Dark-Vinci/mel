@@ -40,7 +40,7 @@ pub trait ChannelRepository {
     ) -> Result<Channel, RepoError>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
-                    -> Result<(), RepoError>;
+        -> Result<(), RepoError>;
 
     async fn get_by_name(
         &self,

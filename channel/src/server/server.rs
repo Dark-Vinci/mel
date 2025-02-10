@@ -1,6 +1,6 @@
 use {
-    async_trait::async_trait,
     crate::app::app::AccountInterface,
+    async_trait::async_trait,
     sdk::generated_proto_rs::{
         mel_account::{
             account_service_server::AccountService, PingResponse,
