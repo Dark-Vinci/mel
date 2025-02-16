@@ -44,6 +44,8 @@ async fn main() -> Result<(), AppError> {
         .init();
 
     panic::set_hook(Box::new(|info| {
+        error!("Panic occurred {}", info);
+
         if let Some(location) = info.location() {
             error!(
                 message = %info,
