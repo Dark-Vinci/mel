@@ -564,25 +564,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "chat"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "mockall",
- "sdk",
- "sea-orm",
- "sea-orm-migration",
- "tokio",
- "tonic",
- "tracing",
- "tracing-appender",
- "tracing-core",
- "tracing-subscriber",
- "uuid",
-]
-
-[[package]]
 name = "chrono"
 version = "0.4.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1726,6 +1707,25 @@ name = "memchr"
 version = "2.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
+
+[[package]]
+name = "messaging"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "mockall",
+ "sdk",
+ "sea-orm",
+ "sea-orm-migration",
+ "tokio",
+ "tonic",
+ "tracing",
+ "tracing-appender",
+ "tracing-core",
+ "tracing-subscriber",
+ "uuid",
+]
 
 [[package]]
 name = "mime"

@@ -10,12 +10,12 @@
       <sourceFolder url="file://$MODULE_DIR$/ui/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/mjk/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/channel/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/chat/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/extras/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/picasso/desktop/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/picasso/mobile/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/picasso/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/picasso/ui/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/messaging/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/picasso/target" />
     </content>

@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod extras;
 pub mod channel;
+pub mod messaging;
 
 pub struct Pagination {
     pub page_size: u64,
