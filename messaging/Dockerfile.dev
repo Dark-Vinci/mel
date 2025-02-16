@@ -4,7 +4,7 @@ RUN apt-get update
 
 RUN cargo install cargo-watch
 
-ARG name=chat
+ARG name=messaging
 ARG config=123
 ARG service_token=0000
 ARG port=5050
@@ -23,14 +23,14 @@ ENV ENVIRONMENT="${environment}"
 
 COPY sdk /app/backend/sdk
 
-WORKDIR /app/backend/chat
+WORKDIR /app/backend/messaging
 
-COPY chat/Cargo.toml /app/backend/chat/Cargo.toml
-COPY chat/Cargo.lock /app/backend/chat/Cargo.lock
+COPY messaging/Cargo.toml /app/backend/messaging/Cargo.toml
+COPY messaging/Cargo.lock /app/backend/messaging/Cargo.lock
 
 RUN apt-get install -y protobuf-compiler
 
-COPY chat /app/backend/chat
+COPY messaging /app/backend/messaging
 
 RUN cargo build
 

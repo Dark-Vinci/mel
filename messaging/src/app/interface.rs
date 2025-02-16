@@ -8,3 +8,6 @@ pub trait Reaction {}
 
 #[async_trait]
 pub trait Response {}
+
+#[async_trait]
+pub trait Chat {}

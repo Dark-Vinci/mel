@@ -1,6 +1,3 @@
-
-
-use crate::app::app::App;
-use crate::app::interface::PinTrait;
+use crate::app::{app::App, interface::PinTrait};
 
 impl PinTrait for App {}

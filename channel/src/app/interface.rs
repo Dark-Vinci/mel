@@ -65,7 +65,7 @@ pub trait ChannelUserTrait {
 pub trait Settings {}
 
 #[async_trait]
-pub trait BookMarkTrait{}
+pub trait BookMarkTrait {}
 
 #[async_trait]
-pub trait PinTrait{}
+pub trait PinTrait {}

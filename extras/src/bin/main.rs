@@ -1,13 +1,13 @@
 use {
-    extras::{app::app::App, config::config::Config, server::server::Account},
+    extras::{app::app::App, config::config::Config, server::server::Extras},
     sdk::{
         constants::constant::{
             LAGOS_TIME, LOCAL_HOST, LOG_DIR, LOG_FILE_NAME,
             LOG_WARNING_FILE_NAME, TIME_ZONE,
         },
         errors::AppError,
-        generated_proto_rs::mel_extras::extras_service_server::AccountServiceServer,
-        utils::utility::graceful_shutdown,
+        generated_proto_rs::mel_account::account_service_server::AccountServiceServer,
+        utils::utility::{graceful_shutdown, service_auth},
     },
     std::{env, net::SocketAddr, panic},
     tonic::transport::Server,
@@ -68,21 +68,21 @@ async fn main() -> Result<(), AppError> {
     let app = App::new(&config).await;
 
     // bootstrap service controller
-    let extras_server = Account::new(app);
+    let extras_server = Extras::new(app);
 
     info!(
         "🚀{0} for {1} is listening on address {2} 🚀",
         app_name, service_name, addr
     );
 
+    let service =
+        AccountServiceServer::with_interceptor(extras_server, service_auth);
+
     // start service and listen to shut down hooks;
-    if let Err(err) = Server::builder()
-        .add_service(AccountServiceServer::new(extras_server))
+    Server::builder()
+        .add_service(service)
         .serve_with_shutdown(addr, graceful_shutdown())
-        .await
-    {
-        error!("error:{}", err);
-    }
+        .await?;
 
     Ok(())
 }

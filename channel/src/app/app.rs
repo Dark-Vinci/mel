@@ -1,6 +1,9 @@
 use {
     crate::{
-        app::interface::{Account, ChannelTrait, Settings},
+        app::interface::{
+            Account, BookMarkTrait, ChannelTrait, ChannelUserTrait, PinTrait,
+            Settings,
+        },
         config::config::Config,
         connections::db::DB,
         repository::{
@@ -12,7 +15,6 @@ use {
     },
     uuid::Uuid,
 };
-use crate::app::interface::{BookMarkTrait, ChannelUserTrait, PinTrait};
 
 pub struct App {
     pub db: DB,
@@ -50,9 +52,8 @@ impl App {
 }
 
 pub trait ChannelInterface:
-    ChannelTrait +
-    ChannelUserTrait +
-    Account +
-    Settings + BookMarkTrait + PinTrait {}
+    ChannelTrait + ChannelUserTrait + Account + Settings + BookMarkTrait + PinTrait
+{
+}
 
 impl ChannelInterface for App {}

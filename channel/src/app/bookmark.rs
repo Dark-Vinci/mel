@@ -1,4 +1,3 @@
-use crate::app::app::App;
-use crate::app::interface::BookMarkTrait;
+use crate::app::{app::App, interface::BookMarkTrait};
 
 impl BookMarkTrait for App {}

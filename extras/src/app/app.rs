@@ -1,6 +1,6 @@
 use {
     crate::{
-        app::interface::{Account, Auth, Settings},
+        app::interface::{ChatMedia, ProfileMedia, ShortUrl, ShortUrlTrack},
         config::config::Config,
         connections::db::DB,
         downstream::downstream::{Downstream, DownstreamImpl},
@@ -19,8 +19,6 @@ pub struct App {
     pub db: DB,
     pub config: Config,
     pub downstream: Box<dyn Downstream + Sync + Send>,
-    // pub redis: Box<dyn RedisInterface>,
-    // pub kafka: Box<dyn KafkaInterface>,
     pub profile_media_repo: Box<dyn ProfileMediaRepository + Sync + Send>,
     pub chat_media_repo: Box<dyn ChatMediaRepository + Sync + Send>,
     pub user_repo: Box<dyn UserRepository + Sync + Send>,
@@ -31,26 +29,6 @@ pub struct App {
 impl App {
     pub async fn new(c: &Config) -> Self {
         let db = DB::new(&c).await.unwrap();
-
-        // let redis = MyRedis::new(
-        //     &c.redis.username,
-        //     &c.redis.password,
-        //     &c.redis.host,
-        //     &c.redis.port,
-        //     "0",
-        // );
-
-        // let (db, redis) = join!(db, redis,);
-
-        // let kafka = Kafka::new(
-        //     &c.kafka.broker,
-        //     vec![],
-        //     &c.kafka.group_id,
-        //     &c.kafka.username,
-        //     &c.kafka.password,
-        //     &c.kafka.host,
-        //     &c.kafka.port,
-        // );
 
         let user = UserRepo::new(db.clone());
         let short_repo = ShortUrlRepo::new(db.clone());
@@ -64,8 +42,8 @@ impl App {
             config: Config::new(),
             downstream: Box::new(DownstreamImpl::new()),
             short_url_repo: Box::new(short_repo),
-            short_url_track_repo: Box::new(short_track), // redis: Box::new(redis),
-            profile_media_repo: Box::new(profile_media_repo), // kafka: Box::new(kafka),
+            short_url_track_repo: Box::new(short_track),
+            profile_media_repo: Box::new(profile_media_repo),
             chat_media_repo: Box::new(chat_media_repo),
         }
     }
@@ -77,6 +55,9 @@ impl App {
     }
 }
 
-pub trait AccountInterface: Auth + Account + Settings {}
+pub trait ExtrasInterface:
+    ShortUrl + ShortUrlTrack + ChatMedia + ProfileMedia
+{
+}
 
-impl AccountInterface for App {}
+impl ExtrasInterface for App {}

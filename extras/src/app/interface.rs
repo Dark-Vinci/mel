@@ -1,19 +1,13 @@
-// use async_trait::async_trait;
-// struct CTX {
-//     request_id: Uuid,
-//     user_id: Option<Uuid>,
-//     time_zone: String,
-//     auth_token: String,
-//     language: String,
-// }
+use async_trait::async_trait;
 
-pub trait Auth {
-    // async fn create_user(&self, ctx: &CTX, user: CreateUserRequest) -> User;
-}
+#[async_trait]
+pub trait ShortUrl {}
 
-pub trait Account {}
+#[async_trait]
+pub trait ShortUrlTrack {}
 
-pub trait Settings {}
+#[async_trait]
+pub trait ChatMedia {}
 
-#[cfg(test)]
-mod tests {}
+#[async_trait]
+pub trait ProfileMedia {}
