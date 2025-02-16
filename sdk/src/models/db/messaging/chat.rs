@@ -6,6 +6,7 @@ use {
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::messaging::{CreateChat, CreateReaction, UpdateChat};
 
 #[derive(
     Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel,
@@ -35,3 +36,15 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
 pub enum Relation {}
+
+impl From<CreateChat> for Model {
+    fn from(reaction: CreateChat) -> Self {
+        todo!()
+    }
+}
+
+impl From<UpdateChat> for Model {
+    fn from(reaction: UpdateChat) -> Self {
+        todo!()
+    }
+}
