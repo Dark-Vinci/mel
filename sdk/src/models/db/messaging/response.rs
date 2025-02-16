@@ -1,10 +1,14 @@
-use chrono::{DateTime, Utc};
-use sea_orm::{ActiveModelBehavior, DeriveEntityModel};
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
-use crate::models::others::messaging::{CreateResponse, UpdateResponse};
+use {
+    crate::models::others::messaging::{CreateResponse, UpdateResponse},
+    chrono::{DateTime, Utc},
+    sea_orm::{ActiveModelBehavior, DeriveEntityModel},
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel)]
+#[derive(
+    Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel,
+)]
 #[sea_orm(table_name = "responses", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
@@ -16,7 +20,7 @@ pub struct Model {
     #[sea_orm(indexed)]
     pub message_id: Uuid,
 
-    #[sea_orm(type="TEXT")]
+    #[sea_orm(type = "TEXT")]
     pub content: String,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
@@ -43,4 +47,4 @@ impl From<UpdateResponse> for Model {
     }
 }
 
-pub enum Relation{}
+pub enum Relation {}

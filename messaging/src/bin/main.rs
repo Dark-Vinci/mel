@@ -1,5 +1,7 @@
 use {
-    messaging::{app::app::App, config::config::Config, server::server::Messaging},
+    messaging::{
+        app::app::App, config::config::Config, server::server::Messaging,
+    },
     sdk::{
         constants::constant::{
             LAGOS_TIME, LOCAL_HOST, LOG_DIR, LOG_FILE_NAME,

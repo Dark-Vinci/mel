@@ -1,6 +1,6 @@
 pub mod auth;
-pub mod extras;
 pub mod channel;
+pub mod extras;
 pub mod messaging;
 
 pub struct Pagination {
@@ -35,8 +35,14 @@ pub struct Paginated<T> {
 }
 
 impl<T> Paginated<T> {
-    pub fn new(result: T, total_pages: u64, current: u64, page_size: u64, total_items: u64) -> Self {
-        Self{
+    pub fn new(
+        result: T,
+        total_pages: u64,
+        current: u64,
+        page_size: u64,
+        total_items: u64,
+    ) -> Self {
+        Self {
             result,
             total_pages,
             current_page: current,

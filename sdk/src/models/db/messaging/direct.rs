@@ -1,5 +1,4 @@
 use {
-    crate::models::others::messaging::CreateReaction,
     chrono::{DateTime, Utc},
     sea_orm::{
         ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
@@ -9,21 +8,21 @@ use {
 };
 
 #[derive(
-    Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
+    Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel,
 )]
-#[sea_orm(table_name = "reactions", schema_name = "public")]
+#[sea_orm(table_name = "direct_messages", schema = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
 
-    #[sea_orm(indexed)]
-    pub message_id: Uuid,
+    pub sender_id: Uuid,
 
-    pub emoji_id: Uuid,
+    pub recipient_id: Uuid,
 
-    pub count: u32,
+    #[sea_orm(column_type = "Text")]
+    pub content: String,
 
-    pub workspace_user_id: Uuid,
+    pub chat_id: Uuid,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     pub created_at: DateTime<Utc>,
@@ -36,12 +35,6 @@ pub struct Model {
 }
 
 impl ActiveModelBehavior for ActiveModel {}
-
-impl From<CreateReaction> for Model {
-    fn from(reaction: CreateReaction) -> Self {
-        todo!()
-    }
-}
 
 #[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
 pub enum Relation {}

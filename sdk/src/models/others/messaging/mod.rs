@@ -7,5 +7,3 @@ pub struct CreateReaction {}
 pub struct CreateResponse {}
 
 pub struct UpdateResponse {}
-
-

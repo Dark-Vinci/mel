@@ -1,6 +1,8 @@
-use sea_orm::DeriveEntityModel;
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use {
+    sea_orm::DeriveEntityModel,
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
