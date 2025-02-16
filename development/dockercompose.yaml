@@ -12,6 +12,46 @@ services:
       - POSTGRES_PASSWORD=melon
       - PGDATA=/temp
 
+  account:
+    build:
+      context: .
+      dockerfile: ../account/Dockerfile.dev
+    env_file:
+      - ./env/account.yaml
+    volumes:
+      - ../sdk:/app/backend/sdk
+      - ../account:/app/backend/account
+    ports:
+      - "2000:2000"
+    depends_on:
+      - postgres
+
+  messaging:
+    build:
+      context: .
+      dockerfile: ../messaging/Dockerfile.dev
+    env_file:
+      - ./env/messaging.yaml
+    volumes:
+      - ../sdk:/app/backend/sdk
+      - ../messaging:/app/backend/messaging
+    ports:
+      - "2001:2001"
+    depends_on:
+      - postgres
+
+  gateway:
+    build:
+      context: .
+      dockerfile: ../gateway/Dockerfile.dev
+    env_file:
+      - ./env/gateway.yaml
+    volumes:
+      - ../sdk:/app/backend/sdk
+      - ../gateway:/app/backend/gateway
+    ports:
+      - "2002:2002"
+
   redis:
     build: ./redis
     ports:
