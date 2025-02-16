@@ -1,3 +1,3 @@
-mod message;
-mod reaction;
-mod emoji;
+pub mod message;
+pub mod reaction;
+pub mod emoji;

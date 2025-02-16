@@ -156,7 +156,7 @@ impl BookMarkRepository for BookMarkRepo {
 
         let result = BookMarkEntity::find()
             .limit(Some(pagination.page_size)) // Set limit
-            .offset((pagination.page_number - 1) * pagination.page_size) // Set offset
+            .offset(pagination.page_offset()) // Set offset
             .all(&self.0.connection) // Execute query
             .await;
 
