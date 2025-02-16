@@ -1,19 +1,10 @@
-// use async_trait::async_trait;
-// struct CTX {
-//     request_id: Uuid,
-//     user_id: Option<Uuid>,
-//     time_zone: String,
-//     auth_token: String,
-//     language: String,
-// }
+use async_trait::async_trait;
 
-pub trait Auth {
-    // async fn create_user(&self, ctx: &CTX, user: CreateUserRequest) -> User;
-}
+#[async_trait]
+pub trait Message {}
 
-pub trait Account {}
+#[async_trait]
+pub trait Reaction {}
 
-pub trait Settings {}
-
-#[cfg(test)]
-mod tests {}
+#[async_trait]
+pub trait Response {}

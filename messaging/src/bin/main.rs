@@ -1,5 +1,5 @@
 use {
-    account::{app::app::App, config::config::Config, server::server::Account},
+    messaging::{app::app::App, config::config::Config, server::server::Messaging},
     sdk::{
         constants::constant::{
             LAGOS_TIME, LOCAL_HOST, LOG_DIR, LOG_FILE_NAME,
@@ -68,7 +68,7 @@ async fn main() -> Result<(), AppError> {
     let app = App::new(&config).await;
 
     // bootstrap service controller
-    let account_server = Account::new(app);
+    let account_server = Messaging::new(app);
 
     info!(
         "🚀{0} for {1} is listening on address {2} 🚀",

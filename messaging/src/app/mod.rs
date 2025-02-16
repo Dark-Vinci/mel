@@ -1,5 +1,5 @@
-mod account;
 pub mod app;
-mod auth;
+mod reaction;
 mod interface;
-mod settings;
+mod response;
+mod message;

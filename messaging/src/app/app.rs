@@ -1,20 +1,24 @@
 use {
     crate::{
-        app::interface::{Account, Auth, Settings},
+        app::interface::{Message, Reaction, Response},
         config::config::Config,
         connections::db::DB,
-        repository::user::{UserRepo, UserRepository},
+        repository::{
+            message::{MessageRepo, MessageRepository},
+            reaction::{ReactionRepo, ReactionRepository},
+            response::{ResponseRepo, ResponseRepository},
+            user::{UserRepo, UserRepository},
+        },
     },
     uuid::Uuid,
 };
-use crate::repository::message::{MessageRepo, MessageRepository};
-use crate::repository::reaction::{ReactionRepo, ReactionRepository};
 
 pub struct App {
     pub db: DB,
     pub config: Config,
     pub user_repo: Box<dyn UserRepository + Sync + Send>,
     pub message_repo: Box<dyn MessageRepository + Sync + Send>,
+    pub response_repo: Box<dyn ResponseRepository + Sync + Send>,
     pub reaction_repo: Box<dyn ReactionRepository + Sync + Send>,
 }
 
@@ -25,6 +29,7 @@ impl App {
         let u = UserRepo::new(db.clone());
         let message_repo = MessageRepo::new(db.clone());
         let reaction_repo = ReactionRepo::new(db.clone());
+        let response_repo = ResponseRepo::new(db.clone());
 
         Self {
             db,
@@ -32,6 +37,7 @@ impl App {
             config: Config::new(),
             message_repo: Box::new(message_repo),
             reaction_repo: Box::new(reaction_repo),
+            response_repo: Box::new(response_repo),
         }
     }
 }
@@ -42,6 +48,6 @@ impl App {
     }
 }
 
-pub trait AccountInterface: Auth + Account + Settings {}
+pub trait MessagingInterface: Message + Response + Reaction {}
 
-impl AccountInterface for App {}
+impl MessagingInterface for App {}
