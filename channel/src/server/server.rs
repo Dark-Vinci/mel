@@ -1,5 +1,5 @@
 use {
-    crate::app::app::AccountInterface,
+    crate::app::app::ChannelInterface,
     async_trait::async_trait,
     sdk::generated_proto_rs::{
         mel_account::{
@@ -12,16 +12,16 @@ use {
     uuid::Uuid,
 };
 
-pub struct Account<A: AccountInterface>(A);
+pub struct Account<A: ChannelInterface>(A);
 
-impl<A: AccountInterface> Account<A> {
+impl<A: ChannelInterface> Account<A> {
     pub fn new(a: A) -> Self {
         Self(a)
     }
 }
 
 #[async_trait]
-impl<A: AccountInterface + Send + Sync + 'static> AccountService
+impl<A: ChannelInterface + Send + Sync + 'static> AccountService
     for Account<A>
 {
     async fn ping(

@@ -3,7 +3,7 @@ use {
     async_trait::async_trait,
     chrono::Utc,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::account::{
                 user,
@@ -25,7 +25,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait WorkspaceUserRepository {
@@ -115,11 +114,7 @@ impl WorkspaceUserRepository for WorkspaceUserRepo {
     }
 
     #[tracing::instrument(name = "WorkspaceUserRepo::delete", skip(self))]
-    async fn delete(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<()> {
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
         debug!(
             "Deleting workspace_user by id: {}, request_id {}",
             id, request_id

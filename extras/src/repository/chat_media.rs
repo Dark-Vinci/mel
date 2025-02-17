@@ -2,7 +2,7 @@ use {
     crate::connections::db::DB,
     async_trait::async_trait,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::extras::profile_media::{
                 ActiveModel, Column, Entity as ChatMediaEntity,
@@ -15,7 +15,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ChatMediaRepository {

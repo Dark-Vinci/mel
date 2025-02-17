@@ -3,7 +3,7 @@ use {
     async_trait::async_trait,
     chrono::Utc,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::channel::channel::{
                 ActiveModel, Column, Entity as PinEntity, Model as Pin,
@@ -21,7 +21,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait PinRepository {
@@ -37,8 +36,7 @@ pub trait PinRepository {
         request_id: Uuid,
     ) -> RepoResult<Pin>;
 
-    async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> RepoResult<()>;
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()>;
 
     async fn get(
         &self,
@@ -47,11 +45,7 @@ pub trait PinRepository {
         request_id: Uuid,
     ) -> RepoResult<Paginated<Vec<Pin>>>;
 
-    async fn get_by_id(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<Pin>;
+    async fn get_by_id(&self, id: Uuid, request_id: Uuid) -> RepoResult<Pin>;
 }
 
 pub struct PinRepo(DB);
@@ -105,11 +99,7 @@ impl PinRepository for PinRepo {
     }
 
     #[tracing::instrument(name = "PinRepo::delete", skip(self))]
-    async fn delete(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<()> {
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
         debug!("Deleting pin by id: {}, request_id {}", id, request_id);
 
         let mut pin = self.get_by_id(id, request_id).await?.into_active_model();
@@ -170,11 +160,7 @@ impl PinRepository for PinRepo {
     }
 
     #[tracing::instrument(name = "PinRepo::get_by_id", skip(self))]
-    async fn get_by_id(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<Pin> {
+    async fn get_by_id(&self, id: Uuid, request_id: Uuid) -> RepoResult<Pin> {
         debug!("Getting pin by id: {}, with request id: {}", id, request_id);
 
         let result = PinEntity::find_by_id(id).one(&self.0.connection).await;

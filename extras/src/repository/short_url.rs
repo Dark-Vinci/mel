@@ -3,7 +3,7 @@ use {
     async_trait::async_trait,
     chrono::Utc,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::extras::short_url::{
                 ActiveModel, Entity as ShortUrlEntity, Model as ShortUrl,
@@ -17,7 +17,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ShortUrlRepository {
@@ -33,8 +32,7 @@ pub trait ShortUrlRepository {
         request_id: Uuid,
     ) -> RepoResult<ShortUrl>;
 
-    async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> RepoResult<()>;
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()>;
 }
 
 pub struct ShortUrlRepo(DB);
@@ -97,11 +95,7 @@ impl ShortUrlRepository for ShortUrlRepo {
     }
 
     #[tracing::instrument(name = "ShortUrlRepo::delete", skip(self))]
-    async fn delete(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<()> {
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
         debug!(
             "ShortUrlRepo::delete called, id: {}, request_id: {request_id}",
             id

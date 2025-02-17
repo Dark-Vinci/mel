@@ -2,7 +2,7 @@ use {
     crate::connections::db::DB,
     chrono::Utc,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::account::{
                 user,
@@ -21,7 +21,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait::async_trait]
 pub trait WorkspaceRepository {

@@ -3,7 +3,7 @@ use {
     async_trait::async_trait,
     chrono::Utc,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::channel::channel_user::{
                 ActiveModel, Column, Entity as ChannelUserEntity,
@@ -22,7 +22,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ChannelUserRepository {
@@ -112,11 +111,7 @@ impl ChannelUserRepository for ChannelUserRepo {
     }
 
     #[tracing::instrument(name = "ChannelUserRepo::delete", skip(self))]
-    async fn delete(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<()> {
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
         debug!(
             "Deleting channel_user by id: {}, request_id {}",
             id, request_id

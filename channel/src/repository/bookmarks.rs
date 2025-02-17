@@ -1,3 +1,4 @@
+use sdk::errors::RepoResult;
 use {
     crate::{connections::db::DB, repository::channel_user},
     async_trait::async_trait,
@@ -25,7 +26,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait BookMarkRepository {
@@ -41,8 +41,7 @@ pub trait BookMarkRepository {
         request_id: Uuid,
     ) -> RepoResult<BookMark>;
 
-    async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> RepoResult<()>;
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()>;
 
     async fn get(
         &self,
@@ -115,11 +114,7 @@ impl BookMarkRepository for BookMarkRepo {
     }
 
     #[tracing::instrument(name = "BookMarkRepo::delete", skip(self))]
-    async fn delete(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<()> {
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
         debug!(
             "Deleting channel_user by id: {}, request_id {}",
             id, request_id

@@ -5,8 +5,3 @@ mod downstream;
 pub mod migration;
 pub mod repository;
 pub mod server;
-// context: requestID
-// timeZone
-// language
-// authToken
-// refresh Token

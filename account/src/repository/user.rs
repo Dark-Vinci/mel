@@ -1,27 +1,21 @@
 use {
     crate::connections::db::DB,
     async_trait::async_trait,
-    chrono::Local,
+    chrono::{Local, Utc},
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::account::user::{self, Entity as User, Model},
             others::auth::create::{CreateUserRequest, UpdateUserRequest},
         },
     },
     sea_orm::{
-        ActiveModelTrait,
-        ActiveValue::Set,
-        ColumnTrait,
-        DbErr,
-        EntityTrait,
-        QueryFilter,
+        ActiveModelTrait, ActiveValue::Set, ColumnTrait, DbErr, EntityTrait,
+        IntoActiveModel, QueryFilter,
     },
     tracing::{debug, error, Level},
     uuid::Uuid,
 };
-use {chrono::Utc, sea_orm::IntoActiveModel};
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait UserRepository {
@@ -31,11 +25,7 @@ pub trait UserRepository {
         request_id: Uuid,
     ) -> RepoResult<Model>;
 
-    async fn get_by_id(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<Model>;
+    async fn get_by_id(&self, id: Uuid, request_id: Uuid) -> RepoResult<Model>;
 
     async fn get_by_email(
         &self,
@@ -92,11 +82,7 @@ impl UserRepository for UserRepo {
     }
 
     #[tracing::instrument(name = "UserRepository::get_by_id", skip(self))]
-    async fn get_by_id(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<Model> {
+    async fn get_by_id(&self, id: Uuid, request_id: Uuid) -> RepoResult<Model> {
         debug!("Getting user by id: {}, with request id: {}", id, request_id);
 
         let result = User::find_by_id(id).one(&self.0.connection).await;
@@ -148,11 +134,7 @@ impl UserRepository for UserRepo {
     }
 
     #[tracing::instrument(name = "UserRepository::soft_delete", skip(self))]
-    async fn soft_delete(
-        &self,
-        request_id: Uuid,
-        id: Uuid,
-    ) -> RepoResult<()> {
+    async fn soft_delete(&self, request_id: Uuid, id: Uuid) -> RepoResult<()> {
         debug!("Deleting user by id: {}, request_id {}", id, request_id);
 
         let mut user =
