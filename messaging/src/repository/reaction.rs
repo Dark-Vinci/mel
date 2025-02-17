@@ -14,6 +14,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ReactionRepository {
@@ -21,16 +22,16 @@ pub trait ReactionRepository {
         &self,
         payload: CreateReaction,
         request_id: Uuid,
-    ) -> Result<Reaction, RepoError>;
+    ) -> RepoResult<Reaction>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> Result<(), RepoError>;
+        -> RepoResult<()>;
 
     async fn find_by_id(
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Reaction, RepoError>;
+    ) -> RepoResult<Reaction>;
 }
 
 pub struct ReactionRepo(DB);
@@ -48,7 +49,7 @@ impl ReactionRepository for ReactionRepo {
         &self,
         payload: CreateReaction,
         request_id: Uuid,
-    ) -> Result<Reaction, RepoError> {
+    ) -> RepoResult<Reaction> {
         debug!(
             "Got request to create reaction with payload {}, request_id: {}",
             payload, request_id
@@ -70,7 +71,7 @@ impl ReactionRepository for ReactionRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!(
             "Got request to delete reaction with id {} and request_id {}",
             id, request_id
@@ -97,7 +98,7 @@ impl ReactionRepository for ReactionRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Reaction, RepoError> {
+    ) -> RepoResult<Reaction> {
         debug!(
             "Got request to find reaction with id {} with request_id {}",
             id, request_id

@@ -21,6 +21,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait PinRepository {
@@ -28,29 +29,29 @@ pub trait PinRepository {
         &self,
         payload: CreatePin,
         request_id: Uuid,
-    ) -> Result<Pin, RepoError>;
+    ) -> RepoResult<Pin>;
 
     async fn update(
         &self,
         payload: UpdatePin,
         request_id: Uuid,
-    ) -> Result<Pin, RepoError>;
+    ) -> RepoResult<Pin>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> Result<(), RepoError>;
+        -> RepoResult<()>;
 
     async fn get(
         &self,
         id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Vec<Pin>>, RepoError>;
+    ) -> RepoResult<Paginated<Vec<Pin>>>;
 
     async fn get_by_id(
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Pin, RepoError>;
+    ) -> RepoResult<Pin>;
 }
 
 pub struct PinRepo(DB);
@@ -68,7 +69,7 @@ impl PinRepository for PinRepo {
         &self,
         payload: CreatePin,
         request_id: Uuid,
-    ) -> Result<Pin, RepoError> {
+    ) -> RepoResult<Pin> {
         debug!("Creating pin by id: {:?}, request_id {}", payload, request_id);
 
         let model: ActiveModel = payload.into();
@@ -88,7 +89,7 @@ impl PinRepository for PinRepo {
         &self,
         payload: UpdatePin,
         request_id: Uuid,
-    ) -> Result<Pin, RepoError> {
+    ) -> RepoResult<Pin> {
         debug!("Updating pin by id: {:?}, request_id {}", payload, request_id);
 
         let model: ActiveModel = payload.into();
@@ -108,7 +109,7 @@ impl PinRepository for PinRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!("Deleting pin by id: {}, request_id {}", id, request_id);
 
         let mut pin = self.get_by_id(id, request_id).await?.into_active_model();
@@ -131,7 +132,7 @@ impl PinRepository for PinRepo {
         id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Vec<Pin>>, RepoError> {
+    ) -> RepoResult<Paginated<Vec<Pin>>> {
         debug!("getting pin users by id: {}, request_id {}", id, request_id);
 
         let result = PinEntity::find()
@@ -173,7 +174,7 @@ impl PinRepository for PinRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Pin, RepoError> {
+    ) -> RepoResult<Pin> {
         debug!("Getting pin by id: {}, with request id: {}", id, request_id);
 
         let result = PinEntity::find_by_id(id).one(&self.0.connection).await;

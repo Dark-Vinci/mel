@@ -18,6 +18,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ChannelRepository {
@@ -25,19 +26,19 @@ pub trait ChannelRepository {
         &self,
         payload: CreateChannel,
         request_id: Uuid,
-    ) -> Result<Channel, RepoError>;
+    ) -> RepoResult<Channel>;
 
     async fn update(
         &self,
         payload: UpdateChannel,
         request_id: Uuid,
-    ) -> Result<Channel, RepoError>;
+    ) -> RepoResult<Channel>;
 
     async fn get_by_id(
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Channel, RepoError>;
+    ) -> RepoResult<Channel>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
         -> Result<(), RepoError>;
@@ -46,7 +47,7 @@ pub trait ChannelRepository {
         &self,
         name: &str,
         request_id: Uuid,
-    ) -> Result<Channel, RepoError>;
+    ) -> RepoResult<Channel>;
 }
 
 pub struct ChannelRepo(DB);
@@ -64,7 +65,7 @@ impl ChannelRepository for ChannelRepo {
         &self,
         payload: CreateChannel,
         request_id: Uuid,
-    ) -> Result<Channel, RepoError> {
+    ) -> RepoResult<Channel> {
         debug!(
             "Creating channel: {:?}, with request id: {}",
             payload, request_id
@@ -92,7 +93,7 @@ impl ChannelRepository for ChannelRepo {
         &self,
         payload: UpdateChannel,
         request_id: Uuid,
-    ) -> Result<Channel, RepoError> {
+    ) -> RepoResult<Channel> {
         debug!("Updating chan by id: {:?}, request_id {}", payload, request_id);
 
         let model: ActiveModel = payload.into();
@@ -112,7 +113,7 @@ impl ChannelRepository for ChannelRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Channel, RepoError> {
+    ) -> RepoResult<Channel> {
         debug!(
             "Getting channel by id: {}, with request id: {}",
             id, request_id
@@ -141,7 +142,7 @@ impl ChannelRepository for ChannelRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!("Deleting channel by id: {}, request_id {}", id, request_id);
 
         let mut result =
@@ -164,7 +165,7 @@ impl ChannelRepository for ChannelRepo {
         &self,
         name: &str,
         request_id: Uuid,
-    ) -> Result<Channel, RepoError> {
+    ) -> RepoResult<Channel> {
         debug!(
             "Getting channel by id: {}, with request id: {}",
             name, request_id

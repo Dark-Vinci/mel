@@ -21,6 +21,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait MessageRepository {
@@ -28,29 +29,29 @@ pub trait MessageRepository {
         &self,
         payload: CreateMessage,
         request_id: Uuid,
-    ) -> Result<Message, RepoError>;
+    ) -> RepoResult<Message>;
 
     async fn update(
         &self,
         payload: UpdateMessage,
         request_id: Uuid,
-    ) -> Result<Message, RepoError>;
+    ) -> RepoResult<Message>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> Result<(), RepoError>;
+        -> RepoResult<()>;
 
     async fn get_by_id(
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Message, RepoError>;
+    ) -> RepoResult<Message>;
 
     async fn get_for_channel(
         &self,
         channel_id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Vec<Message>>, RepoError>;
+    ) -> RepoResult<Paginated<Vec<Message>>>;
 }
 
 pub struct MessageRepo(DB);
@@ -68,7 +69,7 @@ impl MessageRepository for MessageRepo {
         &self,
         payload: CreateMessage,
         request_id: Uuid,
-    ) -> Result<Message, RepoError> {
+    ) -> RepoResult<Message> {
         debug!(
             "Got Create Message request with request id {} and payload",
             request_id, payload
@@ -94,7 +95,7 @@ impl MessageRepository for MessageRepo {
         &self,
         payload: UpdateMessage,
         request_id: Uuid,
-    ) -> Result<Message, RepoError> {
+    ) -> RepoResult<Message> {
         debug!(
             "Got Update Message request with request id {} and payload",
             request_id, payload
@@ -147,7 +148,7 @@ impl MessageRepository for MessageRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Message, RepoError> {
+    ) -> RepoResult<Message> {
         debug!(
             "Got Get Message request with request id {} and id {}",
             request_id, id

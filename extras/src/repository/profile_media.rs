@@ -18,6 +18,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ProfileMediaRepository {
@@ -25,19 +26,19 @@ pub trait ProfileMediaRepository {
         &self,
         payload: CreateProfileMedia,
         request_id: Uuid,
-    ) -> Result<ProfileMedia, RepoError>;
+    ) -> RepoResult<ProfileMedia>;
 
     async fn delete(
         &self,
         workspace_user_id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError>;
+    ) -> RepoResult<()>;
 
     async fn get_by_id(
         &self,
         workspace_user_id: Uuid,
         request_id: Uuid,
-    ) -> Result<ProfileMedia, RepoError>;
+    ) -> RepoResult<ProfileMedia>;
 }
 
 pub struct ProfileMediaRepo(DB);
@@ -54,7 +55,7 @@ impl ProfileMediaRepository for ProfileMediaRepo {
         &self,
         payload: CreateProfileMedia,
         request_id: Uuid,
-    ) -> Result<ProfileMedia, RepoError> {
+    ) -> RepoResult<ProfileMedia> {
         debug!("Received request to create new user profile, payload: {:?}, request_id:{request_id}", payload);
 
         let profile: ActiveModel = payload.into();
@@ -74,7 +75,7 @@ impl ProfileMediaRepository for ProfileMediaRepo {
         &self,
         workspace_user_id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!("Received request to delete profile, id: {:?}, request_id:{request_id}", workspace_user_id);
 
         let mut profile_media = self
@@ -102,7 +103,7 @@ impl ProfileMediaRepository for ProfileMediaRepo {
         &self,
         workspace_user_id: Uuid,
         request_id: Uuid,
-    ) -> Result<ProfileMedia, RepoError> {
+    ) -> RepoResult<ProfileMedia> {
         debug!("Received request to create new user profile, payload: {:?}, request_id:{request_id}", workspace_user_id);
 
         let result = ProfileMediaEntity::find_by_id(workspace_user_id)

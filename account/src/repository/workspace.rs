@@ -21,6 +21,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait::async_trait]
 pub trait WorkspaceRepository {
@@ -28,13 +29,13 @@ pub trait WorkspaceRepository {
         &self,
         result: CreateWorkspaceRequest,
         request_id: Uuid,
-    ) -> Result<Workspace, RepoError>;
+    ) -> RepoResult<Workspace>;
 
     async fn get_by_id(
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Workspace, RepoError>;
+    ) -> RepoResult<Workspace>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
         -> Result<(), RepoError>;
@@ -43,7 +44,7 @@ pub trait WorkspaceRepository {
         &self,
         result: UpdateWorkspaceRequest,
         request_id: Uuid,
-    ) -> Result<Workspace, RepoError>;
+    ) -> RepoResult<Workspace>;
 }
 
 pub struct WorkspaceRepo(DB);
@@ -61,7 +62,7 @@ impl WorkspaceRepository for WorkspaceRepo {
         &self,
         workspace: CreateWorkspaceRequest,
         request_id: Uuid,
-    ) -> Result<Workspace, RepoError> {
+    ) -> RepoResult<Workspace> {
         debug!(
             "Creating workspace: {:?}, with request id: {}",
             workspace, request_id
@@ -89,7 +90,7 @@ impl WorkspaceRepository for WorkspaceRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Workspace, RepoError> {
+    ) -> RepoResult<Workspace> {
         debug!(
             "Getting workspace by id: {}, with request id: {}",
             id, request_id
@@ -142,7 +143,7 @@ impl WorkspaceRepository for WorkspaceRepo {
         &self,
         workspace: UpdateWorkspaceRequest,
         request_id: Uuid,
-    ) -> Result<Workspace, RepoError> {
+    ) -> RepoResult<Workspace> {
         debug!(
             "Updating workspace by id: {:?}, request_id {}",
             workspace, request_id

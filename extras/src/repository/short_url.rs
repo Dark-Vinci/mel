@@ -17,6 +17,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ShortUrlRepository {
@@ -24,14 +25,16 @@ pub trait ShortUrlRepository {
         &self,
         payload: CreateShortUrl,
         request_id: Uuid,
-    ) -> Result<ShortUrl, RepoError>;
+    ) -> RepoResult<ShortUrl>;
+
     async fn get_by_id(
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<ShortUrl, RepoError>;
+    ) -> RepoResult<ShortUrl>;
+
     async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> Result<(), RepoError>;
+        -> RepoResult<()>;
 }
 
 pub struct ShortUrlRepo(DB);
@@ -49,7 +52,7 @@ impl ShortUrlRepository for ShortUrlRepo {
         &self,
         payload: CreateShortUrl,
         request_id: Uuid,
-    ) -> Result<ShortUrl, RepoError> {
+    ) -> RepoResult<ShortUrl> {
         debug!("ShortUrlRepo::create called, payload: {:?}, request_id: {request_id}", payload);
 
         let short_url: ActiveModel = payload.into();
@@ -73,7 +76,7 @@ impl ShortUrlRepository for ShortUrlRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<ShortUrl, RepoError> {
+    ) -> RepoResult<ShortUrl> {
         debug!(
             "ShortUrlRepo::get_by_id called, id: {}, request_id: {request_id}",
             id
@@ -98,7 +101,7 @@ impl ShortUrlRepository for ShortUrlRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!(
             "ShortUrlRepo::delete called, id: {}, request_id: {request_id}",
             id

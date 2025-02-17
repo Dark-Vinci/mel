@@ -17,6 +17,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ResponseRepository {
@@ -24,13 +25,13 @@ pub trait ResponseRepository {
         &self,
         payload: CreateResponse,
         request_id: Uuid,
-    ) -> Result<Response, RepoError>;
+    ) -> RepoResult<Response>;
 
     async fn update(
         &self,
         payload: UpdateResponse,
         request_id: Uuid,
-    ) -> Result<Response, RepoError>;
+    ) -> RepoResult<Response>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
         -> Result<(), RepoError>;
@@ -39,7 +40,7 @@ pub trait ResponseRepository {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Response, RepoError>;
+    ) -> RepoResult<Response>;
 }
 
 pub struct ResponseRepo(DB);
@@ -57,7 +58,7 @@ impl ResponseRepository for ResponseRepo {
         &self,
         payload: CreateResponse,
         request_id: Uuid,
-    ) -> Result<Response, RepoError> {
+    ) -> RepoResult<Response> {
         debug!(
             "Got a create response request with payload: {}, request_id: {}",
             payload, request_id
@@ -79,7 +80,7 @@ impl ResponseRepository for ResponseRepo {
         &self,
         payload: UpdateResponse,
         request_id: Uuid,
-    ) -> Result<Response, RepoError> {
+    ) -> RepoResult<Response> {
         debug!(
             "Got a update request with payload: {}, request_id: {}",
             payload, request_id
@@ -101,7 +102,7 @@ impl ResponseRepository for ResponseRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!(
             "Got delete request with id: {}, request_id: {}",
             id, request_id
@@ -126,7 +127,7 @@ impl ResponseRepository for ResponseRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Response, RepoError> {
+    ) -> RepoResult<Response> {
         debug!("Got find request with id: {}, request_id: {}", id, request_id);
 
         let response = ResponseEntity::find_by_id(id)

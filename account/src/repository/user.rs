@@ -16,12 +16,12 @@ use {
         DbErr,
         EntityTrait,
         QueryFilter,
-        // prelude::DeriveIntoActiveModel
     },
     tracing::{debug, error, Level},
     uuid::Uuid,
 };
 use {chrono::Utc, sea_orm::IntoActiveModel};
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait UserRepository {
@@ -29,19 +29,19 @@ pub trait UserRepository {
         &self,
         user: CreateUserRequest,
         request_id: Uuid,
-    ) -> Result<Model, RepoError>;
+    ) -> RepoResult<Model>;
 
     async fn get_by_id(
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Model, RepoError>;
+    ) -> RepoResult<Model>;
 
     async fn get_by_email(
         &self,
         request_id: Uuid,
         mail: String,
-    ) -> Result<Model, RepoError>;
+    ) -> RepoResult<Model>;
 
     async fn soft_delete(
         &self,
@@ -53,7 +53,7 @@ pub trait UserRepository {
         &self,
         request_id: Uuid,
         user: UpdateUserRequest,
-    ) -> Result<Model, RepoError>;
+    ) -> RepoResult<Model>;
 }
 
 pub struct UserRepo(DB);
@@ -71,7 +71,7 @@ impl UserRepository for UserRepo {
         &self,
         user: CreateUserRequest,
         request_id: Uuid,
-    ) -> Result<Model, RepoError> {
+    ) -> RepoResult<Model> {
         debug!("Creating user: {:?}, with request id: {}", user, request_id);
 
         let a: user::ActiveModel = user.into();
@@ -96,7 +96,7 @@ impl UserRepository for UserRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<Model, RepoError> {
+    ) -> RepoResult<Model> {
         debug!("Getting user by id: {}, with request id: {}", id, request_id);
 
         let result = User::find_by_id(id).one(&self.0.connection).await;
@@ -121,7 +121,7 @@ impl UserRepository for UserRepo {
         &self,
         request_id: Uuid,
         mail: String,
-    ) -> Result<Model, RepoError> {
+    ) -> RepoResult<Model> {
         debug!(
             "Getting user by mail: {}, with request id: {}",
             mail, request_id
@@ -152,7 +152,7 @@ impl UserRepository for UserRepo {
         &self,
         request_id: Uuid,
         id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!("Deleting user by id: {}, request_id {}", id, request_id);
 
         let mut user =
@@ -175,7 +175,7 @@ impl UserRepository for UserRepo {
         &self,
         request_id: Uuid,
         user: UpdateUserRequest,
-    ) -> Result<Model, RepoError> {
+    ) -> RepoResult<Model> {
         debug!("Updating user by id: {:?}, request_id {}", user, request_id);
 
         let model: user::ActiveModel = user.into();

@@ -15,6 +15,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ChatMediaRepository {
@@ -22,13 +23,13 @@ pub trait ChatMediaRepository {
         &self,
         payload: CreateChatMedia,
         request_id: Uuid,
-    ) -> Result<ChatMedia, RepoError>;
+    ) -> RepoResult<ChatMedia>;
 
     async fn get_by_message_id(
         &self,
         message_id: Uuid,
         request_id: Uuid,
-    ) -> Result<ChatMedia, RepoError>;
+    ) -> RepoResult<ChatMedia>;
 }
 
 pub struct ChatMediaRepo(DB);
@@ -46,7 +47,7 @@ impl ChatMediaRepository for ChatMediaRepo {
         &self,
         payload: CreateChatMedia,
         request_id: Uuid,
-    ) -> Result<ChatMedia, RepoError> {
+    ) -> RepoResult<ChatMedia> {
         debug!("Received request to create new user chat_media, payload: {:?}, request_id:{request_id}", payload);
 
         let chat_media: ActiveModel = payload.into();
@@ -69,7 +70,7 @@ impl ChatMediaRepository for ChatMediaRepo {
         &self,
         message_id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!("Received request to get a chat media by message, payload: {:?}, request_id:{request_id}", message_id);
 
         let chat_media = ChatMediaEntity::find()

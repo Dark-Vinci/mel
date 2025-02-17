@@ -1,4 +1,3 @@
-use crate::app::app::App;
-use crate::app::interface::Chat;
+use crate::app::{app::App, interface::Chat};
 
 impl Chat for App {}

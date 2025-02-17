@@ -22,6 +22,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ChannelUserRepository {
@@ -29,13 +30,13 @@ pub trait ChannelUserRepository {
         &self,
         payload: CreateChannelUser,
         request_id: Uuid,
-    ) -> Result<ChannelUser, RepoError>;
+    ) -> RepoResult<ChannelUser>;
 
     async fn update(
         &self,
         payload: UpdateChannelUser,
         request_id: Uuid,
-    ) -> Result<ChannelUser, RepoError>;
+    ) -> RepoResult<ChannelUser>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
         -> Result<(), RepoError>;
@@ -51,7 +52,7 @@ pub trait ChannelUserRepository {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<ChannelUser, RepoError>;
+    ) -> RepoResult<ChannelUser>;
 }
 
 pub struct ChannelUserRepo(DB);
@@ -69,7 +70,7 @@ impl ChannelUserRepository for ChannelUserRepo {
         &self,
         payload: CreateChannelUser,
         request_id: Uuid,
-    ) -> Result<ChannelUser, RepoError> {
+    ) -> RepoResult<ChannelUser> {
         debug!(
             "Creating channel_user by id: {:?}, request_id {}",
             payload, request_id
@@ -92,7 +93,7 @@ impl ChannelUserRepository for ChannelUserRepo {
         &self,
         payload: UpdateChannelUser,
         request_id: Uuid,
-    ) -> Result<ChannelUser, RepoError> {
+    ) -> RepoResult<ChannelUser> {
         debug!(
             "Updating channel_user by id: {:?}, request_id {}",
             payload, request_id
@@ -115,7 +116,7 @@ impl ChannelUserRepository for ChannelUserRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!(
             "Deleting channel_user by id: {}, request_id {}",
             id, request_id
@@ -145,7 +146,7 @@ impl ChannelUserRepository for ChannelUserRepo {
         id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Vec<ChannelUser>>, RepoError> {
+    ) -> RepoResult<Paginated<Vec<ChannelUser>>> {
         debug!(
             "getting channel users by id: {}, request_id {}",
             id, request_id
@@ -196,7 +197,7 @@ impl ChannelUserRepository for ChannelUserRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<ChannelUser, RepoError> {
+    ) -> RepoResult<ChannelUser> {
         debug!(
             "Getting channel_user by id: {}, with request id: {}",
             id, request_id

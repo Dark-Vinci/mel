@@ -25,6 +25,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait WorkspaceUserRepository {
@@ -32,13 +33,13 @@ pub trait WorkspaceUserRepository {
         &self,
         payload: CreateWorkspaceUser,
         request_id: Uuid,
-    ) -> Result<WorkspaceUser, RepoError>;
+    ) -> RepoResult<WorkspaceUser>;
 
     async fn update(
         &self,
         payload: UpdateWorkspaceUser,
         request_id: Uuid,
-    ) -> Result<WorkspaceUser, RepoError>;
+    ) -> RepoResult<WorkspaceUser>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
         -> Result<(), RepoError>;
@@ -54,7 +55,7 @@ pub trait WorkspaceUserRepository {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<WorkspaceUser, RepoError>;
+    ) -> RepoResult<WorkspaceUser>;
 }
 
 pub struct WorkspaceUserRepo(DB);
@@ -72,7 +73,7 @@ impl WorkspaceUserRepository for WorkspaceUserRepo {
         &self,
         payload: CreateWorkspaceUser,
         request_id: Uuid,
-    ) -> Result<WorkspaceUser, RepoError> {
+    ) -> RepoResult<WorkspaceUser> {
         debug!(
             "Creating workspace_user by id: {:?}, request_id {}",
             payload, request_id
@@ -95,7 +96,7 @@ impl WorkspaceUserRepository for WorkspaceUserRepo {
         &self,
         payload: UpdateWorkspaceUser,
         request_id: Uuid,
-    ) -> Result<WorkspaceUser, RepoError> {
+    ) -> RepoResult<WorkspaceUser> {
         debug!(
             "Updating workspace_user by id: {:?}, request_id {}",
             payload, request_id
@@ -118,7 +119,7 @@ impl WorkspaceUserRepository for WorkspaceUserRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!(
             "Deleting workspace_user by id: {}, request_id {}",
             id, request_id
@@ -148,7 +149,7 @@ impl WorkspaceUserRepository for WorkspaceUserRepo {
         id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Vec<WorkspaceUser>>, RepoError> {
+    ) -> RepoResult<Paginated<Vec<WorkspaceUser>>> {
         debug!(
             "getting channel users by id: {}, request_id {}",
             id, request_id
@@ -199,7 +200,7 @@ impl WorkspaceUserRepository for WorkspaceUserRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<WorkspaceUser, RepoError> {
+    ) -> RepoResult<WorkspaceUser> {
         debug!(
             "Getting workspace_user by id: {}, with request id: {}",
             id, request_id

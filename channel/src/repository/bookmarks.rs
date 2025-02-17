@@ -25,6 +25,7 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
+use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait BookMarkRepository {
@@ -32,29 +33,29 @@ pub trait BookMarkRepository {
         &self,
         payload: CreateBookMark,
         request_id: Uuid,
-    ) -> Result<BookMark, RepoError>;
+    ) -> RepoResult<BookMark>;
 
     async fn update(
         &self,
         payload: UpdateBookMark,
         request_id: Uuid,
-    ) -> Result<BookMark, RepoError>;
+    ) -> RepoResult<BookMark>;
 
     async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> Result<(), RepoError>;
+        -> RepoResult<()>;
 
     async fn get(
         &self,
         id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Vec<BookMark>>, RepoError>;
+    ) -> RepoResult<Paginated<Vec<BookMark>>>;
 
     async fn get_by_id(
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<BookMark, RepoError>;
+    ) -> RepoResult<BookMark>;
 }
 
 pub struct BookMarkRepo(DB);
@@ -72,7 +73,7 @@ impl BookMarkRepository for BookMarkRepo {
         &self,
         payload: CreateBookMark,
         request_id: Uuid,
-    ) -> Result<BookMark, RepoError> {
+    ) -> RepoResult<BookMark> {
         debug!(
             "Creating channel_user by id: {:?}, request_id {}",
             payload, request_id
@@ -95,7 +96,7 @@ impl BookMarkRepository for BookMarkRepo {
         &self,
         payload: UpdateBookMark,
         request_id: Uuid,
-    ) -> Result<BookMark, RepoError> {
+    ) -> RepoResult<BookMark> {
         debug!(
             "Updating channel_user by id: {:?}, request_id {}",
             payload, request_id
@@ -118,7 +119,7 @@ impl BookMarkRepository for BookMarkRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<(), RepoError> {
+    ) -> RepoResult<()> {
         debug!(
             "Deleting channel_user by id: {}, request_id {}",
             id, request_id
@@ -148,7 +149,7 @@ impl BookMarkRepository for BookMarkRepo {
         id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Vec<BookMark>>, RepoError> {
+    ) -> RepoResult<Paginated<Vec<BookMark>>> {
         debug!(
             "getting channel users by id: {}, request_id {}",
             id, request_id
@@ -199,7 +200,7 @@ impl BookMarkRepository for BookMarkRepo {
         &self,
         id: Uuid,
         request_id: Uuid,
-    ) -> Result<BookMark, RepoError> {
+    ) -> RepoResult<BookMark> {
         debug!(
             "Getting channel_user by id: {}, with request id: {}",
             id, request_id
