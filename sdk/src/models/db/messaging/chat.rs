@@ -1,17 +1,15 @@
 use {
     chrono::{DateTime, Utc},
-    sea_orm::{
-        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
-    },
+    sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::messaging::{CreateChat, CreateReaction, UpdateChat};
+use crate::models::others::messaging::{CreateChat, UpdateChat};
 
 #[derive(
     Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel,
 )]
-#[sea_orm(table_name = "chats", schema = "public")]
+#[sea_orm(table_name = "chats", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
@@ -38,13 +36,13 @@ impl ActiveModelBehavior for ActiveModel {}
 pub enum Relation {}
 
 impl From<CreateChat> for Model {
-    fn from(reaction: CreateChat) -> Self {
+    fn from(_reaction: CreateChat) -> Self {
         todo!()
     }
 }
 
 impl From<UpdateChat> for Model {
-    fn from(reaction: UpdateChat) -> Self {
+    fn from(_reaction: UpdateChat) -> Self {
         todo!()
     }
 }

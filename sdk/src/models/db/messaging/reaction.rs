@@ -1,9 +1,7 @@
 use {
     crate::models::others::messaging::CreateReaction,
     chrono::{DateTime, Utc},
-    sea_orm::{
-        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
-    },
+    sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
@@ -38,7 +36,7 @@ pub struct Model {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateReaction> for Model {
-    fn from(reaction: CreateReaction) -> Self {
+    fn from(_reaction: CreateReaction) -> Self {
         todo!()
     }
 }

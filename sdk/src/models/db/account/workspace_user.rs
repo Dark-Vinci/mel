@@ -38,13 +38,13 @@ pub enum Relation {
 }
 
 impl From<CreateWorkspaceUser> for ActiveModel {
-    fn from(val: CreateWorkspaceUser) -> Self {
+    fn from(_val: CreateWorkspaceUser) -> Self {
         todo!()
     }
 }
 
 impl From<UpdateWorkspaceUser> for ActiveModel {
-    fn from(fro: UpdateWorkspaceUser) -> Self {
+    fn from(_fro: UpdateWorkspaceUser) -> Self {
         todo!()
     }
 }

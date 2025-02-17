@@ -1,6 +1,6 @@
 use {
     chrono::{DateTime, Utc},
-    sea_orm::entity::prelude::*,
+    sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
@@ -31,6 +31,6 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Related {}
+pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}

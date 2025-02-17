@@ -1,17 +1,17 @@
 use {
     chrono::{DateTime, Utc},
-    sea_orm::{
-        tests_cfg::cake::{ActiveModel, Entity},
-        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
-        Related, RelationDef, RelationTrait,
-    },
+    // sea_orm::{
+    //     ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
+    //     Related, RelationDef, RelationTrait,
+    // },
+    sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
 
-#[derive(Debug, Serialize, Deserialize, DeriveEntityModel)]
-#[sea_orm(table_name = "short_url_track", schame_name = "public")]
-struct Model {
+#[derive(Debug, Clone, Serialize, Deserialize, DeriveEntityModel)]
+#[sea_orm(table_name = "short_url_track", schema_name = "public")]
+pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
 
@@ -29,7 +29,7 @@ impl ActiveModelBehavior for ActiveModel {}
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::short_url::Entity",
-        from = "Column::ShortUrlID",
+        from = "Column::ShortUrlId",
         to = "super::short_url::Column::Id"
     )]
     ShortUrl,

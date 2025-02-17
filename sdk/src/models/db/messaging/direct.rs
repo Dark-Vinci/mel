@@ -1,8 +1,6 @@
 use {
     chrono::{DateTime, Utc},
-    sea_orm::{
-        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
-    },
+    sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
@@ -10,7 +8,7 @@ use {
 #[derive(
     Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel,
 )]
-#[sea_orm(table_name = "direct_messages", schema = "public")]
+#[sea_orm(table_name = "direct_messages", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,

@@ -2,8 +2,8 @@ use {
     crate::app::app::ExtrasInterface,
     async_trait::async_trait,
     sdk::generated_proto_rs::{
-        mel_account::{
-            account_service_server::AccountService, PingResponse,
+        mel_extras::{
+            extras_service_server::ExtrasService, PingResponse,
             SayHelloRequest, SayHelloResponse,
         },
         mel_utils::Empty,
@@ -21,7 +21,7 @@ impl<A: ExtrasInterface> Extras<A> {
 }
 
 #[async_trait]
-impl<T: ExtrasInterface> AccountService for Extras<T> {
+impl<T: ExtrasInterface> ExtrasService for Extras<T> {
     async fn ping(
         &self,
         _request: Request<Empty>,

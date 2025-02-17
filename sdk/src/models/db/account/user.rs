@@ -68,21 +68,7 @@ impl From<UpdateUserRequest> for ActiveModel {
     }
 }
 
-impl ActiveModelBehavior for ActiveModel {
-    async fn before_save<C>(self, _db: &C, insert: bool) -> Result<Self, DbErr>
-    where
-        C: ConnectionTrait,
-    {
-        if insert || !self.password.is_unchanged() {
-            let mut this = self;
-            this.password = Set(format!("Pass{}", this.password.to_string()));
-
-            Ok(this)
-        } else {
-            Ok(self)
-        }
-    }
-}
+impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}

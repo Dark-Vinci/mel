@@ -1,18 +1,15 @@
 use {
     crate::models::others::{
-        auth::create::UpdateUserRequest, extras::CreateShortUrl,
+        extras::CreateShortUrl,
     },
     chrono::{DateTime, Utc},
-    sea_orm::{
-        ActiveModelBehavior, ActiveValue::Set, DeriveEntityModel,
-        DeriveRelation, EnumIter, Related, RelationDef, RelationTrait,
-    },
+    sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
 
-#[derive(Debug, Serialize, Deserialize, DeriveEntityModel)]
-#[sea_orm(table_name = "short_url", schame_name = "public")]
+#[derive(Clone, Debug, Serialize, Deserialize, DeriveEntityModel)]
+#[sea_orm(table_name = "short_url", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
@@ -39,7 +36,7 @@ pub struct Model {
 pub enum Relation {
     #[sea_orm(
         belongs_to = "super::short_url_track::Entity",
-        from = "Column::ShortUrlTrackID",
+        from = "Column::Id",
         to = "super::short_url_track::Column::Id"
     )]
     ShortUrlTrack,
@@ -54,8 +51,8 @@ impl Related<super::short_url_track::Entity> for Relation {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateShortUrl> for ActiveModel {
-    fn from(fro: UpdateUserRequest) -> Self {
-        let mut val: ActiveModel = Self {
+    fn from(_fro: CreateShortUrl) -> Self {
+        let val: ActiveModel = Self {
             ..Default::default()
         };
 

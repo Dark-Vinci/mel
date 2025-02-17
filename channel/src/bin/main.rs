@@ -1,12 +1,12 @@
 use {
-    channel::{app::app::App, config::config::Config, server::server::Account},
+    channel::{app::app::App, config::config::Config, server::server::Channel},
     sdk::{
         constants::constant::{
             LAGOS_TIME, LOCAL_HOST, LOG_DIR, LOG_FILE_NAME,
             LOG_WARNING_FILE_NAME, TIME_ZONE,
         },
         errors::AppError,
-        generated_proto_rs::mel_account::account_service_server::AccountServiceServer,
+        generated_proto_rs::mel_channel::channel_service_server::ChannelServiceServer,
         utils::utility::{graceful_shutdown, service_auth},
     },
     std::{env, net::SocketAddr, panic},
@@ -70,7 +70,7 @@ async fn main() -> Result<(), AppError> {
     let app = App::new(&config).await;
 
     // bootstrap service controller
-    let channel_server = Account::new(app);
+    let channel_server = Channel::new(app);
 
     info!(
         "🚀{0} for {1} is listening on address {2} 🚀",
@@ -78,7 +78,7 @@ async fn main() -> Result<(), AppError> {
     );
 
     let service =
-        AccountServiceServer::with_interceptor(channel_server, service_auth);
+        ChannelServiceServer::with_interceptor(channel_server, service_auth);
 
     // start service and listen to shut down hooks;
     Server::builder()

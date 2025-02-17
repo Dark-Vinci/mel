@@ -1,5 +1,5 @@
 use {
-    sea_orm::DeriveEntityModel,
+    sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
@@ -14,3 +14,8 @@ pub struct Model {
 
     pub unicode: String,
 }
+
+impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {}

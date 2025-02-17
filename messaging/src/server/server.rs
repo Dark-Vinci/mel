@@ -2,8 +2,8 @@ use {
     crate::app::app::MessagingTrait,
     async_trait::async_trait,
     sdk::generated_proto_rs::{
-        mel_account::{
-            account_service_server::AccountService, PingResponse,
+        mel_messaging::{
+            messaging_service_server::MessagingService, PingResponse,
             SayHelloRequest, SayHelloResponse,
         },
         mel_utils::Empty,
@@ -21,7 +21,7 @@ impl<A: MessagingTrait> Messaging<A> {
 }
 
 #[async_trait]
-impl<A: MessagingTrait + Send + Sync + 'static> AccountService
+impl<A: MessagingTrait + Send + Sync + 'static> MessagingService
     for Messaging<A>
 {
     async fn ping(

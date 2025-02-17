@@ -33,8 +33,8 @@ pub struct Model {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateChannel> for ActiveModel {
-    fn from(fro: CreateChannel) -> Self {
-        let mut val: ActiveModel = Self {
+    fn from(_fro: CreateChannel) -> Self {
+        let val: ActiveModel = Self {
             ..Default::default()
         };
 
@@ -45,8 +45,8 @@ impl From<CreateChannel> for ActiveModel {
 }
 
 impl From<UpdateChannel> for ActiveModel {
-    fn from(fro: UpdateChannel) -> Self {
-        let mut val: ActiveModel = Self {
+    fn from(_fro: UpdateChannel) -> Self {
+        let val: ActiveModel = Self {
             ..Default::default()
         };
 

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package mel_extras;
+
+import "utils/util.proto";
+import "extras/request.proto";
+import "extras/response.proto";
+
+service ExtrasService {
+  rpc Ping(mel_utils.Empty) returns (PingResponse);
+  rpc SayHello(SayHelloRequest) returns (SayHelloResponse);
+}

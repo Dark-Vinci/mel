@@ -1,12 +1,13 @@
 use {
     crate::models::others::auth::channel::{
-        CreateChannel, CreateChannelUser, UpdateChannel,
+        CreateChannelUser,
     },
     chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::auth::channel::UpdateChannelUser;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -30,8 +31,8 @@ pub struct Model {
 }
 
 impl From<CreateChannelUser> for ActiveModel {
-    fn from(fro: CreateChannel) -> Self {
-        let mut val: ActiveModel = Self {
+    fn from(_fro: CreateChannelUser) -> Self {
+        let val: ActiveModel = Self {
             ..Default::default()
         };
 
@@ -41,9 +42,9 @@ impl From<CreateChannelUser> for ActiveModel {
     }
 }
 
-impl From<CreateChannelUser> for ActiveModel {
-    fn from(fro: UpdateChannel) -> Self {
-        let mut val: ActiveModel = Self {
+impl From<UpdateChannelUser> for ActiveModel {
+    fn from(_fro: UpdateChannelUser) -> Self {
+        let val: ActiveModel = Self {
             ..Default::default()
         };
 

@@ -14,7 +14,7 @@ pub struct CreateProfileMedia {
 
 #[derive(Debug)]
 pub struct CreateChatMedia {
-    url: String,
-    channel_id: Option<Uuid>,
-    message_id: Uuid,
+    pub url: String,
+    pub channel_id: Option<Uuid>,
+    pub message_id: Uuid,
 }

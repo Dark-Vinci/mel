@@ -1,7 +1,7 @@
 use {
     crate::models::others::messaging::{CreateResponse, UpdateResponse},
     chrono::{DateTime, Utc},
-    sea_orm::{ActiveModelBehavior, DeriveEntityModel},
+    sea_orm::{entity::prelude::*},
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
@@ -36,15 +36,16 @@ pub struct Model {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateResponse> for Model {
-    fn from(msg: CreateResponse) -> Self {
+    fn from(_msg: CreateResponse) -> Self {
         todo!()
     }
 }
 
 impl From<UpdateResponse> for Model {
-    fn from(msg: UpdateResponse) -> Self {
+    fn from(_msg: UpdateResponse) -> Self {
         todo!()
     }
 }
 
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {}

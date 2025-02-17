@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package mel_messaging;
+
+message SayHelloRequest {
+  string name = 1;
+  string request_id = 2;
+}

@@ -2,8 +2,8 @@ use {
     crate::app::app::ChannelInterface,
     async_trait::async_trait,
     sdk::generated_proto_rs::{
-        mel_account::{
-            account_service_server::AccountService, PingResponse,
+        mel_channel::{
+            channel_service_server::ChannelService, PingResponse,
             SayHelloRequest, SayHelloResponse,
         },
         mel_utils::Empty,
@@ -12,17 +12,17 @@ use {
     uuid::Uuid,
 };
 
-pub struct Account<A: ChannelInterface>(A);
+pub struct Channel<A: ChannelInterface>(A);
 
-impl<A: ChannelInterface> Account<A> {
+impl<A: ChannelInterface> Channel<A> {
     pub fn new(a: A) -> Self {
         Self(a)
     }
 }
 
 #[async_trait]
-impl<A: ChannelInterface + Send + Sync + 'static> AccountService
-    for Account<A>
+impl<A: ChannelInterface + Send + Sync + 'static> ChannelService
+    for Channel<A>
 {
     async fn ping(
         &self,

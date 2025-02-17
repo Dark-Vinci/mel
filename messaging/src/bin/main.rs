@@ -8,7 +8,7 @@ use {
             LOG_WARNING_FILE_NAME, TIME_ZONE,
         },
         errors::AppError,
-        generated_proto_rs::mel_account::account_service_server::AccountServiceServer,
+        generated_proto_rs::mel_messaging::messaging_service_server::MessagingServiceServer,
         utils::utility::{graceful_shutdown, service_auth},
     },
     std::{env, net::SocketAddr, panic},
@@ -78,7 +78,7 @@ async fn main() -> Result<(), AppError> {
     );
 
     let service =
-        AccountServiceServer::with_interceptor(messaging_server, service_auth);
+        MessagingServiceServer::with_interceptor(messaging_server, service_auth);
 
     // start service and listen to shut down hooks;
     Server::builder()

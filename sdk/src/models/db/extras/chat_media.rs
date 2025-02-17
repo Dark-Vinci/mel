@@ -1,10 +1,9 @@
 use {
     crate::models::others::{
-        auth::create::UpdateUserRequest,
-        extras::{CreateChatMedia, CreateProfileMedia},
+        extras::{CreateChatMedia,},
     },
     chrono::Utc,
-    sea_orm::{entity::prelude::*, ActiveValue::Set},
+    sea_orm::{entity::prelude::*},
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
@@ -42,8 +41,8 @@ impl ActiveModelBehavior for ActiveModel {}
 pub enum Relation {}
 
 impl From<CreateChatMedia> for ActiveModel {
-    fn from(fro: UpdateUserRequest) -> Self {
-        let mut val: ActiveModel = Self {
+    fn from(_fro: CreateChatMedia) -> Self {
+        let val: ActiveModel = Self {
             ..Default::default()
         };
 
