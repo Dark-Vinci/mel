@@ -1,8 +1,9 @@
+use async_trait::async_trait;
 use uuid::Uuid;
 
-#[async_trait::async_trait]
+#[async_trait]
 pub trait Downstream {
-    async fn ping(request_id: Uuid);
+    async fn ping(&self, request_id: Uuid);
 }
 
 pub struct DownstreamImpl {}
@@ -13,8 +14,9 @@ impl DownstreamImpl {
     }
 }
 
+#[async_trait]
 impl Downstream for DownstreamImpl {
-    async fn ping(request_id: Uuid) {
+    async fn ping(&self, _request_id: Uuid) {
         todo!()
     }
 }

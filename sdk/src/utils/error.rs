@@ -16,5 +16,5 @@ pub fn collect_error(param: ValidationErrors) -> String {
             format!("{message}, Field {field}: Message: {error}").to_string();
     }
 
-    return message;
+    message
 }

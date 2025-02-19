@@ -1,4 +1,4 @@
-use {account::migration::migrator::Migrator, sea_orm_migration::prelude::*};
+use {extras::migration::migrator::Migrator, sea_orm_migration::prelude::*};
 
 #[tokio::main]
 async fn main() {

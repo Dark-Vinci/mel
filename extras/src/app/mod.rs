@@ -1,4 +1,3 @@
-mod account;
 pub mod app;
 mod chat_media;
 mod interface;

@@ -1,19 +1,18 @@
 use {
     crate::connections::db::DB,
     async_trait::async_trait,
-    chrono::Utc,
     sdk::{
         errors::{RepoError, RepoResult},
         models::{
-            db::extras::short_url::{
-                ActiveModel, Entity as ShortUrlTrackEntity,
+            db::extras::short_url_track::{
+                ActiveModel,
                 Model as ShortUrlTrack,
             },
             others::extras::CreateShortUrlTrack,
         },
     },
     sea_orm::{
-        ActiveModelTrait, ActiveValue::Set, DbErr, EntityTrait, IntoActiveModel,
+        ActiveModelTrait, DbErr,
     },
     tracing::{debug, error},
     uuid::Uuid,
@@ -27,7 +26,11 @@ pub trait ShortUrlTrackRepository {
         request_id: Uuid,
     ) -> RepoResult<ShortUrlTrack>;
 
-    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()>;
+    async fn get_by_id(
+        &self,
+        id: Uuid,
+        request_id: Uuid,
+    ) -> RepoResult<ShortUrlTrack>;
 }
 
 pub struct ShortUrlTrackRepo(DB);
@@ -64,19 +67,7 @@ impl ShortUrlTrackRepository for ShortUrlTrackRepo {
         Ok(result)
     }
 
-    #[tracing::instrument(name = "ShortUrlTrackRepo::delete", skip(self))]
-    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
-        debug!("ShortUrlTrackRepo::delete called, id: {}, request_id: {request_id}", id);
-
-        let mut result =
-            self.get_by_id(request_id, id).await?.into_active_model();
-
-        result.deleted_at = Set(Some(Utc::now()));
-
-        let _ = result.update(&self.0.connection).await.map_err(|err| {
-            return RepoError::SomethingWentWrong;
-        })?;
-
-        Ok(())
+    async fn get_by_id(&self, _id: Uuid, _request_id: Uuid) -> RepoResult<ShortUrlTrack> {
+        todo!()
     }
 }

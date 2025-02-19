@@ -1,0 +1,39 @@
+#!/bin/sh
+FROM rust:slim-buster
+RUN apt-get update
+
+RUN cargo install cargo-watch
+
+ARG name=gateway
+ARG config=123
+ARG service_token=0000
+ARG port=5050
+ARG environment=development
+
+# shellcheck disable=SC2154
+ENV CONFIG="${config}"
+# shellcheck disable=SC2154
+ENV SERVICE_TOKEN="${service_token}"
+# shellcheck disable=SC2154
+ENV NAME="${name}"
+# shellcheck disable=SC2154
+ENV PORT="${port}"
+# shellcheck disable=SC2154
+ENV ENVIRONMENT="${environment}"
+
+COPY sdk /app/backend/sdk
+
+WORKDIR /app/backend/gateway
+
+COPY gateway/Cargo.toml /app/backend/gateway/Cargo.toml
+COPY gateway/Cargo.lock /app/backend/gateway/Cargo.lock
+
+RUN apt-get install -y protobuf-compiler
+
+COPY gateway /app/backend/gateway
+
+RUN cargo build
+
+CMD ["cargo", "watch", "-c", "-w", "src", "-x", "run --bin=main"]
+
+EXPOSE "$PORT"

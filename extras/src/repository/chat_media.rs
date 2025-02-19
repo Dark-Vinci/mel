@@ -4,13 +4,14 @@ use {
     sdk::{
         errors::{RepoError, RepoResult},
         models::{
-            db::extras::profile_media::{
+            db::extras::chat_media::{
                 ActiveModel, Column, Entity as ChatMediaEntity,
                 Model as ChatMedia,
             },
             others::extras::CreateChatMedia,
         },
     },
+    sea_orm::ColumnTrait,
     sea_orm::{ActiveModelTrait, EntityTrait, QueryFilter},
     tracing::{debug, error},
     uuid::Uuid,
@@ -69,7 +70,7 @@ impl ChatMediaRepository for ChatMediaRepo {
         &self,
         message_id: Uuid,
         request_id: Uuid,
-    ) -> RepoResult<()> {
+    ) -> RepoResult<ChatMedia> {
         debug!("Received request to get a chat media by message, payload: {:?}, request_id:{request_id}", message_id);
 
         let chat_media = ChatMediaEntity::find()

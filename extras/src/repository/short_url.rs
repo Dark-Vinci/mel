@@ -83,7 +83,7 @@ impl ShortUrlRepository for ShortUrlRepo {
         let short_ur = ShortUrlEntity::find_by_id(id)
             .one(&self.0.connection)
             .await
-            .map_err(|err| {
+            .map_err(|_err| {
                 return RepoError::NotFound;
             })?;
 
@@ -106,7 +106,7 @@ impl ShortUrlRepository for ShortUrlRepo {
 
         result.deleted_at = Set(Some(Utc::now()));
 
-        let _ = result.update(&self.0.connection).await.map_err(|err| {
+        let _ = result.update(&self.0.connection).await.map_err(|_err| {
             return RepoError::SomethingWentWrong;
         })?;
 

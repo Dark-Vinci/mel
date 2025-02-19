@@ -1,13 +1,10 @@
 use {
     chrono::{DateTime, Utc},
-    // sea_orm::{
-    //     ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
-    //     Related, RelationDef, RelationTrait,
-    // },
     sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::extras::CreateShortUrlTrack;
 
 #[derive(Debug, Clone, Serialize, Deserialize, DeriveEntityModel)]
 #[sea_orm(table_name = "short_url_track", schema_name = "public")]
@@ -38,5 +35,11 @@ pub enum Relation {
 impl Related<super::short_url::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::ShortUrl.def()
+    }
+}
+
+impl From<CreateShortUrlTrack> for ActiveModel {
+    fn from(_model: CreateShortUrlTrack) -> Self {
+        todo!()
     }
 }

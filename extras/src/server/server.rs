@@ -12,16 +12,16 @@ use {
     uuid::Uuid,
 };
 
-pub struct Extras<A: ExtrasInterface>(A);
+pub struct Extras<E: ExtrasInterface>(E);
 
-impl<A: ExtrasInterface> Extras<A> {
-    pub fn new(a: A) -> Self {
+impl<E: ExtrasInterface> Extras<E> {
+    pub fn new(a: E) -> Self {
         Self(a)
     }
 }
 
 #[async_trait]
-impl<T: ExtrasInterface> ExtrasService for Extras<T> {
+impl<T: ExtrasInterface + Send + Sync + 'static> ExtrasService for Extras<T> {
     async fn ping(
         &self,
         _request: Request<Empty>,

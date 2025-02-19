@@ -48,8 +48,9 @@ impl ProfileMediaRepo {
     }
 }
 
+#[async_trait]
 impl ProfileMediaRepository for ProfileMediaRepo {
-    #[tracing::instrument(name = "ProfileMediaRepo::create", skip(self))]
+    #[tracing::instrument(name="ProfileMediaRepo::create", skip(self))]
     async fn create(
         &self,
         payload: CreateProfileMedia,
@@ -69,7 +70,7 @@ impl ProfileMediaRepository for ProfileMediaRepo {
         Ok(result)
     }
 
-    #[tracing::instrument(name = "ProfileMediaRepo::delete", skip(self))]
+    #[tracing::instrument(name="ProfileMediaRepo::delete", skip(self))]
     async fn delete(
         &self,
         workspace_user_id: Uuid,
@@ -97,7 +98,7 @@ impl ProfileMediaRepository for ProfileMediaRepo {
         Ok(())
     }
 
-    #[tracing::instrument(name = "ProfileMediaRepo::get_by_id", skip(self))]
+    #[tracing::instrument(name="ProfileMediaRepo::get_by_id", skip(self))]
     async fn get_by_id(
         &self,
         workspace_user_id: Uuid,
