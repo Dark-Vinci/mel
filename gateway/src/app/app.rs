@@ -3,27 +3,30 @@ use {
         app::interfaces::{Account, AppInterface},
         config::config::Config,
         downstream::{Downstream, DownstreamInterface},
+        models::context::CTX,
     },
-    sdk::utils::redis::{MyRedis, RedisInterface},
+    sdk::utils::{redis::{MyRedis, RedisInterface}, objects::{ObjectStore, S3}},
     std::sync::Arc,
 };
-use crate::models::context::CTX;
 
 #[derive(Clone)]
 pub struct App {
     config: Config,
     downstream: Arc<dyn DownstreamInterface + Sync + Send>,
     redis: Arc<dyn RedisInterface + Send + Sync>,
+    object_store: Arc<dyn ObjectStore + Send + Sync>,
 }
 
 impl App {
     pub async fn new(c: Config) -> Self {
         let r = MyRedis::new("url", "", "", "", "").await;
+        let object_store = S3::new("", "", "", "");
 
         Self {
             config: c,
             downstream: Arc::new(Downstream::new()),
             redis: Arc::new(r),
+            object_store: Arc::new(object_store),
         }
     }
 }

@@ -1,10 +1,10 @@
 use {
+    crate::models::others::messaging::{CreateChat, UpdateChat},
     chrono::{DateTime, Utc},
     sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::messaging::{CreateChat, UpdateChat};
 
 #[derive(
     Debug, Clone, PartialEq, Serialize, Deserialize, DeriveEntityModel,

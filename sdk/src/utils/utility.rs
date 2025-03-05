@@ -93,14 +93,16 @@ where
 
 // type AuthChecker = dyn Fn(Request<()>) -> Result<Request<()>, Status> + Send + Sync;
 
-
-
-pub fn service_auth(token: &str) -> impl Fn(Request<()>) -> Result<Request<()>, Status> + '_ {
+pub fn service_auth(
+    token: &str,
+) -> impl Fn(Request<()>) -> Result<Request<()>, Status> + '_ {
     let token = token.to_string(); // Ensure token is owned and accessible in closure
 
     move |req: Request<()>| -> Result<Request<()>, Status> {
         match req.metadata().get("authorization") {
-            Some(t) if t.to_str().ok().map(|s| s == token).unwrap_or(false) => Ok(req),
+            Some(t) if t.to_str().ok().map(|s| s == token).unwrap_or(false) => {
+                Ok(req)
+            },
             _ => Err(Status::unauthenticated("No valid auth token")),
         }
     }

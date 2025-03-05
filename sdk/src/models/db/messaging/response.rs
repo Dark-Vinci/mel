@@ -1,7 +1,7 @@
 use {
     crate::models::others::messaging::{CreateResponse, UpdateResponse},
     chrono::{DateTime, Utc},
-    sea_orm::{entity::prelude::*},
+    sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };

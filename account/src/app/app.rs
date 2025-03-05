@@ -6,7 +6,6 @@ use {
         downstream::downstream::{Downstream, DownstreamImpl},
         repository::{
             channel::{ChannelRepo, ChannelRepository},
-            channel_user::ChannelUserRepository,
             user::{UserRepo, UserRepository},
             workspace::{WorkspaceRepo, WorkspaceRepository},
             workspace_user::{WorkspaceUserRepo, WorkspaceUserRepository},
@@ -20,12 +19,9 @@ pub struct App {
     pub db: DB,
     pub config: Config,
     pub downstream: Box<dyn Downstream + Sync + Send>,
-    // pub redis: Box<dyn RedisInterface>,
-    // pub kafka: Box<dyn KafkaInterface>,
     pub user_repo: Box<dyn UserRepository + Sync + Send>,
     pub workspace_repo: Box<dyn WorkspaceRepository + Sync + Send>,
     pub channel_repo: Box<dyn ChannelRepository + Sync + Send>,
-    pub channel_user_repo: Box<dyn ChannelUserRepository + Sync + Send>,
     pub workspace_user_repo: Box<dyn WorkspaceUserRepository + Sync + Send>,
 }
 
@@ -40,29 +36,8 @@ impl App {
         let db = DB::new(&c).await.unwrap();
         let downstream = DownstreamImpl::new();
 
-        // let redis = MyRedis::new(
-        //     &c.redis.username,
-        //     &c.redis.password,
-        //     &c.redis.host,
-        //     &c.redis.port,
-        //     "0",
-        // );
-
-        // let (db, redis) = join!(db, redis,);
-
-        // let kafka = Kafka::new(
-        //     &c.kafka.broker,
-        //     vec![],
-        //     &c.kafka.group_id,
-        //     &c.kafka.username,
-        //     &c.kafka.password,
-        //     &c.kafka.host,
-        //     &c.kafka.port,
-        // );
-
         let user = UserRepo::new(db.clone());
         let channel = ChannelRepo::new(db.clone());
-        let channel_user = WorkspaceUserRepo::new(db.clone());
         let workspace = WorkspaceRepo::new(db.clone());
         let workspace_user = WorkspaceUserRepo::new(db.clone());
 
@@ -74,9 +49,6 @@ impl App {
             user_repo: Box::new(user),
             downstream: Box::new(downstream),
             config: Config::new(), //todo; update this
-            channel_user_repo: Box::new(channel_user),
-            // redis: Box::new(redis),
-            // kafka: Box::new(kafka),
         }
     }
 }

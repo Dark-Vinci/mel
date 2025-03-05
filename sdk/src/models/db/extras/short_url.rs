@@ -1,7 +1,5 @@
 use {
-    crate::models::others::{
-        extras::CreateShortUrl,
-    },
+    crate::models::others::extras::CreateShortUrl,
     chrono::{DateTime, Utc},
     sea_orm::prelude::*,
     serde::{Deserialize, Serialize},

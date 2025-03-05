@@ -1,4 +1,3 @@
-
 #[derive(Debug, Clone)]
 pub struct CreateMessage {}
 
@@ -15,7 +14,7 @@ pub struct CreateResponse {}
 pub struct UpdateResponse {}
 
 #[derive(Debug, Clone)]
-pub struct CreateChat{}
+pub struct CreateChat {}
 
 #[derive(Debug, Clone)]
-pub struct UpdateChat{}
+pub struct UpdateChat {}

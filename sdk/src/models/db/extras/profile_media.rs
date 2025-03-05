@@ -1,9 +1,7 @@
 use {
-    crate::models::others::{
-        extras::CreateProfileMedia,
-    },
+    crate::models::others::extras::CreateProfileMedia,
     chrono::Utc,
-    sea_orm::{entity::prelude::*, },
+    sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };

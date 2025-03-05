@@ -1,13 +1,12 @@
 use {
     crate::models::others::auth::channel::{
-        CreateChannelUser,
+        CreateChannelUser, UpdateChannelUser,
     },
     chrono::Utc,
     sea_orm::entity::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::auth::channel::UpdateChannelUser;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,

@@ -1,0 +1,44 @@
+// struct Meme{}
+//
+// impl Meme {
+//     async fn get_one<F, Fut>(f: F) -> i32
+//         where F: Fn(i32) -> Fut,
+//         Fut: Future<Output = i32>
+//     {
+//         println!("THE ASYNC CLOSURE METHOD");
+//
+//         f(2).await
+//     }
+// }
+//
+// let async_closure = |x: i32| async move {
+// println!("{}", x);
+// x * x
+// };
+//
+// let caller = async_closure(1).await;
+
+
+        // let redis = MyRedis::new(
+        //     &c.redis.username,
+        //     &c.redis.password,
+        //     &c.redis.host,
+        //     &c.redis.port,
+        //     "0",
+        // );
+
+        // let (db, redis) = join!(db, redis,);
+
+        // let kafka = Kafka::new(
+        //     &c.kafka.broker,
+        //     vec![],
+        //     &c.kafka.group_id,
+        //     &c.kafka.username,
+        //     &c.kafka.password,
+        //     &c.kafka.host,
+        //     &c.kafka.port,
+        // );
+
+// channel_user_repo: Box::new(channel_user),
+            // redis: Box::new(redis),
+            // kafka: Box::new(kafka),

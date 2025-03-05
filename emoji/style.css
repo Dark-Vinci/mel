@@ -1,0 +1,40 @@
+#game {
+    position: relative;
+    width: 400px;
+    height: 600px;
+    border: 1px solid black;
+    overflow: hidden;
+    margin: 20px auto;
+}
+
+#player, .enemy {
+    position: absolute;
+    font-size: 40px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bullet {
+    position: absolute;
+    width: 5px;
+    height: 10px;
+    background-color: black;
+}
+
+#score, #lives {
+    font-size: 20px;
+    margin: 10px;
+}
+
+#game-over {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: red;
+    display: none;
+}

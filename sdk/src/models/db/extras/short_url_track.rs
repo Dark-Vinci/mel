@@ -1,10 +1,10 @@
 use {
+    crate::models::others::extras::CreateShortUrlTrack,
     chrono::{DateTime, Utc},
     sea_orm::prelude::*,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::extras::CreateShortUrlTrack;
 
 #[derive(Debug, Clone, Serialize, Deserialize, DeriveEntityModel)]
 #[sea_orm(table_name = "short_url_track", schema_name = "public")]
