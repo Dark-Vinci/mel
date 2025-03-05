@@ -5,7 +5,10 @@ use {
         downstream::{Downstream, DownstreamInterface},
         models::context::CTX,
     },
-    sdk::utils::{redis::{MyRedis, RedisInterface}, objects::{ObjectStore, S3}},
+    sdk::utils::{
+        objects::{ObjectStore, S3},
+        redis::{MyRedis, RedisInterface},
+    },
     std::sync::Arc,
 };
 

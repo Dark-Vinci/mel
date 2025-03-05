@@ -6,8 +6,8 @@ use {
         routing::get,
         Router,
     },
-    uuid::Uuid,
     tracing,
+    uuid::Uuid,
 };
 
 pub fn build(state: Hub) -> Router {

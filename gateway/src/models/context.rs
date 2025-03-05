@@ -1,5 +1,7 @@
-use std::fmt::{Display, Formatter};
-use uuid::Uuid;
+use {
+    std::fmt::{Display, Formatter},
+    uuid::Uuid,
+};
 
 #[derive(Debug)]
 pub struct CTX<'a> {
@@ -13,7 +15,7 @@ pub struct CTX<'a> {
 
 impl<'a> Default for CTX<'a> {
     fn default() -> Self {
-        Self{
+        Self {
             user_agent: "",
             auth_token: None,
             refresh_token: None,
@@ -31,8 +33,12 @@ impl Display for CTX<'_> {
 }
 
 impl<'a> CTX<'a> {
-    pub fn new(user_agent: &'a str, auth_token: Option<&'a str>, refresh_token: Option<&'a str>) -> Self {
-        Self{
+    pub fn new(
+        user_agent: &'a str,
+        auth_token: Option<&'a str>,
+        refresh_token: Option<&'a str>,
+    ) -> Self {
+        Self {
             user_agent,
             auth_token,
             refresh_token,
@@ -41,19 +47,19 @@ impl<'a> CTX<'a> {
             request_id: Default::default(),
         }
     }
-    
+
     pub fn get_user_id(&self) -> Option<Uuid> {
         self.user_id
     }
-    
+
     pub fn get_auth_token(&self) -> Option<&'a str> {
         self.auth_token
     }
-    
+
     pub fn get_refresh_token(&self) -> Option<&'a str> {
         self.refresh_token
     }
-    
+
     pub fn get_user_agent(&self) -> &'a str {
         self.user_agent
     }

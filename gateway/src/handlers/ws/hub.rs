@@ -50,7 +50,10 @@ impl Hub {
 
     #[tracing::instrument(skip(self))]
     pub async fn register_client(&mut self, socket: WebSocket, id: Uuid) {
-        tracing::info!("Got a request to register client with the server: {:?}, {id}", socket);
+        tracing::info!(
+            "Got a request to register client with the server: {:?}, {id}",
+            socket
+        );
 
         let mut client = Client::new(
             socket,

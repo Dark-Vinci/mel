@@ -1,5 +1,4 @@
-use axum::async_trait;
-use crate::models::context::CTX;
+use {crate::models::context::CTX, axum::async_trait};
 
 pub trait AppInterface: Account + Send + Sync {}
 
