@@ -9,7 +9,7 @@ pub trait ObjectStore {
     async fn get(&self, key: Uuid, bucket: String) -> Result<(), S3Error>;
 }
 
-enum ContentType {
+pub enum ContentType {
     PDF,
     MP4,
     JSON,
@@ -28,7 +28,7 @@ impl Display for ContentType {
 
 pub struct Object {
     pub bucket: String,
-    pub key: Uuid,
+    pub key: String,
     pub name: String,
     pub content_type: ContentType,
     pub content: Vec<u8>,

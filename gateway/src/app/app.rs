@@ -17,7 +17,7 @@ pub struct App {
     config: Config,
     downstream: Arc<dyn DownstreamInterface + Sync + Send>,
     redis: Arc<dyn RedisInterface + Send + Sync>,
-    object_store: Arc<dyn ObjectStore + Send + Sync>,
+    pub object_store: Arc<dyn ObjectStore + Send + Sync>,
 }
 
 impl App {

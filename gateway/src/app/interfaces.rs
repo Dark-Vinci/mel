@@ -1,6 +1,12 @@
 use {crate::models::context::CTX, axum::async_trait};
 
-pub trait AppInterface: Account + Send + Sync {}
+pub trait AppInterface: Account + Send + Sync + MediaUploads {}
+
+
+#[async_trait]
+pub trait MediaUploads{
+    async fn upload(&self, ctx: CTX, payload: ()) -> Result<(), ()>;
+}
 
 #[async_trait]
 pub trait Account {
