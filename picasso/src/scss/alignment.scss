@@ -1,0 +1,18 @@
+@mixin flex($justify: center, $direction: row, $align: center) {
+  display: flex;
+  justify-content: $justify;
+  align-items: $align;
+  flex-direction: $direction;
+}
+
+@mixin flex-center() {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin grid() {
+  display: grid;
+  place-items: center;
+}
