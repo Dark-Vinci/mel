@@ -28,11 +28,13 @@
     ],
     "paths":  {
       "@pages": ["src/pages"],
-      "@router": ["src/routers"],
+      "@router": ["src/router"],
       "@components": ["src/components"],
       "@containers": ["src/containers"],
       "@tools": ["src/tools"],
       "@app": ["src/app"],
+      "@store": ["src/store"],
+//      "@store": ["src/store"],
       "@/*": ["src/*"]
     }
   }

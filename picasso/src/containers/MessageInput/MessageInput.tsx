@@ -1,5 +1,9 @@
 import {JSX, useRef, useState} from "react";
+import {marked} from "marked";
+
 import {ActiveEmoji, Emoji, IfElse, Plus, Send} from "@components";
+// import {useDispatch} from "react-redux";
+// import {AppDispatch} from "@/store";
 
 const buttonStyle = {
     background: 'none',
@@ -11,6 +15,8 @@ const buttonStyle = {
 };
 
 export function MessageInput(): JSX.Element {
+    // const dispatch = useDispatch<AppDispatch>();
+    // // dispatch(remove)
     const [message, setMessage] = useState('');
     const [showFormatting, setShowFormatting] = useState(true);
     const [emojiActive, setEmojiActive] = useState(false);
@@ -146,6 +152,7 @@ export function MessageInput(): JSX.Element {
                         onChange={(e) => setMessage(e.target.value)}
                         placeholder="Message #general"
                         rows={4}
+                        dangerouslySetInnerHTML={{ __html: marked(message) }}
                         style={{
                             width: '100%',
                             padding: '10px',
