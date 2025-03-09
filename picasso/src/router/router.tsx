@@ -14,4 +14,4 @@ export const router = createBrowserRouter([
         path: '*',
         element: <div> 404 page </div>
     }
-])
+]);

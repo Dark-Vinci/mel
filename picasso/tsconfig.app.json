@@ -33,7 +33,7 @@
       "@containers": ["src/containers"],
       "@tools": ["src/tools"],
       "@app": ["src/app"],
-      "@": ["src/*"]
+      "@/*": ["src/*"]
     }
   }
 }

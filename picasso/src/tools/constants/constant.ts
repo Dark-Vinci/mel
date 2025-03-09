@@ -1,0 +1,1 @@
+export const THREAD_PROFILE_MAX_COUNT = 7;

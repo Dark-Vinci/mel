@@ -13,7 +13,7 @@ export default defineConfig({
       "@containers": path.resolve(__dirname, "src/containers"),
       "@tools": path.resolve(__dirname, "src/tools"),
       "@app": path.resolve(__dirname, "src/app"),
-      "@": path.resolve(__dirname, "src/*")
+      "@/*": path.resolve(__dirname, "src/*")
     },
   },
 });
