@@ -1,22 +1,17 @@
 import { JSX } from 'react';
-import {Header} from "@components";
-
+import { Header } from '@components';
 
 export function Channel(): JSX.Element {
-    return (
+  return (
+    <div>
+      <div>
         <div>
-            <div>
-                <div>
-                    <Header
-                        title={''}
-                        topic={''}
-                        memberCount={''}
-                    />
-                </div>
-
-                <div>MAIN</div>
-                <div>INPUT/JOIN</div>
-            </div>
+          <Header title={''} topic={''} memberCount={''} />
         </div>
-    )
+
+        <div>MAIN</div>
+        <div>INPUT/JOIN</div>
+      </div>
+    </div>
+  );
 }

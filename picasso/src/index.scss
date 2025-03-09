@@ -5,7 +5,6 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
-
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
@@ -34,5 +33,4 @@ body {
 [data-theme='dark'] {
   --bg-color: #f5f5f5;
   --text-color: #121212; //#f5f5f5;
-  /* other dark theme variables */
 }

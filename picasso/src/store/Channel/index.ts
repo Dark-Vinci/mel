@@ -1,1 +1,1 @@
-export {channelStore} from './channel';
+export { channelStore } from './channel';

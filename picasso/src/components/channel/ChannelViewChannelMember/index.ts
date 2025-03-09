@@ -1,1 +1,1 @@
-export * from './ChannelViewChannelMember'
+export * from './ChannelViewChannelMember';

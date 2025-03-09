@@ -1,1 +1,1 @@
-export * from './MiniProfilePicture'
+export * from './MiniProfilePicture';

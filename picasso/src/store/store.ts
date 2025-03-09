@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
-import {channelStore} from './Channel';
+import { channelStore } from './Channel';
 
 export const store = configureStore({
-    reducer: {
-        channel: channelStore.channelReducer,
-    },
+  reducer: {
+    channel: channelStore.channelReducer,
+  },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

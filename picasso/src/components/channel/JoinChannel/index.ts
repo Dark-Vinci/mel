@@ -1,1 +1,1 @@
-export * from './JoinChannel'
+export * from './JoinChannel';
