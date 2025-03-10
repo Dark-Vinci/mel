@@ -8,20 +8,21 @@ use {
         routing::post,
         Router,
     },
-    sdk::utils::types::FileInfo,
-    std::sync::Arc,
+    sdk::utils::types::{FileInfo, VecFile},
 };
 
-pub fn router() -> Router {
+pub fn router(state: AppState) -> Router {
     Router::new()
         .route("/single", post(upload_file))
         .route("/multiple", post(upload_multiple_files))
+        .with_state(state)
 }
 
+#[axum_macros::debug_handler]
 async fn upload_file(
-    mut multipart: Multipart,
-    State(state): State<Arc<AppState>>,
     Context(ctx): Context,
+    State(state): State<AppState>,
+    mut multipart: Multipart,
 ) -> Result<FileInfo, GatewayError> {
     while let Some(field) = multipart.next_field().await.unwrap() {
         let file_name =
@@ -45,11 +46,12 @@ async fn upload_file(
     Err(GatewayError::Generic)
 }
 
+#[axum_macros::debug_handler]
 async fn upload_multiple_files(
-    mut multipart: Multipart,
-    State(state): State<Arc<AppState>>,
     Context(ctx): Context,
-) -> Result<Vec<FileInfo>, GatewayError> {
+    State(state): State<AppState>,
+    mut multipart: Multipart,
+) -> Result<VecFile, GatewayError> {
     let mut file_uploads = vec![];
 
     while let Some(field) = multipart.next_field().await.unwrap() {
@@ -65,11 +67,18 @@ async fn upload_multiple_files(
 
         let mut file_info = FileInfo::new(file_name, content_type, &data);
 
-        // todo: upload to s3 bucket
-        let _ = state.app.upload(ctx.clone(), &mut file_info).await?;
+        let _ = state
+            .app
+            .upload(ctx.clone(), &mut file_info)
+            .await
+            .map_err(|_e| {
+                return GatewayError::Generic;
+            })?;
 
         file_uploads.push(file_info);
     }
 
-    Ok(file_uploads)
+    let result = VecFile::new(file_uploads);
+
+    Ok(result)
 }

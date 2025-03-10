@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
-members = [ "account",
+members = [
+    "account",
     "gateway",
     "sdk",
     "messaging",

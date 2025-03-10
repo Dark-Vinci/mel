@@ -3,6 +3,9 @@ name = "sdk"
 version = "0.1.0"
 edition = "2021"
 
+[patch.crates-io]
+axum_core = "0.8.1"
+
 [dependencies]
 rdkafka = "0.37.0"
 tokio = { version = "1.41.1", features = ["full"] }

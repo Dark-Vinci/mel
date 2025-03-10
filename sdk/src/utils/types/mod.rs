@@ -1,5 +1,3 @@
-// use axum::body::Bytes;
-
 use axum::body::Bytes;
 use axum::response::{IntoResponse, Response};
 use serde::{Deserialize, Serialize};
@@ -11,6 +9,23 @@ pub struct FileInfo {
     pub bucket: Option<String>,
     pub key: Option<String>,
     pub data: Vec<u8>
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct VecFile{
+    pub value: Vec<FileInfo>,
+}
+
+impl VecFile {
+    pub fn new(value: Vec<FileInfo>) -> Self {
+        Self { value }
+    }
+}
+
+impl IntoResponse for VecFile {
+    fn into_response(self) -> Response {
+        todo!()
+    }
 }
 
 impl IntoResponse for FileInfo {

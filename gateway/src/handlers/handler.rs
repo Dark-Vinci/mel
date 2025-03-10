@@ -28,7 +28,7 @@ use {
 
 #[derive(Clone)]
 pub struct AppState {
-    pub app: Arc<dyn AppInterface>,
+    pub app: Arc<dyn AppInterface + Send + Sync>,
 }
 
 impl AppState {
