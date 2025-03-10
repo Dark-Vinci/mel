@@ -1,5 +1,4 @@
-use std::fmt::Display;
-use thiserror::Error;
+use {std::fmt::Display, thiserror::Error};
 
 #[derive(Debug, Error)]
 pub enum S3Error {

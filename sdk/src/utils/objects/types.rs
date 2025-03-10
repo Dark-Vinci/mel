@@ -1,8 +1,8 @@
-use std::str::FromStr;
-use async_trait::async_trait;
 use {
     crate::errors::s3::S3Error,
-    aws_sdk_s3::operation::put_object::PutObjectOutput, std::fmt::Display,
+    async_trait::async_trait,
+    aws_sdk_s3::operation::put_object::PutObjectOutput,
+    std::{fmt::Display, str::FromStr},
     uuid::Uuid,
 };
 

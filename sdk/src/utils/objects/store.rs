@@ -1,12 +1,11 @@
-use async_trait::async_trait;
-use aws_credential_types::Credentials;
 use {
     crate::{
         errors::s3::S3Error,
         utils::objects::types::{Object, ObjectStore},
     },
+    async_trait::async_trait,
     aws_config::{retry::RetryConfig, BehaviorVersion, Region, SdkConfig},
-    aws_credential_types::provider::SharedCredentialsProvider,
+    aws_credential_types::{provider::SharedCredentialsProvider, Credentials},
     aws_sdk_s3::{
         operation::put_object::PutObjectOutput, primitives::ByteStream, Client,
         Config,

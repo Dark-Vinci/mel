@@ -2,5 +2,5 @@ pub mod error;
 pub mod kafka;
 pub mod objects;
 pub mod redis;
-pub mod utility;
 pub mod types;
+pub mod utility;
