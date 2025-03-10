@@ -2,46 +2,50 @@ use {
     crate::{
         app::{app::App, interfaces::MediaUploads},
         errors::GatewayError,
-        models::context::CTX,
+        models::context::Ctx,
     },
-    axum::async_trait,
+    async_trait::async_trait,
     sdk::utils::{
         objects::{ContentType, Object, ObjectCreateResponse},
         types::FileInfo,
     },
-    std::str::FromStr,
     tracing::{debug, error},
     uuid::Uuid,
 };
 
 #[async_trait]
 impl MediaUploads for App {
-    #[tracing::instrument(skip(self, payload.data), name = "App::media::upload")]
+    #[tracing::instrument(skip(self, payload), name = "App::media::upload")]
     async fn upload(
         &self,
-        ctx: CTX,
+        ctx: Ctx,
         payload: &mut FileInfo,
     ) -> Result<ObjectCreateResponse, GatewayError> {
         // todo: really learn to use the tracing crate
-        debug!(message = "Sending media upload request", ctx);
+        debug!(message = "Sending media upload request");
 
-        payload.key =
-            Some(&format!("{}-{}", Uuid::new_v4(), ctx.get_user_id().unwrap()));
+        let name = &payload.file_name;
+        let key = format!("{}-{}", Uuid::new_v4(), ctx.user_id.unwrap());
+        let bucket = self.config.uploads_bucket.clone();
 
-        payload.bucket = Some(&self.config.uploads_bucket);
+        payload.key = Some(key.clone());
+
+        payload.bucket = Some(bucket.clone());
 
         // hurray; turbo fish
-        let content_type = payload.content_type.parse::<ContentType>()
+        let content_type = payload
+            .content_type
+            .parse::<ContentType>()
             .map_err(|_| GatewayError::Generic)?;
 
         let result = self
             .object_store
             .upload(Object {
-                bucket: String::from(payload.bucket),
-                key: String::from(payload.key),
-                name: String::from(payload.file_name),
+                bucket,
+                key,
+                name: String::from(name),
                 content_type,
-                content: Vec::from(*payload.data),
+                content: Vec::from(&*payload.data),
             })
             .await
             .map_err(|err| {

@@ -1,10 +1,6 @@
 use {
-    crate::models::context::Ctx,
-    axum::{
-        async_trait,
-        extract::{FromRequest, Request},
-        http::HeaderValue,
-    },
+    crate::models::{context::Ctx, error_response::ApiError},
+    axum::extract::{FromRequest, Request},
     sdk::constants::{
         AUTH_TOKEN, CHROME, REFRESH_TOKEN, REQUEST_ID, TIME_ZONE, USER_AGENT,
         USER_ID, UTC,
@@ -14,12 +10,11 @@ use {
 
 pub struct Context(pub Ctx);
 
-#[async_trait]
 impl<B> FromRequest<B> for Context
 where
     B: Send + Sync,
 {
-    type Rejection = String;
+    type Rejection = ApiError;
 
     async fn from_request(
         req: Request,
@@ -31,40 +26,42 @@ where
         let user_agent = req
             .headers()
             .get(USER_AGENT)
-            .unwrap_or(&HeaderValue::from_static(CHROME))
-            .to_str()
-            .unwrap();
+            .and_then(|v| v.to_str().ok())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| CHROME.to_string());
 
         let time_zone = req
             .headers()
             .get(TIME_ZONE)
-            .unwrap_or(&HeaderValue::from_static(UTC))
-            .to_str()
-            .unwrap();
+            .and_then(|v| v.to_str().ok())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| UTC.to_string());
 
         let auth_token = req
             .headers()
             .get(AUTH_TOKEN)
-            .unwrap_or(&HeaderValue::from_static(""))
-            .to_str()
-            .unwrap();
+            .and_then(|v| v.to_str().ok())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| "".to_string());
 
         let refresh_token = req
             .headers()
             .get(REFRESH_TOKEN)
-            .unwrap_or(&HeaderValue::from_static(""))
-            .to_str()
-            .unwrap();
+            .and_then(|v| v.to_str().ok())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| "".to_string());
 
         let user_id = req
             .headers()
             .get(USER_ID)
-            .unwrap_or(&HeaderValue::from_static(&Uuid::nil().to_string()))
-            .to_str()
-            .unwrap();
+            .and_then(|v| v.to_str().ok())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| {
+                "00000000-00000000-00000000-00000000".to_string()
+            });
 
-        let request_id = Uuid::from(request_id);
-        let user_id = Some(Uuid::from(user_id));
+        let request_id = Uuid::parse_str(&request_id).unwrap();
+        let user_id = Some(Uuid::parse_str(&user_id).unwrap());
 
         let mut ctx = Ctx::new(
             user_agent.to_string(),

@@ -27,9 +27,9 @@ async fn main() -> Result<(), AppError> {
     let file_writer = debug_logger.and(warning_error_logger);
 
     let filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::INFO.into())
+        .with_default_directive(LevelFilter::TRACE.into())
         .from_env()?
-        .add_directive("gateway=debug".parse()?);
+        .add_directive("gateway=trace".parse()?);
 
     tracing_subscriber::fmt()
         .pretty()

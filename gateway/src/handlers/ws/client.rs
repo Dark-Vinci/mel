@@ -5,7 +5,6 @@ use {
         SinkExt, StreamExt,
     },
     serde::{Deserialize, Serialize},
-    std::sync::Arc,
     tokio::sync::{broadcast, mpsc},
     tracing::info,
     uuid::Uuid,
@@ -54,7 +53,8 @@ impl Client {
                         Ok(msg) => {
                             if msg.to_user == self.user_id.to_string() {
                                 let msg = serde_json::to_string(&msg).unwrap(); // todo; handle graciously
-                                self.sender.send(Message::Text(msg)).await.unwrap();
+
+                                self.sender.send(Message::Text(msg.into())).await.unwrap();
                             }
                         }
 
@@ -81,7 +81,7 @@ impl Client {
                                 },
 
                                 Message::Binary(bin) => {
-                                    let str = String::from_utf8(bin).unwrap();
+                                    let str = String::from_utf8(bin.to_vec()).unwrap();
 
                                     info!("Receive text message: {:?}", str);
 

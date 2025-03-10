@@ -1,7 +1,6 @@
 use {
     crate::{
-        errors::GatewayError,
-        handlers::handler::AppState,
+        errors::GatewayError, handlers::handler::AppState,
         middleware::context::Context,
     },
     axum::{
@@ -10,6 +9,7 @@ use {
         Router,
     },
     sdk::utils::types::FileInfo,
+    std::sync::Arc,
 };
 
 pub fn router() -> Router {
@@ -20,17 +20,23 @@ pub fn router() -> Router {
 
 async fn upload_file(
     mut multipart: Multipart,
-    State(state): State<AppState>,
+    State(state): State<Arc<AppState>>,
     Context(ctx): Context,
 ) -> Result<FileInfo, GatewayError> {
     while let Some(field) = multipart.next_field().await.unwrap() {
-        let data = field.bytes().await.unwrap(); // Read file content
-        let file_name = field.file_name().unwrap();
-        let content_type = field.content_type().unwrap_or_default();
+        let file_name =
+            field.file_name().map(|s| s.to_string()).unwrap_or_default();
+
+        let content_type = field
+            .content_type()
+            .map(|s| s.to_string())
+            .unwrap_or_default();
+
+        let data = field.bytes().await.unwrap();
 
         let mut file_info = FileInfo::new(file_name, content_type, &data);
 
-        // todo: upload to s3 bucket
+        // TODO: Upload to S3 bucket
         let _ = state.app.upload(ctx, &mut file_info).await?;
 
         return Ok(file_info);
@@ -41,15 +47,21 @@ async fn upload_file(
 
 async fn upload_multiple_files(
     mut multipart: Multipart,
-    State(state): State<AppState>,
+    State(state): State<Arc<AppState>>,
     Context(ctx): Context,
 ) -> Result<Vec<FileInfo>, GatewayError> {
     let mut file_uploads = vec![];
 
     while let Some(field) = multipart.next_field().await.unwrap() {
-        let data = field.bytes().await.unwrap(); // Read file content
-        let file_name = field.file_name().unwrap();
-        let content_type = field.content_type().unwrap_or_default();
+        let file_name =
+            field.file_name().map(|s| s.to_string()).unwrap_or_default();
+
+        let content_type = field
+            .content_type()
+            .map(|s| s.to_string())
+            .unwrap_or_default();
+
+        let data = field.bytes().await.unwrap();
 
         let mut file_info = FileInfo::new(file_name, content_type, &data);
 
