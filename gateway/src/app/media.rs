@@ -30,7 +30,8 @@ impl MediaUploads for App {
 
         payload.bucket = Some(&self.config.uploads_bucket);
 
-        let content_type = ContentType::from_str(&payload.content_type)
+        // hurray; turbo fish
+        let content_type = payload.content_type.parse::<ContentType>()
             .map_err(|_| GatewayError::Generic)?;
 
         let result = self
