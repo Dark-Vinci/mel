@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use {
     crate::errors::s3::S3Error,
     aws_sdk_s3::operation::put_object::PutObjectOutput, std::fmt::Display,
@@ -13,6 +14,18 @@ pub enum ContentType {
     PDF,
     MP4,
     JSON,
+}
+
+impl FromStr for ContentType {
+    type Err = String;
+
+    //  todo: update accordingly
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "application/pdf" => Ok(ContentType::PDF),
+            _ => Ok(ContentType::JSON),
+        }
+    }
 }
 
 impl Display for ContentType {

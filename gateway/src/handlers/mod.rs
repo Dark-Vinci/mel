@@ -1,3 +1,3 @@
-pub mod api;
+mod api;
 pub mod handler;
-pub mod ws;
+mod ws;

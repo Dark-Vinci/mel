@@ -1,11 +1,10 @@
 use {
     crate::handlers::{
-        api::{auth, messages},
+        api::{auth, media::media, messages},
         handler::AppState,
     },
     axum::Router,
 };
-use crate::handlers::api::media;
 
 pub fn endpoints(state: AppState) -> Router {
     Router::new()

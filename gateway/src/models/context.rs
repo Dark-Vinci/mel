@@ -13,6 +13,36 @@ pub struct CTX<'a> {
     request_id: Uuid,
 }
 
+#[derive(Debug, Clone)]
+pub struct Ctx {
+    pub user_agent: String,
+    pub auth_token: Option<String>,
+    pub refresh_token: Option<String>,
+    pub user_id: Option<Uuid>,
+    pub time_zone: String,
+    pub request_id: Uuid,
+}
+
+impl Ctx {
+    pub fn new(
+        user_agent: String,
+        request_id: Uuid,
+        time_zone: String,
+        auth_token: Option<String>,
+        refresh_token: Option<String>,
+        user_id: Option<Uuid>,
+    ) -> Self {
+        Self {
+            user_agent,
+            auth_token,
+            refresh_token,
+            user_id,
+            time_zone,
+            request_id,
+        }
+    }
+}
+
 impl<'a> Default for CTX<'a> {
     fn default() -> Self {
         Self {

@@ -2,7 +2,6 @@ use {
     gateway::{
         app::app::App, config::config::Config, handlers::handler::Handlers,
     },
-    panic::set_hook,
     sdk::{
         constants::constant::{
             LAGOS_TIME, LOCAL_HOST, LOG_DIR, LOG_FILE_NAME,
@@ -11,7 +10,7 @@ use {
         errors::AppError,
         utils::utility::graceful_shutdown,
     },
-    std::{env, net::SocketAddr, panic},
+    std::{env, net::SocketAddr, panic::set_hook},
     tokio::net::TcpListener,
     tracing::level_filters::LevelFilter,
     tracing_appender::rolling,

@@ -3,7 +3,7 @@ use {
         app::interfaces::{Account, AppInterface},
         config::config::Config,
         downstream::{Downstream, DownstreamInterface},
-        models::context::CTX,
+        models::context::Ctx,
     },
     sdk::utils::{
         objects::{ObjectStore, S3},
@@ -14,9 +14,9 @@ use {
 
 #[derive(Clone)]
 pub struct App {
-    config: Config,
-    downstream: Arc<dyn DownstreamInterface + Sync + Send>,
-    redis: Arc<dyn RedisInterface + Send + Sync>,
+    pub config: Config,
+    pub downstream: Arc<dyn DownstreamInterface + Sync + Send>,
+    pub redis: Arc<dyn RedisInterface + Send + Sync>,
     pub object_store: Arc<dyn ObjectStore + Send + Sync>,
 }
 
@@ -35,15 +35,15 @@ impl App {
 }
 
 impl Account for App {
-    async fn login_user(ctx: CTX, payload: String) -> String {
+    async fn login_user(ctx: Ctx, payload: String) -> String {
         todo!()
     }
 
-    async fn forget_password(ctx: CTX, payload: String) -> String {
+    async fn forget_password(ctx: Ctx, payload: String) -> String {
         todo!()
     }
 
-    async fn create_user(ctx: CTX, payload: String) -> String {
+    async fn create_user(ctx: Ctx, payload: String) -> String {
         todo!()
     }
 }

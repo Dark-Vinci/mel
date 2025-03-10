@@ -12,6 +12,8 @@ use {
     uuid::Uuid,
 };
 
+pub type ObjectCreateResponse = PutObjectOutput;
+
 pub struct S3 {
     client: Client,
 }

@@ -5,6 +5,7 @@ pub struct Config {
     pub app: App,
     pub downstream: Downstream,
     pub redis: Redis,
+    pub uploads_bucket: String,
 }
 
 impl Config {
@@ -17,6 +18,7 @@ impl Config {
             app,
             downstream,
             redis,
+            uploads_bucket: "".to_string(),
         }
     }
 }
