@@ -1,10 +1,12 @@
-use std::str::FromStr;
 use {
     crate::errors::s3::S3Error,
-    aws_sdk_s3::operation::put_object::PutObjectOutput, std::fmt::Display,
+    async_trait::async_trait,
+    aws_sdk_s3::operation::put_object::PutObjectOutput,
+    std::{fmt::Display, str::FromStr},
     uuid::Uuid,
 };
 
+#[async_trait]
 pub trait ObjectStore {
     async fn upload(&self, obj: Object) -> Result<PutObjectOutput, S3Error>;
     async fn get(&self, key: Uuid, bucket: String) -> Result<(), S3Error>;

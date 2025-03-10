@@ -9,6 +9,6 @@ use {
 pub fn endpoints(state: AppState) -> Router {
     Router::new()
         .nest("/messages", auth::router(state.clone()))
-        .nest("/auth", messages::router(state))
-        .nest("/media", media::router())
+        .nest("/auth", messages::router(state.clone()))
+        .nest("/media", media::router(state))
 }

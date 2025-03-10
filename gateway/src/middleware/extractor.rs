@@ -1,7 +1,6 @@
 use {
     crate::models::error_response::ApiError,
     axum::{
-        async_trait,
         extract::{FromRequest, FromRequestParts, Path, Query, Request},
         http::{request::Parts, StatusCode},
         Json,
@@ -16,7 +15,7 @@ use {
 #[derive(Debug, Clone, Copy, Default)]
 pub struct QueryValidator<T: Validate>(pub T);
 
-#[async_trait]
+// #[async_trait]
 impl<K, T> FromRequestParts<K> for QueryValidator<T>
 where
     K: Send + Sync,
@@ -60,7 +59,6 @@ where
 #[derive(Debug, Clone, Copy, Default)]
 pub struct ParamValidator<T: Validate>(pub T);
 
-#[async_trait]
 impl<K, T> FromRequestParts<K> for ParamValidator<T>
 where
     K: Send + Sync,
@@ -104,7 +102,6 @@ where
 #[derive(Debug, Clone, Copy, Default)]
 pub struct BodyValidator<T: Validate>(pub T);
 
-#[async_trait]
 impl<B, T> FromRequest<B> for BodyValidator<T>
 where
     B: Send + Sync,

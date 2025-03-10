@@ -3,8 +3,9 @@ use {
         errors::s3::S3Error,
         utils::objects::types::{Object, ObjectStore},
     },
+    async_trait::async_trait,
     aws_config::{retry::RetryConfig, BehaviorVersion, Region, SdkConfig},
-    aws_credential_types::provider::SharedCredentialsProvider,
+    aws_credential_types::{provider::SharedCredentialsProvider, Credentials},
     aws_sdk_s3::{
         operation::put_object::PutObjectOutput, primitives::ByteStream, Client,
         Config,
@@ -23,14 +24,14 @@ impl S3 {
         url: &str,
         access_key_id: &str,
         secret_access_key: &str,
-        provider_name: &str,
+        _provider_name: &str,
     ) -> Self {
-        let pre_credentials = aws_credential_types::Credentials::new(
+        let pre_credentials = Credentials::new(
             access_key_id,
             secret_access_key,
             None,
             None,
-            provider_name,
+            "MINIO",
         );
 
         let bbb = SharedCredentialsProvider::new(pre_credentials);
@@ -51,6 +52,7 @@ impl S3 {
     }
 }
 
+#[async_trait]
 impl ObjectStore for S3 {
     async fn upload(&self, obj: Object) -> Result<PutObjectOutput, S3Error> {
         let result = self

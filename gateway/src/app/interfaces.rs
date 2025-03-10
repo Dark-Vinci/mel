@@ -1,6 +1,6 @@
 use {
     crate::{errors::GatewayError, models::context::Ctx},
-    axum::async_trait,
+    async_trait::async_trait,
     sdk::utils::{objects::ObjectCreateResponse, types::FileInfo},
 };
 
@@ -17,7 +17,7 @@ pub trait MediaUploads {
 
 #[async_trait]
 pub trait Account {
-    async fn login_user(ctx: Ctx, payload: String) -> String;
-    async fn forget_password(ctx: Ctx, payload: String) -> String;
-    async fn create_user(ctx: Ctx, payload: String) -> String;
+    async fn login_user(&self, ctx: Ctx, payload: String) -> String;
+    async fn forget_password(&self, ctx: Ctx, payload: String) -> String;
+    async fn create_user(&self, ctx: Ctx, payload: String) -> String;
 }

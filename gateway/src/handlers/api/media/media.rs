@@ -1,7 +1,6 @@
 use {
     crate::{
-        errors::GatewayError,
-        handlers::handler::AppState,
+        errors::GatewayError, handlers::handler::AppState,
         middleware::context::Context,
     },
     axum::{
@@ -9,28 +8,36 @@ use {
         routing::post,
         Router,
     },
-    sdk::utils::types::FileInfo,
+    sdk::utils::types::{FileInfo, VecFile},
 };
 
-pub fn router() -> Router {
+pub fn router(state: AppState) -> Router {
     Router::new()
         .route("/single", post(upload_file))
         .route("/multiple", post(upload_multiple_files))
+        .with_state(state)
 }
 
+#[axum_macros::debug_handler]
 async fn upload_file(
-    mut multipart: Multipart,
-    State(state): State<AppState>,
     Context(ctx): Context,
+    State(state): State<AppState>,
+    mut multipart: Multipart,
 ) -> Result<FileInfo, GatewayError> {
     while let Some(field) = multipart.next_field().await.unwrap() {
-        let data = field.bytes().await.unwrap(); // Read file content
-        let file_name = field.file_name().unwrap();
-        let content_type = field.content_type().unwrap_or_default();
+        let file_name =
+            field.file_name().map(|s| s.to_string()).unwrap_or_default();
+
+        let content_type = field
+            .content_type()
+            .map(|s| s.to_string())
+            .unwrap_or_default();
+
+        let data = field.bytes().await.unwrap();
 
         let mut file_info = FileInfo::new(file_name, content_type, &data);
 
-        // todo: upload to s3 bucket
+        // TODO: Upload to S3 bucket
         let _ = state.app.upload(ctx, &mut file_info).await?;
 
         return Ok(file_info);
@@ -39,25 +46,39 @@ async fn upload_file(
     Err(GatewayError::Generic)
 }
 
+#[axum_macros::debug_handler]
 async fn upload_multiple_files(
-    mut multipart: Multipart,
-    State(state): State<AppState>,
     Context(ctx): Context,
-) -> Result<Vec<FileInfo>, GatewayError> {
+    State(state): State<AppState>,
+    mut multipart: Multipart,
+) -> Result<VecFile, GatewayError> {
     let mut file_uploads = vec![];
 
     while let Some(field) = multipart.next_field().await.unwrap() {
-        let data = field.bytes().await.unwrap(); // Read file content
-        let file_name = field.file_name().unwrap();
-        let content_type = field.content_type().unwrap_or_default();
+        let file_name =
+            field.file_name().map(|s| s.to_string()).unwrap_or_default();
+
+        let content_type = field
+            .content_type()
+            .map(|s| s.to_string())
+            .unwrap_or_default();
+
+        let data = field.bytes().await.unwrap();
 
         let mut file_info = FileInfo::new(file_name, content_type, &data);
 
-        // todo: upload to s3 bucket
-        let _ = state.app.upload(ctx.clone(), &mut file_info).await?;
+        let _ = state
+            .app
+            .upload(ctx.clone(), &mut file_info)
+            .await
+            .map_err(|_e| {
+                return GatewayError::Generic;
+            })?;
 
         file_uploads.push(file_info);
     }
 
-    Ok(file_uploads)
+    let result = VecFile::new(file_uploads);
+
+    Ok(result)
 }

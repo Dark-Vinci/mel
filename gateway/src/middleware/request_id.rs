@@ -1,7 +1,6 @@
 use {
     crate::models::error_response::ApiError,
     axum::{
-        async_trait,
         extract::{FromRequest, FromRequestParts, Request},
         http::request::Parts,
     },
@@ -12,7 +11,6 @@ use {
 
 pub struct RequestID;
 
-#[async_trait]
 impl<B> FromRequestParts<B> for RequestID
 where
     B: Send + Sync,
@@ -36,7 +34,6 @@ where
 // GET THE REQUEST ID
 pub struct GetRequestID(pub Uuid);
 
-#[async_trait]
 impl<B> FromRequest<B> for GetRequestID
 where
     B: Send + Sync,
