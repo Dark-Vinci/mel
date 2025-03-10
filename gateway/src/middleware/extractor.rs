@@ -59,7 +59,6 @@ where
 #[derive(Debug, Clone, Copy, Default)]
 pub struct ParamValidator<T: Validate>(pub T);
 
-// #[async_trait]
 impl<K, T> FromRequestParts<K> for ParamValidator<T>
 where
     K: Send + Sync,
@@ -103,7 +102,6 @@ where
 #[derive(Debug, Clone, Copy, Default)]
 pub struct BodyValidator<T: Validate>(pub T);
 
-// #[async_trait]
 impl<B, T> FromRequest<B> for BodyValidator<T>
 where
     B: Send + Sync,
