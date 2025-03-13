@@ -3,7 +3,7 @@ use {
     async_trait::async_trait,
     chrono::Utc,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::messaging::message::{
                 ActiveModel, Entity as MessageEntity, Model as Message,
@@ -21,7 +21,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait MessageRepository {
@@ -38,8 +37,11 @@ pub trait MessageRepository {
         request_id: Uuid,
     ) -> RepoResult<Message>;
 
-    async fn delete(&self, current: ActiveModel, request_id: Uuid)
-        -> RepoResult<()>;
+    async fn delete(
+        &self,
+        current: ActiveModel,
+        request_id: Uuid,
+    ) -> RepoResult<()>;
 
     async fn get_by_id(
         &self,
@@ -225,8 +227,13 @@ impl MessageRepository for MessageRepo {
                 RepoError::SomethingWentWrong
             })?;
 
-        let paginated =
-            Paginated::new(result, pagination.total_pages(count), pagination.page_number + 1, pagination.page_size, count);
+        let paginated = Paginated::new(
+            result,
+            pagination.total_pages(count),
+            pagination.page_number + 1,
+            pagination.page_size,
+            count,
+        );
 
         Ok(paginated)
     }

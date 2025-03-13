@@ -2,7 +2,7 @@ use {
     crate::connections::db::DB,
     async_trait::async_trait,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::messaging::chat::{
                 ActiveModel, Column, Entity as ChatEntity, Model as Chat,
@@ -20,7 +20,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ChatRepository {
@@ -30,11 +29,7 @@ pub trait ChatRepository {
         request_id: Uuid,
     ) -> RepoResult<Chat>;
 
-    async fn find_by_id(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<Chat>;
+    async fn find_by_id(&self, id: Uuid, request_id: Uuid) -> RepoResult<Chat>;
 
     async fn find_for_user(
         &self,
@@ -81,11 +76,7 @@ impl ChatRepository for ChatRepo {
     }
 
     #[tracing::instrument(skip(self), name = "ChatRepository::find_by_id")]
-    async fn find_by_id(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<Chat> {
+    async fn find_by_id(&self, id: Uuid, request_id: Uuid) -> RepoResult<Chat> {
         debug!(
             request_id = %request_id,
             "Got request to find direct message",
@@ -156,8 +147,13 @@ impl ChatRepository for ChatRepo {
             RepoError::SomethingWentWrong
         })?;
 
-        let paginated =
-            Paginated::new(result, pagination.total_pages(count), pagination.page_number + 1, pagination.page_size, count);
+        let paginated = Paginated::new(
+            result,
+            pagination.total_pages(count),
+            pagination.page_number + 1,
+            pagination.page_size,
+            count,
+        );
 
         Ok(paginated)
     }

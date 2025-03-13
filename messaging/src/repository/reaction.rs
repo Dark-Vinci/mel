@@ -2,7 +2,7 @@ use {
     crate::connections::db::DB,
     async_trait::async_trait,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::messaging::reaction::{
                 ActiveModel, Entity as ReactionEntity, Model as Reaction,
@@ -14,7 +14,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ReactionRepository {
@@ -24,8 +23,7 @@ pub trait ReactionRepository {
         request_id: Uuid,
     ) -> RepoResult<Reaction>;
 
-    async fn delete(&self, id: Uuid, request_id: Uuid)
-        -> RepoResult<()>;
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()>;
 
     async fn find_by_id(
         &self,
@@ -67,11 +65,7 @@ impl ReactionRepository for ReactionRepo {
     }
 
     #[tracing::instrument(skip(self), name = "ReactionRepository::delete")]
-    async fn delete(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<()> {
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
         debug!(
             "Got request to delete reaction with id {} and request_id {}",
             id, request_id

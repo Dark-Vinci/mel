@@ -3,7 +3,7 @@ use {
     async_trait::async_trait,
     chrono::Utc,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::messaging::response::{
                 ActiveModel, Entity as ResponseEntity, Model as Response,
@@ -17,7 +17,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ResponseRepository {
@@ -98,11 +97,7 @@ impl ResponseRepository for ResponseRepo {
     }
 
     #[tracing::instrument(skip(self), name = "ResponseRepository::delete")]
-    async fn delete(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<()> {
+    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
         debug!(
             "Got delete request with id: {}, request_id: {}",
             id, request_id
