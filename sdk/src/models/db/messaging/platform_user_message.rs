@@ -1,11 +1,12 @@
-use sea_orm::Set;
 use {
+    crate::models::others::messaging::{
+        CreateChannelUserMessage, UpdateChannelUserMessage,
+    },
     chrono::{DateTime, Utc},
-    sea_orm::prelude::*,
+    sea_orm::{prelude::*, Set},
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::messaging::{CreateChannelUserMessage, UpdateChannelUserMessage};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -36,7 +37,9 @@ impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateChannelUserMessage> for Model {
     fn from(reaction: CreateChannelUserMessage) -> Self {
-        let mut value = Model{..Default::default()};
+        let mut value = Model {
+            ..Default::default()
+        };
 
         value.id = Uuid::new_v4();
         value.user_id = reaction.user_id;

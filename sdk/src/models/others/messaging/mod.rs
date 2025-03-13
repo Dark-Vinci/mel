@@ -1,5 +1,7 @@
-use chrono::{DateTime, Utc};
-use uuid::Uuid;
+use {
+    chrono::{DateTime, Utc},
+    uuid::Uuid,
+};
 
 #[derive(Debug, Clone)]
 pub struct CreateMessage {
@@ -8,7 +10,7 @@ pub struct CreateMessage {
     pub body: String,
     pub created_by: Uuid,
     pub is_private_message: bool,
-    pub activate_at: Option<DateTime<Utc>>
+    pub activate_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Clone)]

@@ -1,8 +1,7 @@
-use sea_orm::Set;
 use {
     crate::models::others::messaging::{CreateMessage, UpdateMessage},
     chrono::{DateTime, Utc},
-    sea_orm::prelude::*,
+    sea_orm::{prelude::*, Set},
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
@@ -52,7 +51,9 @@ impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateMessage> for Model {
     fn from(msg: CreateMessage) -> Self {
-        let mut value = Model { ..Default::default() };
+        let mut value = Model {
+            ..Default::default()
+        };
 
         value.channel_id = msg.channel_id.into();
         value.workspace_id = msg.workspace_id.into();
@@ -81,7 +82,7 @@ impl From<(UpdateMessage, ActiveModel)> for ActiveModel {
         }
 
         if value.make_main_by.is_set() {
-            return value
+            return value;
         }
 
         if msg.0.make_main_by.is_some() {

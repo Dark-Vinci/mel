@@ -72,4 +72,3 @@ impl Related<super::super::messaging::message::Entity> for Relation {
         Relation::ShortUrlTrack.def()
     }
 }
-
