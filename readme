@@ -1,1 +1,5 @@
 # My slack clone
+
+Later we should have the db implementation below
+
+db -> retry layer -> search layer -> Timer layer -> cache layer
