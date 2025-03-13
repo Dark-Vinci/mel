@@ -36,7 +36,12 @@ pub struct UpdateChannelUserMessage {
 }
 
 #[derive(Debug, Clone)]
-pub struct CreateReaction {}
+pub struct CreateReaction {
+    pub emoji_id: Uuid,
+    pub message_id: Uuid,
+    pub workspace_user_id: Uuid,
+    pub max_count: u32,
+}
 
 #[derive(Debug, Clone)]
 pub struct CreateResponse {}

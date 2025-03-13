@@ -1,3 +1,5 @@
+use chrono::Utc;
+use sea_orm::Set;
 use {
     crate::connections::db::DB,
     async_trait::async_trait,
@@ -49,14 +51,18 @@ impl ReactionRepository for ReactionRepo {
         request_id: Uuid,
     ) -> RepoResult<Reaction> {
         debug!(
-            "Got request to create reaction with payload {}, request_id: {}",
-            payload, request_id
+            request_id = %request_id,
+            "Got request to create reaction"
         );
 
         let model: ActiveModel = payload.into();
 
         let result = model.insert(&self.0.connection).await.map_err(|err| {
-            error!("Failed to insert reaction: {:?}", err);
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, unable to insert reaction"
+            );
 
             RepoError::FailedToInsert
         })?;
@@ -65,21 +71,20 @@ impl ReactionRepository for ReactionRepo {
     }
 
     #[tracing::instrument(skip(self), name = "ReactionRepository::delete")]
-    async fn delete(&self, id: Uuid, request_id: Uuid) -> RepoResult<()> {
+    async fn delete(&self, mut reaction: ActiveModel, request_id: Uuid) -> RepoResult<()> {
         debug!(
-            "Got request to delete reaction with id {} and request_id {}",
-            id, request_id
+            request_id = %request_id
+            "Got request to delete reaction"
         );
 
-        let reaction =
-            self.find_by_id(request_id, id).await.map_err(|err| {
-                error!("Failed to find reaction: {:?}", err);
-
-                RepoError::NotFound
-            })?;
+        reaction.deleted_at = Set(Some(Utc::now()));
 
         let _ = reaction.delete(&self.0.connection).await.map_err(|err| {
-            error!("Failed to delete reaction: {:?}", err);
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, unable to delete reaction"
+            );
 
             RepoError::SomethingWentWrong
         })?;
@@ -94,20 +99,25 @@ impl ReactionRepository for ReactionRepo {
         request_id: Uuid,
     ) -> RepoResult<Reaction> {
         debug!(
-            "Got request to find reaction with id {} with request_id {}",
-            id, request_id
+            request_id = %request_id,
+            "Got request to find reaction by id"
         );
 
         let result = ReactionEntity::find_by_id(id)
             .one(&self.0.connection)
             .await
             .map_err(|err| {
-                error!("Failed to find reaction: {:?}", err);
+                error!(
+                    debug_error = ?err,
+                    display_error = %err,
+                    "failure, unable to find reaction"
+                );
 
                 RepoError::NotFound
             })?;
 
         if result.is_none() {
+            error!("unable to find reaction");
             return Err(RepoError::NotFound);
         }
 

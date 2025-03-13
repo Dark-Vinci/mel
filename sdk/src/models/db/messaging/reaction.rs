@@ -34,8 +34,17 @@ pub struct Model {
 impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateReaction> for Model {
-    fn from(_reaction: CreateReaction) -> Self {
-        todo!()
+    fn from(reaction: CreateReaction) -> Self {
+        let mut value = Model{..Default::default()};
+
+        value.id = Uuid::new_v4();
+        value.emoji_id = reaction.emoji_id;
+        value.message_id = reaction.message_id;
+        value.workspace_user_id = reaction.workspace_user_id;
+        value.max_count = reaction.max_count;
+        value.created_at = Utc::now();
+
+        value
     }
 }
 
