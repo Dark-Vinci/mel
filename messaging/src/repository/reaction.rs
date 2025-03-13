@@ -1,8 +1,7 @@
-use chrono::Utc;
-use sea_orm::Set;
 use {
     crate::connections::db::DB,
     async_trait::async_trait,
+    chrono::Utc,
     sdk::{
         errors::{RepoError, RepoResult},
         models::{
@@ -12,7 +11,7 @@ use {
             others::messaging::CreateReaction,
         },
     },
-    sea_orm::{ActiveModelTrait, EntityTrait, ModelTrait},
+    sea_orm::{ActiveModelTrait, EntityTrait, ModelTrait, Set},
     tracing::{debug, error},
     uuid::Uuid,
 };
@@ -71,7 +70,11 @@ impl ReactionRepository for ReactionRepo {
     }
 
     #[tracing::instrument(skip(self), name = "ReactionRepository::delete")]
-    async fn delete(&self, mut reaction: ActiveModel, request_id: Uuid) -> RepoResult<()> {
+    async fn delete(
+        &self,
+        mut reaction: ActiveModel,
+        request_id: Uuid,
+    ) -> RepoResult<()> {
         debug!(
             request_id = %request_id
             "Got request to delete reaction"
