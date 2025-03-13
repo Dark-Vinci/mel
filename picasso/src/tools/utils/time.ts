@@ -5,10 +5,10 @@ export function getDayDifference(date1: Date, date2: Date): number {
 
 export function generateRandomColor(): string {
   let result = '#';
-  let db = '0123456789abcdef';
+  const db = '0123456789abcdef';
 
   for (let i = 0; i < 6; i++) {
-    let rand = Math.random() * db.length;
+    const rand = Math.random() * db.length;
     result += db[rand];
   }
 

@@ -4,7 +4,7 @@ import { Channel, ChannelState } from '@/store/Channel/type';
 import { ChannelReducer } from '@/store/Channel/reducer';
 
 const initialState: ChannelState = {
-  posts: [],
+  channels: [],
 };
 
 let c = new ChannelReducer();
