@@ -22,6 +22,9 @@ pub struct Model {
     #[sea_orm(indexed)]
     pub user_id: Uuid,
 
+    #[sea_orm(indexed)]
+    pub platform_id: Uuid,
+
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     pub created_at: DateTime<Utc>,
 
@@ -29,6 +32,8 @@ pub struct Model {
     pub updated_at: DateTime<Utc>,
 
     pub seen_at: Option<DateTime<Utc>>,
+
+    pub deleted_at: Option<DateTime<Utc>>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

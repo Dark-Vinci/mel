@@ -1,13 +1,14 @@
-use sea_orm::ActiveModelTrait;
+use chrono::Utc;
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, Condition, DbErr, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect};
 use tracing::{debug, error};
-// use sdk::errors::RepoResult;
 use sdk::{
     errors::{RepoError, RepoResult},
     models::{
-        db::messaging::message::Model as Message,
+        db::messaging::message::{Model as Message, Entity as MessageEntity},
         db::messaging::platform_user_message::{
-            ActiveModel, Column, Entity as PlatformUserMessageEntity,
+            ActiveModel, Entity as PlatformUserMessageEntity,
             Model as PlatformUserMessage,
+            Column,
         },
         others::{
             messaging::{CreateChat, UpdateChat},
@@ -66,6 +67,7 @@ pub trait PlatformUserMessageRepository {
     async fn update(
         &self,
         payload: UpdatePlatformUserMessage,
+        current: ActiveModel,
         request_id: Uuid,
     ) -> RepoResult<PlatformUserMessage>;
 
@@ -77,9 +79,8 @@ pub trait PlatformUserMessageRepository {
 
     async fn get_platform_message(
         &self,
-        platform_id: Uuid,
-        is_channel: bool,
-        user_id: Uuid,
+        payload: QueryUserMessage,
+        pagination: Pagination,
         request_id: Uuid,
     ) -> RepoResult<Paginated<UserMessages>>;
 }
@@ -123,29 +124,129 @@ impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
         Ok(result)
     }
 
+    #[tracing::instrument(skip(self), name = "PlatformUserMessageRepository::update")]
     async fn update(
         &self,
         payload: UpdatePlatformUserMessage,
+        mut current: ActiveModel,
         request_id: Uuid,
     ) -> RepoResult<PlatformUserMessage> {
-        todo!()
+        debug!(
+            request_id = %request_id,
+            "Got request to update user message message"
+        );
+
+        let model: ActiveModel = (payload, current).into();
+
+        let result = model.update(&self.0.connection).await.map_err(|err| {
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, unable  to update user message"
+            );
+
+            if let Err(DbErr::RecordNotUpdated) = err {
+                return RepoError::FailedToUpdate;
+            }
+
+            RepoError::SomethingWentWrong
+        })?;
+
+        Ok(result)
     }
 
+    #[tracing::instrument(skip(self), name = "PlatformUserMessageRepository::delete")]
     async fn delete(
         &self,
-        message: ActiveModel,
+        mut message: ActiveModel,
         request_id: Uuid,
     ) -> RepoResult<()> {
-        todo!()
+        debug!(
+            request_id = %request_id,
+            "Got request to delete message"
+        );
+
+        message.deleted_at = Set(Some(Utc::now()));
+
+        let _ = message.update(&self.0.connection).await.map_err(|err| {
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, unable  to delete user message"
+            );
+
+            RepoError::SomethingWentWrong
+        })?;
+
+        Ok(())
     }
 
+
+    #[tracing::instrument(skip(self), name = "PlatformUserMessageRepository::get_platform_message")]
     async fn get_platform_message(
         &self,
-        platform_id: Uuid,
-        is_channel: bool,
-        user_id: Uuid,
+        payload: QueryUserMessage,
+        pagination: Pagination,
         request_id: Uuid,
     ) -> RepoResult<Paginated<UserMessages>> {
-        todo!()
+        debug!(
+            request_id = %request_id,
+            "Got request to get platform messages"
+        );
+
+
+        // suppose to be Mode, Option<Model>
+        let result = PlatformUserMessageEntity::find()
+            .find_also_related(MessageEntity)
+            .filter(
+                Condition::all()
+                    .add(Column::PlatformId.eq(payload.platform_id))
+                    .add(Column::UserId.eq(payload.user_id))
+                    .add(Column::IsPrivateMessage.eq(payload.is_dm))
+            )
+            .limit(Some(pagination.page_size))
+            .offset(pagination.page_offset())
+            .all(&self.0.connection)
+            .await
+            .map_err(|err| {
+                error!(
+                    debug_error = ?err,
+                    display_error = %err,
+                    "failure, Unable to query user message by range with error"
+                );
+
+                RepoError::SomethingWentWrong
+            })?;
+
+        let count = PlatformUserMessageEntity::find()
+            .count(&self.0.connection)
+            .await
+            .map_err(|err| {
+                error!(
+                    debug_error = ?err,
+                    display_error = %err,
+                    "failure, Unable to count user message by range"
+                );
+
+                RepoError::SomethingWentWrong
+            })?;
+
+        let result: UserMessages = result.into();
+
+        let paginated = Paginated::new(
+            result,
+            pagination.total_pages(count),
+            pagination.page_number + 1,
+            pagination.page_size,
+            count,
+        );
+
+        Ok(paginated)
     }
+}
+
+pub struct QueryUserMessage {
+    pub platform_id: Uuid,
+    pub is_dm: bool,
+    pub user_id: Uuid,
 }
