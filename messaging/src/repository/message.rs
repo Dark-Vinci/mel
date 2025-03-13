@@ -34,10 +34,11 @@ pub trait MessageRepository {
     async fn update(
         &self,
         payload: UpdateMessage,
+        current: ActiveModel,
         request_id: Uuid,
     ) -> RepoResult<Message>;
 
-    async fn delete(&self, id: Uuid, request_id: Uuid)
+    async fn delete(&self, current: ActiveModel, request_id: Uuid)
         -> RepoResult<()>;
 
     async fn get_by_id(
@@ -71,14 +72,18 @@ impl MessageRepository for MessageRepo {
         request_id: Uuid,
     ) -> RepoResult<Message> {
         debug!(
-            "Got Create Message request with request id {} and payload",
-            request_id, payload
+            request_id = %request_id,
+            "Got Create Message request to create message",
         );
 
         let model: ActiveModel = payload.into();
 
         let result = model.insert(&self.0.connection).await.map_err(|err| {
-            error!("Failed to create message with error {err}");
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, unable to create message"
+            );
 
             if let Err(DbErr::RecordNotInserted) = err {
                 return RepoError::FailedToInsert;
@@ -94,21 +99,24 @@ impl MessageRepository for MessageRepo {
     async fn update(
         &self,
         payload: UpdateMessage,
+        current: ActiveModel,
         request_id: Uuid,
     ) -> RepoResult<Message> {
         debug!(
-            "Got Update Message request with request id {} and payload",
-            request_id, payload
+            request_id = %request_id,
+            "Got request to update message"
         );
 
-        let model: ActiveModel = payload.into();
+        let model: ActiveModel = (payload, current).into();
 
         let result = model.update(&self.0.connection).await.map_err(|err| {
-            error!("Failed to update message with error {err}");
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, unable  to update message"
+            );
 
             if let Err(DbErr::RecordNotUpdated) = err {
-                error!("Failed to update message with error {err}");
-
                 return RepoError::FailedToUpdate;
             }
 
@@ -121,21 +129,22 @@ impl MessageRepository for MessageRepo {
     #[tracing::instrument(skip(self), name = "MessageRepo::delete")]
     async fn delete(
         &self,
-        id: Uuid,
+        mut message: ActiveModel,
         request_id: Uuid,
     ) -> Result<(), RepoError> {
         debug!(
-            "Got Delete Message request with request id {} and id {}",
-            request_id, id
+            request_id = %request_id,
+            "Got request to delete message"
         );
-
-        let mut message =
-            self.get_by_id(id, request_id).await?.into_active_model();
 
         message.deleted_at = Set(Some(Utc::now()));
 
         let _ = message.update(&self.0.connection).await.map_err(|err| {
-            error!("Failed to update message with error {err}");
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, unable  to delete message"
+            );
 
             RepoError::SomethingWentWrong
         })?;
@@ -150,21 +159,25 @@ impl MessageRepository for MessageRepo {
         request_id: Uuid,
     ) -> RepoResult<Message> {
         debug!(
-            "Got Get Message request with request id {} and id {}",
-            request_id, id
+            request_id = %request_id,
+            "Got a request to delete message"
         );
 
         let message = MessageEntity::find_by_id(id)
             .one(&self.0.connection)
             .await
             .map_err(|err| {
-                error!("Failed to get user by id with error {err}");
+                error!(
+                    debug_error = ?err,
+                    display_error = %err,
+                    "failure, unable  to get message by id"
+                );
 
                 return RepoError::NotFound;
             })?;
 
         if message.is_none() {
-            error!("Failed to get user by id");
+            error!("Fail, unable to get message by id");
             return Err(RepoError::NotFound);
         }
 
@@ -179,17 +192,22 @@ impl MessageRepository for MessageRepo {
         request_id: Uuid,
     ) -> Result<Paginated<Vec<Message>>, RepoError> {
         debug!(
-            "Got Get For Channel request with request id {} and id {}",
-            request_id, channel_id
+            request_id = %request_id,
+            "Got request to get channel messages"
         );
 
+        // todo; make this requests in parallel
         let result = MessageEntity::find()
             .limit(Some(pagination.page_size))
             .offset(pagination.page_offset())
             .all(&self.0.connection)
             .await
             .map_err(|err| {
-                error!("Unable to query message by range with error {err}");
+                error!(
+                    debug_error = ?err,
+                    display_error = %err,
+                    "failure, Unable to query message by range with error"
+                );
 
                 RepoError::SomethingWentWrong
             })?;
@@ -198,13 +216,17 @@ impl MessageRepository for MessageRepo {
             .count(&self.0.connection)
             .await
             .map_err(|err| {
-                error!("Unable to count message by range with error {err}");
+                error!(
+                    debug_error = ?err,
+                    display_error = %err,
+                    "failure, Unable to count message by range"
+                );
 
                 RepoError::SomethingWentWrong
             })?;
 
         let paginated =
-            Paginated::new(result, pagination.total_pages(count), 0, 0, count);
+            Paginated::new(result, pagination.total_pages(count), pagination.page_number + 1, pagination.page_size, count);
 
         Ok(paginated)
     }
