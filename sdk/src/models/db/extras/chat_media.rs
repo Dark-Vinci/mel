@@ -6,6 +6,21 @@ use {
     uuid::Uuid,
 };
 
+#[derive(Clone, Debug, EnumIter, DeriveActiveEnum, PartialEq)]
+#[sea_orm(rs_type = "String", db_type = "String(StringLen::None)")]
+pub enum MediaType {
+    #[sea_orm(string_value = "pdf")]
+    PDF,
+    #[sea_orm(string_value = "jpg")]
+    JPG,
+    #[sea_orm(string_value = "png")]
+    PNG,
+    #[sea_orm(string_value = "mp3")]
+    MP3,
+    #[sea_orm(string_value = "mp4")]
+    MP4,
+}
+
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
 )]
@@ -19,12 +34,20 @@ pub struct Model {
     pub message_id: Uuid,
 
     #[sea_orm(indexed)]
-    pub channel_id: Uuid, // channel <-> user
+    pub medium_id: Uuid, // channel <-> dm(medium)
 
     pub workspace_id: Uuid,
 
     #[sea_orm(type = "TEXT")]
     pub url: String,
+
+    pub bucket: String,
+
+    pub key: String,
+
+    pub r#type: MediaType,
+
+    pub file_name: String,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     pub created_at: chrono::DateTime<Utc>,
@@ -35,9 +58,6 @@ pub struct Model {
 
 impl ActiveModelBehavior for ActiveModel {}
 
-#[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
-pub enum Relation {}
-
 impl From<CreateChatMedia> for ActiveModel {
     fn from(_fro: CreateChatMedia) -> Self {
         let val: ActiveModel = Self {
@@ -47,5 +67,21 @@ impl From<CreateChatMedia> for ActiveModel {
         // todo: fill other fields
 
         val
+    }
+}
+
+#[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::super::messaging::message::Entity",
+        from = "Column::MessageId",
+        to = "super::super::messaging::message::Column::Id"
+    )]
+    Message,
+}
+
+impl Related<super::super::messaging::message::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Message.def()
     }
 }

@@ -30,22 +30,6 @@ pub struct Model {
     deleted_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
-pub enum Relation {
-    #[sea_orm(
-        belongs_to = "super::short_url_track::Entity",
-        from = "Column::Id",
-        to = "super::short_url_track::Column::Id"
-    )]
-    ShortUrlTrack,
-}
-
-impl Related<super::short_url_track::Entity> for Relation {
-    fn to() -> RelationDef {
-        Relation::ShortUrlTrack.def()
-    }
-}
-
 impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateShortUrl> for ActiveModel {
@@ -59,3 +43,33 @@ impl From<CreateShortUrl> for ActiveModel {
         val
     }
 }
+
+#[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::short_url_track::Entity",
+        from = "Column::Id",
+        to = "super::short_url_track::Column::Id"
+    )]
+    ShortUrlTrack,
+
+    #[sea_orm(
+        belongs_to = "super::message::Entity",
+        from = "Column::MessageId",
+        to = "super::super::messaging::message::Column::Id"
+    )]
+    Message,
+}
+
+impl Related<super::short_url_track::Entity> for Relation {
+    fn to() -> RelationDef {
+        Relation::ShortUrlTrack.def()
+    }
+}
+
+impl Related<super::super::messaging::message::Entity> for Relation {
+    fn to() -> RelationDef {
+        Relation::ShortUrlTrack.def()
+    }
+}
+

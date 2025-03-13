@@ -4,3 +4,4 @@ pub mod emoji;
 pub mod message;
 pub mod reaction;
 pub mod response;
+pub mod platform_user_message;

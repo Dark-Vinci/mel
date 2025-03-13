@@ -22,12 +22,6 @@ pub struct Model {
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     pub created_at: DateTime<Utc>,
-
-    #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub updated_at: DateTime<Utc>,
-
-    #[sea_orm(nullable)]
-    pub deleted_at: Option<DateTime<Utc>>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

@@ -17,17 +17,15 @@ pub struct Model {
     #[sea_orm(indexed)]
     pub message_id: Uuid,
 
+    #[sea_orm(indexed)]
     pub emoji_id: Uuid,
 
-    pub count: u32,
+    pub max_count: u32,
 
     pub workspace_user_id: Uuid,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     pub created_at: DateTime<Utc>,
-
-    #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub updated_at: DateTime<Utc>,
 
     #[sea_orm(nullable)]
     pub deleted_at: Option<DateTime<Utc>>,
@@ -41,5 +39,25 @@ impl From<CreateReaction> for Model {
     }
 }
 
-#[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
-pub enum Relation {}
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::message::Entity",
+        from = "Column::MessageId",
+        to = "super::message::Column::Id"
+    )]
+    Message,
+
+    #[sea_orm(
+        belongs_to = "super::super::extras::emoji::Entity",
+        from = "Column::EmojiId",
+        to = "super::super::extras::emoji::Column::Id"
+    )]
+    Emoji,
+}
+
+impl Related<super::message::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Message.def()
+    }
+}
