@@ -22,14 +22,14 @@ pub struct UpdateMessage {
 }
 
 #[derive(Debug, Clone)]
-pub struct CreateChannelUserMessage {
+pub struct CreatePlatformUserMessage {
     pub is_private_message: bool,
     pub message_id: Uuid,
     pub user_id: Uuid,
 }
 
 #[derive(Debug, Clone)]
-pub struct UpdateChannelUserMessage {
+pub struct UpdatePlatformUserMessage {
     pub message_id: Uuid,
     pub id: Uuid,
     pub seen: bool,

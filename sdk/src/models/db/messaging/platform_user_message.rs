@@ -1,12 +1,10 @@
 use {
-    crate::models::others::messaging::{
-        CreateChannelUserMessage, UpdateChannelUserMessage,
-    },
     chrono::{DateTime, Utc},
     sea_orm::{prelude::*, Set},
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::messaging::{CreatePlatformUserMessage, UpdatePlatformUserMessage};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -35,8 +33,8 @@ pub struct Model {
 
 impl ActiveModelBehavior for ActiveModel {}
 
-impl From<CreateChannelUserMessage> for Model {
-    fn from(reaction: CreateChannelUserMessage) -> Self {
+impl From<CreatePlatformUserMessage> for Model {
+    fn from(reaction: CreatePlatformUserMessage) -> Self {
         let mut value = Model {
             ..Default::default()
         };
@@ -53,8 +51,8 @@ impl From<CreateChannelUserMessage> for Model {
     }
 }
 
-impl From<(UpdateChannelUserMessage, ActiveModel)> for ActiveModel {
-    fn from(value: (UpdateChannelUserMessage, ActiveModel)) -> Self {
+impl From<(UpdatePlatformUserMessage, ActiveModel)> for ActiveModel {
+    fn from(value: (UpdatePlatformUserMessage, ActiveModel)) -> Self {
         let reaction = value.0;
         let mut active_model = value.1;
 
