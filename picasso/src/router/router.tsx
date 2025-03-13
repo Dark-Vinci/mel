@@ -1,11 +1,15 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import { Login } from '@pages';
+import { ToggleTheme } from '@containers';
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <div>welcome to rslack app</div>,
+    path: '/melon',
+    element: <div>
+      <div>welcome to rslack app</div>
+      <ToggleTheme />
+    </div>,
   },
   {
     path: 'auth',

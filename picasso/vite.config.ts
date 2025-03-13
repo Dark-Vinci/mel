@@ -14,7 +14,7 @@ export default defineConfig({
       "@tools": path.resolve(__dirname, "src/tools"),
       "@app": path.resolve(__dirname, "src/app"),
       "@store": path.resolve(__dirname, "src/store"),
-      "@/*": path.resolve(__dirname, "src/*")
+      "@": path.resolve(__dirname, "src")
     },
   },
 });

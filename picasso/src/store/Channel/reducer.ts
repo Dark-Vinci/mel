@@ -1,5 +1,5 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { Channel, ChannelState } from '@/store/Channel/type.ts';
+import { Channel, ChannelState } from '@/store/Channel/type';
 
 export class ChannelReducer {
   public constructor() {}
