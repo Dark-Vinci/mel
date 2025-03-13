@@ -1,60 +1,34 @@
-use chrono::Utc;
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, Condition, DbErr, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect, QueryFilter};
-use tracing::{debug, error};
-use sdk::{
-    errors::{RepoError, RepoResult},
-    models::{
-        db::messaging::message::{Model as Message, Entity as MessageEntity},
-        db::messaging::platform_user_message::{
-            ActiveModel, Entity as PlatformUserMessageEntity,
-            Model as PlatformUserMessage,
-            Column,
-        },
-        others::{
-            messaging::{CreateChat, UpdateChat},
-            Paginated, Pagination,
-        },
-    },
-};
 use {
     crate::connections::db::DB,
     async_trait::async_trait,
-    sdk::models::others::messaging::{
-        CreatePlatformUserMessage, UpdatePlatformUserMessage,
+    chrono::Utc,
+    sdk::{
+        errors::{RepoError, RepoResult},
+        models::{
+            db::messaging::{
+                message::{Entity as MessageEntity, Model as Message},
+                platform_user_message::{
+                    ActiveModel, Column, Entity as PlatformUserMessageEntity,
+                    Model as PlatformUserMessage,
+                },
+            },
+            others::{
+                messaging::{
+                    CreateChat, CreatePlatformUserMessage, UpdateChat,
+                    UpdatePlatformUserMessage, QueryUserMessagePayload,
+                    UserMessages,
+                },
+                Paginated, Pagination,
+            },
+        },
     },
-    sea_orm::tests_cfg::cake,
+    sea_orm::{
+        tests_cfg::cake, ActiveModelTrait, ActiveValue::Set, Condition, DbErr,
+        EntityTrait, IntoActiveModel, PaginatorTrait, QueryFilter, QuerySelect,
+    },
+    tracing::{debug, error},
     uuid::Uuid,
 };
-
-struct UserMessage {
-    platform_user_message: PlatformUserMessage,
-    message: Option<Message>,
-}
-
-impl From<(PlatformUserMessage, Option<Message>)> for UserMessage {
-    fn from(payload: (PlatformUserMessage, Option<Message>)) -> Self {
-        Self {
-            platform_user_message: payload.0,
-            message: payload.1,
-        }
-    }
-}
-
-struct UserMessages {
-    value: Vec<UserMessage>,
-}
-
-impl From<Vec<(PlatformUserMessage, Option<Message>)>> for UserMessages {
-    fn from(payload: Vec<(PlatformUserMessage, Option<Message>)>) -> Self {
-        let mut result = Self { value: Vec::new() };
-
-        for v in payload {
-            result.value.push(v.into())
-        }
-
-        result
-    }
-}
 
 #[async_trait]
 pub trait PlatformUserMessageRepository {
@@ -79,7 +53,7 @@ pub trait PlatformUserMessageRepository {
 
     async fn get_platform_message(
         &self,
-        payload: QueryUserMessage,
+        payload: QueryUserMessagePayload,
         pagination: Pagination,
         request_id: Uuid,
     ) -> RepoResult<Paginated<UserMessages>>;
@@ -111,20 +85,27 @@ impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
 
         let user_message: ActiveModel = payload.into();
 
-        let result = user_message.insert(&self.0.connection).await.map_err(|err| {
-            error!(
-                debug_error = ?err,
-                display_error = %err,
-                "Failed to insert into database"
-            );
+        let result =
+            user_message
+                .insert(&self.0.connection)
+                .await
+                .map_err(|err| {
+                    error!(
+                        debug_error = ?err,
+                        display_error = %err,
+                        "Failed to insert into database"
+                    );
 
-            RepoError::FailedToInsert
-        })?;
+                    RepoError::FailedToInsert
+                })?;
 
         Ok(result)
     }
 
-    #[tracing::instrument(skip(self), name = "PlatformUserMessageRepository::update")]
+    #[tracing::instrument(
+        skip(self),
+        name = "PlatformUserMessageRepository::update"
+    )]
     async fn update(
         &self,
         payload: UpdatePlatformUserMessage,
@@ -155,7 +136,10 @@ impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
         Ok(result)
     }
 
-    #[tracing::instrument(skip(self), name = "PlatformUserMessageRepository::delete")]
+    #[tracing::instrument(
+        skip(self),
+        name = "PlatformUserMessageRepository::delete"
+    )]
     async fn delete(
         &self,
         mut message: ActiveModel,
@@ -181,11 +165,13 @@ impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
         Ok(())
     }
 
-
-    #[tracing::instrument(skip(self), name = "PlatformUserMessageRepository::get_platform_message")]
+    #[tracing::instrument(
+        skip(self),
+        name = "PlatformUserMessageRepository::get_platform_message"
+    )]
     async fn get_platform_message(
         &self,
-        payload: QueryUserMessage,
+        payload: QueryUserMessagePayload,
         pagination: Pagination,
         request_id: Uuid,
     ) -> RepoResult<Paginated<UserMessages>> {
@@ -196,25 +182,24 @@ impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
 
         let (result, count) = tokio::join!(
             PlatformUserMessageEntity::find()
-            .find_also_related(MessageEntity)
-            .filter(
-                Condition::all()
-                    .add(Column::PlatformId.eq(payload.platform_id))
-                    .add(Column::UserId.eq(payload.user_id))
-                    .add(Column::IsPrivateMessage.eq(payload.is_dm))
-            )
-            .limit(Some(pagination.page_size))
-            .offset(pagination.page_offset())
-            .all(&self.0.connection),
-
+                .find_also_related(MessageEntity)
+                .filter(
+                    Condition::all()
+                        .add(Column::PlatformId.eq(payload.platform_id))
+                        .add(Column::UserId.eq(payload.user_id))
+                        .add(Column::IsPrivateMessage.eq(payload.is_dm))
+                )
+                .limit(Some(pagination.page_size))
+                .offset(pagination.page_offset())
+                .all(&self.0.connection),
             PlatformUserMessageEntity::find()
-            .filter(
-                Condition::all()
-                    .add(Column::PlatformId.eq(payload.platform_id))
-                    .add(Column::UserId.eq(payload.user_id))
-                    .add(Column::IsPrivateMessage.eq(payload.is_dm))
-            )
-            .count(&self.0.connection)
+                .filter(
+                    Condition::all()
+                        .add(Column::PlatformId.eq(payload.platform_id))
+                        .add(Column::UserId.eq(payload.user_id))
+                        .add(Column::IsPrivateMessage.eq(payload.is_dm))
+                )
+                .count(&self.0.connection)
         );
 
         let unwrapped_result = result.map_err(|err| {
@@ -249,10 +234,4 @@ impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
 
         Ok(paginated)
     }
-}
-
-pub struct QueryUserMessage {
-    pub platform_id: Uuid,
-    pub is_dm: bool,
-    pub user_id: Uuid,
 }

@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use {
     chrono::{DateTime, Utc},
     uuid::Uuid,
@@ -27,6 +28,46 @@ pub struct CreatePlatformUserMessage {
     pub message_id: Uuid,
     pub user_id: Uuid,
 }
+
+#[derive(Debug, Clone)]
+pub struct QueryUserMessagePayload {
+    pub platform_id: Uuid,
+    pub is_dm: bool,
+    pub user_id: Uuid,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserMessage {
+    platform_user_message: crate::models::db::messaging::platform_user_message::Model,
+    message: Option<crate::models::db::messaging::message::Model>,
+}
+
+impl From<(crate::models::db::messaging::platform_user_message::Model, Option<crate::models::db::messaging::message::Model>)> for UserMessage {
+    fn from(payload: (crate::models::db::messaging::platform_user_message::Model, Option<crate::models::db::messaging::message::Model>)) -> Self {
+        Self {
+            platform_user_message: payload.0,
+            message: payload.1,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserMessages {
+    value: Vec<UserMessage>,
+}
+
+impl From<Vec<(crate::models::db::messaging::platform_user_message::Model, Option<crate::models::db::messaging::message::Model>)>> for UserMessages {
+    fn from(payload: Vec<(crate::models::db::messaging::platform_user_message::Model, Option<crate::models::db::messaging::message::Model>)>) -> Self {
+        let mut result = Self { value: Vec::new() };
+
+        for v in payload {
+            result.value.push(v.into())
+        }
+
+        result
+    }
+}
+
 
 #[derive(Debug, Clone)]
 pub struct UpdatePlatformUserMessage {
