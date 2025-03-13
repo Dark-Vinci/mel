@@ -1,5 +1,5 @@
 use chrono::Utc;
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, Condition, DbErr, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect};
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, Condition, DbErr, EntityTrait, IntoActiveModel, PaginatorTrait, QuerySelect, QueryFilter};
 use tracing::{debug, error};
 use sdk::{
     errors::{RepoError, RepoResult},
@@ -194,9 +194,8 @@ impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
             "Got request to get platform messages"
         );
 
-
-        // suppose to be Mode, Option<Model>
-        let result = PlatformUserMessageEntity::find()
+        let (result, count) = tokio::join!(
+            PlatformUserMessageEntity::find()
             .find_also_related(MessageEntity)
             .filter(
                 Condition::all()
@@ -206,39 +205,46 @@ impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
             )
             .limit(Some(pagination.page_size))
             .offset(pagination.page_offset())
-            .all(&self.0.connection)
-            .await
-            .map_err(|err| {
-                error!(
-                    debug_error = ?err,
-                    display_error = %err,
-                    "failure, Unable to query user message by range with error"
-                );
+            .all(&self.0.connection),
 
-                RepoError::SomethingWentWrong
-            })?;
-
-        let count = PlatformUserMessageEntity::find()
+            PlatformUserMessageEntity::find()
+            .filter(
+                Condition::all()
+                    .add(Column::PlatformId.eq(payload.platform_id))
+                    .add(Column::UserId.eq(payload.user_id))
+                    .add(Column::IsPrivateMessage.eq(payload.is_dm))
+            )
             .count(&self.0.connection)
-            .await
-            .map_err(|err| {
-                error!(
-                    debug_error = ?err,
-                    display_error = %err,
-                    "failure, Unable to count user message by range"
-                );
+        );
 
-                RepoError::SomethingWentWrong
-            })?;
+        let unwrapped_result = result.map_err(|err| {
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, Unable to query user message by range with error"
+            );
 
-        let result: UserMessages = result.into();
+            RepoError::SomethingWentWrong
+        })?;
+
+        let unwrapped_count = count.map_err(|err| {
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure, Unable to count user message by range"
+            );
+
+            RepoError::SomethingWentWrong
+        })?;
+
+        let formatted_result: UserMessages = unwrapped_result.into();
 
         let paginated = Paginated::new(
-            result,
-            pagination.total_pages(count),
+            formatted_result,
+            pagination.total_pages(unwrapped_count),
             pagination.page_number + 1,
             pagination.page_size,
-            count,
+            unwrapped_count,
         );
 
         Ok(paginated)
