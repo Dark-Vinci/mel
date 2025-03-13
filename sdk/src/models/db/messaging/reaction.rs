@@ -35,7 +35,9 @@ impl ActiveModelBehavior for ActiveModel {}
 
 impl From<CreateReaction> for Model {
     fn from(reaction: CreateReaction) -> Self {
-        let mut value = Model{..Default::default()};
+        let mut value = Model {
+            ..Default::default()
+        };
 
         value.id = Uuid::new_v4();
         value.emoji_id = reaction.emoji_id;

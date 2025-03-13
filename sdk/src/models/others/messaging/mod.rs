@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
 use {
     chrono::{DateTime, Utc},
+    serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
 
@@ -38,12 +38,23 @@ pub struct QueryUserMessagePayload {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserMessage {
-    platform_user_message: crate::models::db::messaging::platform_user_message::Model,
+    platform_user_message:
+        crate::models::db::messaging::platform_user_message::Model,
     message: Option<crate::models::db::messaging::message::Model>,
 }
 
-impl From<(crate::models::db::messaging::platform_user_message::Model, Option<crate::models::db::messaging::message::Model>)> for UserMessage {
-    fn from(payload: (crate::models::db::messaging::platform_user_message::Model, Option<crate::models::db::messaging::message::Model>)) -> Self {
+impl
+    From<(
+        crate::models::db::messaging::platform_user_message::Model,
+        Option<crate::models::db::messaging::message::Model>,
+    )> for UserMessage
+{
+    fn from(
+        payload: (
+            crate::models::db::messaging::platform_user_message::Model,
+            Option<crate::models::db::messaging::message::Model>,
+        ),
+    ) -> Self {
         Self {
             platform_user_message: payload.0,
             message: payload.1,
@@ -56,8 +67,20 @@ pub struct UserMessages {
     value: Vec<UserMessage>,
 }
 
-impl From<Vec<(crate::models::db::messaging::platform_user_message::Model, Option<crate::models::db::messaging::message::Model>)>> for UserMessages {
-    fn from(payload: Vec<(crate::models::db::messaging::platform_user_message::Model, Option<crate::models::db::messaging::message::Model>)>) -> Self {
+impl
+    From<
+        Vec<(
+            crate::models::db::messaging::platform_user_message::Model,
+            Option<crate::models::db::messaging::message::Model>,
+        )>,
+    > for UserMessages
+{
+    fn from(
+        payload: Vec<(
+            crate::models::db::messaging::platform_user_message::Model,
+            Option<crate::models::db::messaging::message::Model>,
+        )>,
+    ) -> Self {
         let mut result = Self { value: Vec::new() };
 
         for v in payload {
@@ -67,7 +90,6 @@ impl From<Vec<(crate::models::db::messaging::platform_user_message::Model, Optio
         result
     }
 }
-
 
 #[derive(Debug, Clone)]
 pub struct UpdatePlatformUserMessage {

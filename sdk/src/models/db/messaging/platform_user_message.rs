@@ -1,10 +1,12 @@
 use {
+    crate::models::others::messaging::{
+        CreatePlatformUserMessage, UpdatePlatformUserMessage,
+    },
     chrono::{DateTime, Utc},
     sea_orm::{prelude::*, Set},
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::messaging::{CreatePlatformUserMessage, UpdatePlatformUserMessage};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
