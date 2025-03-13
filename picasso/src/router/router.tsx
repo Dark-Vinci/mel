@@ -6,10 +6,12 @@ import { ToggleTheme } from '@containers';
 export const router = createBrowserRouter([
   {
     path: '/melon',
-    element: <div>
-      <div>welcome to rslack app</div>
-      <ToggleTheme />
-    </div>,
+    element: (
+      <div>
+        <div>welcome to rslack app</div>
+        <ToggleTheme />
+      </div>
+    ),
   },
   {
     path: 'auth',
