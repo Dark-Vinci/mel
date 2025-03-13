@@ -14,9 +14,9 @@ use {
             },
             others::{
                 messaging::{
-                    CreateChat, CreatePlatformUserMessage, UpdateChat,
-                    UpdatePlatformUserMessage, QueryUserMessagePayload,
-                    UserMessages,
+                    CreateChat, CreatePlatformUserMessage,
+                    QueryUserMessagePayload, UpdateChat,
+                    UpdatePlatformUserMessage, UserMessages,
                 },
                 Paginated, Pagination,
             },
@@ -59,16 +59,16 @@ pub trait PlatformUserMessageRepository {
     ) -> RepoResult<Paginated<UserMessages>>;
 }
 
-pub struct PlatformUserMessageRepositoryRepo(DB);
+pub struct PlatformUserMessageRepo(DB);
 
-impl PlatformUserMessageRepositoryRepo {
+impl PlatformUserMessageRepo {
     pub fn new(db: DB) -> Self {
         Self(db)
     }
 }
 
 #[async_trait]
-impl PlatformUserMessageRepository for PlatformUserMessageRepositoryRepo {
+impl PlatformUserMessageRepository for PlatformUserMessageRepo {
     #[tracing::instrument(
         skip(self),
         name = "PlatformUserMessageRepository::create"
