@@ -1,9 +1,9 @@
-import  {useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 
 import { ThemeContext } from '@store';
 
-interface themeProps{
-    children: ReactNode
+interface themeProps {
+  children: ReactNode;
 }
 
 export const ThemeProvider = ({ children }: themeProps) => {
@@ -13,12 +13,12 @@ export const ThemeProvider = ({ children }: themeProps) => {
   });
 
   useEffect(() => {
-    localStorage.setItem('theme', theme); 
+    localStorage.setItem('theme', theme);
     document.body.className = theme;
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
   return (
