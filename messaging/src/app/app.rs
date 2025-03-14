@@ -23,6 +23,8 @@ pub struct App {
         Box<dyn PlatformUserMessageRepository + Sync + Send>,
     pub reaction_repo: Box<dyn ReactionRepository + Sync + Send>,
     pub chat_repo: Box<dyn ChatRepository + Sync + Send>,
+    // kafka needed here {to send the created details to gateway so it can handle with WS}
+    // cache layer too is needed for get operations
 }
 
 impl App {
