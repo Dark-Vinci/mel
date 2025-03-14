@@ -5,3 +5,4 @@ mod downstream;
 pub mod migration;
 pub mod repository;
 pub mod server;
+pub mod email;
