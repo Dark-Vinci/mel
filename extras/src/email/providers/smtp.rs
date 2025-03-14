@@ -1,15 +1,20 @@
-use std::time::Duration;
-use lettre::message::header::ContentType;
-use lettre::message::Mailbox;
-use lettre::{Message, SmtpTransport, Transport};
-use lettre::transport::smtp::authentication::Credentials;
-use crate::email::email::{Email, EmailClient, EmailError, EmailSettings, IntermediateString};
+use {
+    crate::email::email::{
+        Email, EmailClient, EmailError, EmailSettings, IntermediateString,
+    },
+    lettre::{
+        message::{header::ContentType, Mailbox},
+        transport::smtp::authentication::Credentials,
+        Message, SmtpTransport, Transport,
+    },
+    std::time::Duration,
+};
 
 #[derive(Default, Clone)]
 pub enum SmtpConnection {
     #[default]
     StartTls,
-    Plaintext
+    Plaintext,
 }
 
 #[derive(Clone)]
@@ -28,18 +33,17 @@ impl SmtpServerConfig {
             return Err("email.smtp.host must not be empty");
         }
 
-        if self.username.is_none()  {
+        if self.username.is_none() {
             return Err("email.smtp.username must not be empty");
         }
 
-        if self.password.is_none()  {
+        if self.password.is_none() {
             return Err("email.smtp.password must not be empty");
         }
 
         Ok(())
     }
 }
-
 
 pub struct SmtpServer {
     pub sender: String,
@@ -53,11 +57,11 @@ impl EmailClient for SmtpServer {
         &self,
         recipient: Email,
         subject: String,
-        body: Self::RichText
+        body: Self::RichText,
     ) -> Result<(), EmailError> {
         // Create a client every time when the email is being sent
-        let email_client =
-            Self::create_client(self).map_err(|_| EmailError::SendingFailure)?;
+        let email_client = Self::create_client(self)
+            .map_err(|_| EmailError::SendingFailure)?;
 
         let email = Message::builder()
             .to(Self::parse_mail(recipient.to_string())?)
@@ -75,9 +79,12 @@ impl EmailClient for SmtpServer {
         Ok(())
     }
 
-    async fn to_text(&self, intermediate_string: IntermediateString) -> Result<String, EmailError>
+    async fn to_text(
+        &self,
+        intermediate_string: IntermediateString,
+    ) -> Result<String, EmailError>
     where
-        Self::RichText: Send
+        Self::RichText: Send,
     {
         Ok(intermediate_string.into_inner())
     }
@@ -94,9 +101,7 @@ impl SmtpServer {
     fn parse_mail(email: String) -> Result<Mailbox, EmailError> {
         Ok(Mailbox::new(
             None,
-            email
-                .parse()
-                .map_err(|_| EmailError::SendingFailure)?
+            email.parse().map_err(|_| EmailError::SendingFailure)?,
         ))
     }
 
@@ -110,47 +115,48 @@ impl SmtpServer {
             .username
             .clone()
             .zip(self.smtp_config.password.clone())
-            .map(|(username, password)| {
-                Credentials::new(username, password)
-            });
+            .map(|(username, password)| Credentials::new(username, password));
 
         match &self.smtp_config.connection {
             SmtpConnection::StartTls => {
                 match credentials {
                     Some(credentials) => {
-                        Ok(
-                            SmtpTransport::starttls_relay(&host)
-                                .map_err(|_| SmtpError::ConnectionFailure)?
-                                .port(port)
-                                .timeout(timeout)
-                                .credentials(credentials)
-                                .build(),
-                        )
-                    }
+                        Ok(SmtpTransport::starttls_relay(&host)
+                            .map_err(|_| SmtpError::ConnectionFailure)?
+                            .port(port)
+                            .timeout(timeout)
+                            .credentials(credentials)
+                            .build())
+                    },
 
                     None => {
                         Ok(SmtpTransport::starttls_relay(&host)
                             .map_err(|_| SmtpError::ConnectionFailure)?
                             .port(port)
                             .timeout(timeout)
-                            .build()
-                        )
-                    }
+                            .build())
+                    },
                 }
-            }
+            },
 
-            SmtpConnection::Plaintext => match credentials {
-                Some(credentials) => Ok(SmtpTransport::builder_dangerous(&host)
-                    .port(port)
-                    .timeout(timeout)
-                    .credentials(credentials)
-                    .build()),
+            SmtpConnection::Plaintext => {
+                match credentials {
+                    Some(credentials) => {
+                        Ok(SmtpTransport::builder_dangerous(&host)
+                            .port(port)
+                            .timeout(timeout)
+                            .credentials(credentials)
+                            .build())
+                    },
 
-                None => Ok(SmtpTransport::builder_dangerous(&host)
-                    .port(port)
-                    .timeout(timeout)
-                    .build()),
-            }
+                    None => {
+                        Ok(SmtpTransport::builder_dangerous(&host)
+                            .port(port)
+                            .timeout(timeout)
+                            .build())
+                    },
+                }
+            },
         }
     }
 }

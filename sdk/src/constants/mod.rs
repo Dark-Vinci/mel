@@ -11,6 +11,8 @@ pub const CHROME: &'static str = "CHROME";
 // pub const
 pub mod constant;
 
+pub type Boxed<T> = Box<dyn T + Send + Sync>;
+
 #[derive(Default, Debug, PartialEq, Eq)]
 pub enum Environment {
     Production,

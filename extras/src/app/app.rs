@@ -4,6 +4,10 @@ use {
         config::config::Config,
         connections::db::DB,
         downstream::downstream::{Downstream, DownstreamImpl},
+        email::{
+            email::{EmailClient, EmailClientConfigs::Smtp, EmailSettings},
+            providers::smtp::{SmtpServer, SmtpServerConfig},
+        },
         repository::{
             chat_media::{ChatMediaRepo, ChatMediaRepository},
             profile_media::{ProfileMediaRepo, ProfileMediaRepository},
@@ -11,21 +15,19 @@ use {
             short_url_track::{ShortUrlTrackRepo, ShortUrlTrackRepository},
         },
     },
+    sdk::constants::Boxed,
     uuid::Uuid,
 };
-use crate::email::email::{EmailClient, EmailClientConfigs, EmailSettings};
-use crate::email::email::EmailClientConfigs::Smtp;
-use crate::email::providers::smtp::{SmtpServer, SmtpServerConfig};
 
 pub struct App {
     pub db: DB,
     pub config: Config,
-    pub mailer: Box<dyn EmailClient<RichText=String> + Sync + Send>,
-    pub downstream: Box<dyn Downstream + Sync + Send>,
-    pub profile_media_repo: Box<dyn ProfileMediaRepository + Sync + Send>,
-    pub chat_media_repo: Box<dyn ChatMediaRepository + Sync + Send>,
-    pub short_url_repo: Box<dyn ShortUrlRepository + Sync + Send>,
-    pub short_url_track_repo: Box<dyn ShortUrlTrackRepository + Send + Sync>,
+    pub mailer: Boxed<dyn EmailClient<RichText = String>>,
+    pub downstream: Boxed<dyn Downstream>,
+    pub profile_media_repo: Boxed<dyn ProfileMediaRepository>,
+    pub chat_media_repo: Boxed<dyn ChatMediaRepository>,
+    pub short_url_repo: Boxed<dyn ShortUrlRepository>,
+    pub short_url_track_repo: Boxed<dyn ShortUrlTrackRepository>,
 }
 
 impl App {
@@ -48,11 +50,11 @@ impl App {
                     username: None,
                     password: None,
                     connection: Default::default(),
-                }
-            }
+                },
+            },
         );
 
-        let smpt_config = SmtpServerConfig{
+        let smpt_config = SmtpServerConfig {
             host: "".to_string(),
             port: 0,
             time_out: 0,

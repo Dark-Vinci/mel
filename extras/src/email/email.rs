@@ -1,5 +1,6 @@
-use async_trait::async_trait;
-use crate::email::providers::smtp::{SmtpServerConfig};
+use {
+    crate::email::providers::smtp::SmtpServerConfig, async_trait::async_trait,
+};
 
 #[derive(Debug)]
 pub struct IntermediateString(String);
@@ -33,8 +34,12 @@ pub struct EmailSettings {
 }
 
 impl EmailSettings {
-    pub(crate) fn new(sender_email: String, allowed_unverified_days: i64, client_config: EmailClientConfigs) -> Self {
-        Self{
+    pub(crate) fn new(
+        sender_email: String,
+        allowed_unverified_days: i64,
+        client_config: EmailClientConfigs,
+    ) -> Self {
+        Self {
             sender_email,
             allowed_unverified_days,
             client_config,
@@ -42,13 +47,13 @@ impl EmailSettings {
     }
 }
 
-pub enum EmailClientConfigs{
+pub enum EmailClientConfigs {
     #[default]
     None,
 
-    Smtp{
+    Smtp {
         smtp: SmtpServerConfig,
-    }
+    },
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -99,6 +104,6 @@ pub trait EmailService: Sync + Send {
 pub trait EmailData {
     async fn get_email_data(
         &self,
-        base_url: &str
+        base_url: &str,
     ) -> Result<EmailContents, EmailError>;
 }

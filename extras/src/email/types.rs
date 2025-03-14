@@ -1,14 +1,11 @@
-use crate::email::email::{Email, EmailContents, EmailData, EmailError, IntermediateString};
+use crate::email::email::{
+    Email, EmailContents, EmailData, EmailError, IntermediateString,
+};
 
 pub enum EmailBody {
-    Verify {
-        link: String,
-    },
+    Verify { link: String },
 
-    Reset {
-        link: String,
-        user_name: String,
-    },
+    Reset { link: String, user_name: String },
 
     Welcome,
 }
@@ -20,7 +17,7 @@ pub mod html {
         match body {
             EmailBody::Verify { link } => {
                 format!(include_str!("templates/verify.html"), link = link)
-            }
+            },
 
             EmailBody::Reset { link, user_name } => {
                 format!(
@@ -32,7 +29,7 @@ pub mod html {
 
             EmailBody::Welcome => {
                 include_str!("templates/welcome_to_community.html").to_string()
-            }
+            },
         }
     }
 }
@@ -52,14 +49,12 @@ pub struct EmailToken {
 }
 
 impl EmailToken {
-    pub async fn new_token(
-        _email: String,
-    ) -> Result<String, ()> {
+    pub async fn new_token(_email: String) -> Result<String, ()> {
         todo!()
     }
 
     pub fn get_email(&self) -> Result<String, ()> {
-       todo!()
+        todo!()
     }
 
     pub fn get_entity(&self) -> Option<&String> {
@@ -85,13 +80,13 @@ pub fn get_link_with_token(
     email_url
 }
 
-
 #[async_trait::async_trait]
 impl EmailData for VerifyEmail {
-    async fn get_email_data(&self, base_url: String) -> Result<EmailContents, EmailError> {
-        let token = EmailToken::new_token(
-            self.recipient_email.clone(),
-        )
+    async fn get_email_data(
+        &self,
+        base_url: String,
+    ) -> Result<EmailContents, EmailError> {
+        let token = EmailToken::new_token(self.recipient_email.clone())
             .await
             .map_err(|_| EmailError::TokenGenerationFailure)?;
 

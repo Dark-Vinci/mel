@@ -5,15 +5,12 @@ use {
         errors::{RepoError, RepoResult},
         models::{
             db::extras::short_url_track::{
-                ActiveModel,
-                Model as ShortUrlTrack,
+                ActiveModel, Model as ShortUrlTrack,
             },
             others::extras::CreateShortUrlTrack,
         },
     },
-    sea_orm::{
-        ActiveModelTrait, DbErr,
-    },
+    sea_orm::{ActiveModelTrait, DbErr},
     tracing::{debug, error},
     uuid::Uuid,
 };
@@ -67,7 +64,11 @@ impl ShortUrlTrackRepository for ShortUrlTrackRepo {
         Ok(result)
     }
 
-    async fn get_by_id(&self, _id: Uuid, _request_id: Uuid) -> RepoResult<ShortUrlTrack> {
+    async fn get_by_id(
+        &self,
+        _id: Uuid,
+        _request_id: Uuid,
+    ) -> RepoResult<ShortUrlTrack> {
         todo!()
     }
 }
