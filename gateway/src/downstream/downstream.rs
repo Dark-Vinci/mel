@@ -1,5 +1,3 @@
-use std::any::Any;
-// use futures_util::TryFutureExt;
 use tracing::error;
 use crate::config::config::Config;
 use crate::downstream::account::account::{Account, AccountOperations};
@@ -17,6 +15,7 @@ pub struct Downstream{
 }
 
 impl Downstream {
+    #[tracing::instrument]
     pub async fn connect(config: Config) -> Self {
         let mut account = Account::new(config.downstream.account_grpc_address.clone());
         if let Err(err) = account.connect().await {
@@ -49,13 +48,3 @@ impl Downstream {
 }
 
 pub trait DownstreamOperations: MessagingOperations + ExtrasOperations + ChannelOperations + AccountOperations {}
-
-impl MessagingOperations for Downstream {}
-
-impl ExtrasOperations for Downstream {}
-
-impl ChannelOperations for Downstream {}
-
-impl AccountOperations for Downstream {}
-
-impl DownstreamOperations for Downstream {}

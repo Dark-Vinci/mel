@@ -2,7 +2,6 @@ use {
     crate::{
         app::interfaces::{Account, AppInterface},
         config::config::Config,
-        downstream::{Downstream, DownstreamInterface},
         models::context::Ctx,
     },
     async_trait::async_trait,
@@ -12,11 +11,12 @@ use {
     },
     std::sync::Arc,
 };
+use crate::downstream::downstream::{Downstream, DownstreamOperations};
 
 #[derive(Clone)]
 pub struct App {
     pub config: Config,
-    pub downstream: Arc<dyn DownstreamInterface + Sync + Send>,
+    pub downstream: Arc<dyn DownstreamOperations + Sync + Send>,
     pub redis: Arc<dyn RedisInterface + Send + Sync>,
     pub object_store: Arc<dyn ObjectStore + Send + Sync>,
 }
@@ -25,10 +25,11 @@ impl App {
     pub async fn new(c: Config) -> Self {
         let r = MyRedis::new("url", "", "", "", "").await;
         let object_store = S3::new("", "", "", "");
+        let downstream = Downstream::connect(c.clone()).await;
 
         Self {
             config: c,
-            downstream: Arc::new(Downstream::new()),
+            downstream: Arc::new(downstream),
             redis: Arc::new(r),
             object_store: Arc::new(object_store),
         }
