@@ -1,8 +1,10 @@
-use crate::downstream::account::account::AccountOperations;
-use crate::downstream::channel::channel::ChannelOperations;
-use crate::downstream::downstream::{Downstream, DownstreamOperations};
-use crate::downstream::extras::extras::ExtrasOperations;
-use crate::downstream::messaging::messaging::MessagingOperations;
+use crate::downstream::{
+    account::account::AccountOperations,
+    channel::channel::ChannelOperations,
+    downstream::{Downstream, DownstreamOperations},
+    extras::extras::ExtrasOperations,
+    messaging::messaging::MessagingOperations,
+};
 
 impl MessagingOperations for Downstream {}
 

@@ -1,7 +1,8 @@
-use async_trait::async_trait;
-use tonic::transport::Channel;
-use tracing::error;
-use sdk::generated_proto_rs::mel_messaging::messaging_service_client::MessagingServiceClient;
+use {
+    async_trait::async_trait,
+    sdk::generated_proto_rs::mel_messaging::messaging_service_client::MessagingServiceClient,
+    tonic::transport::Channel, tracing::error,
+};
 
 #[derive(Clone, Debug)]
 pub struct Messaging {
@@ -11,13 +12,15 @@ pub struct Messaging {
 
 impl Messaging {
     pub fn new(config: String) -> Self {
-        Self{
+        Self {
             config,
             connection: None,
         }
     }
 
-    pub async fn get_connection(&mut self) -> Option<MessagingServiceClient<Channel>> {
+    pub async fn get_connection(
+        &mut self,
+    ) -> Option<MessagingServiceClient<Channel>> {
         if self.connection.is_none() {
             if let Err(err) = self.connect().await {
                 error!("Error connecting to MessagingService again: {:?}", err);
@@ -33,9 +36,7 @@ impl Messaging {
             return Ok(());
         }
 
-        let channel = Channel::from_static(&self.config)
-            .connect()
-            .await?; // todo; change the error to client connection error
+        let channel = Channel::from_static(&self.config).connect().await?; // todo; change the error to client connection error
 
         let client = MessagingServiceClient::new(channel);
 
@@ -46,4 +47,4 @@ impl Messaging {
 }
 
 #[async_trait]
-pub trait MessagingOperations{}
+pub trait MessagingOperations {}

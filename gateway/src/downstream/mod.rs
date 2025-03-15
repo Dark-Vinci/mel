@@ -1,7 +1,7 @@
-mod extras;
 mod account;
-mod messaging;
 mod channel;
+mod extras;
+mod messaging;
 mod operations;
 
 pub mod downstream;

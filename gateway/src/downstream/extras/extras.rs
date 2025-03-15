@@ -1,8 +1,12 @@
-use async_trait::async_trait;
-use tonic::transport::Channel;
-use tracing::error;
-use sdk::generated_proto_rs::mel_extras::extras_service_client::ExtrasServiceClient;
-use sdk::generated_proto_rs::mel_messaging::messaging_service_client::MessagingServiceClient;
+use {
+    async_trait::async_trait,
+    sdk::generated_proto_rs::{
+        mel_extras::extras_service_client::ExtrasServiceClient,
+        mel_messaging::messaging_service_client::MessagingServiceClient,
+    },
+    tonic::transport::Channel,
+    tracing::error,
+};
 
 #[derive(Clone, Debug)]
 pub struct Extras {
@@ -12,16 +16,21 @@ pub struct Extras {
 
 impl Extras {
     pub fn new(config: String) -> Self {
-        Self{
+        Self {
             config,
             connection: None,
         }
     }
 
-    pub async fn get_connection(&mut self) -> Option<ExtrasServiceClient<Channel>> {
+    pub async fn get_connection(
+        &mut self,
+    ) -> Option<ExtrasServiceClient<Channel>> {
         if self.connection.is_none() {
             if let Err(err) = self.connect().await {
-                error!("Error connecting to ExtrasServiceClient again: {:?}", err);
+                error!(
+                    "Error connecting to ExtrasServiceClient again: {:?}",
+                    err
+                );
                 return None;
             }
         }
@@ -34,9 +43,7 @@ impl Extras {
             return Ok(());
         }
 
-        let channel = Channel::from_static(&self.config)
-            .connect()
-            .await?; // todo; change the error to client connection error
+        let channel = Channel::from_static(&self.config).connect().await?; // todo; change the error to client connection error
 
         let client = ExtrasServiceClient::new(channel);
 
@@ -47,4 +54,4 @@ impl Extras {
 }
 
 #[async_trait]
-pub trait ExtrasOperations{}
+pub trait ExtrasOperations {}

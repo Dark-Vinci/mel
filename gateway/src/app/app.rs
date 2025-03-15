@@ -2,6 +2,7 @@ use {
     crate::{
         app::interfaces::{Account, AppInterface},
         config::config::Config,
+        downstream::downstream::{Downstream, DownstreamOperations},
         models::context::Ctx,
     },
     async_trait::async_trait,
@@ -11,7 +12,6 @@ use {
     },
     std::sync::Arc,
 };
-use crate::downstream::downstream::{Downstream, DownstreamOperations};
 
 #[derive(Clone)]
 pub struct App {

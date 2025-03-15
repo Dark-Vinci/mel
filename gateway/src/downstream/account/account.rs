@@ -1,8 +1,12 @@
-use async_trait::async_trait;
-use tonic::transport::Channel;
-use tracing::error;
-use sdk::generated_proto_rs::mel_account::account_service_client::AccountServiceClient;
-use sdk::generated_proto_rs::mel_channel::channel_service_client::ChannelServiceClient;
+use {
+    async_trait::async_trait,
+    sdk::generated_proto_rs::{
+        mel_account::account_service_client::AccountServiceClient,
+        mel_channel::channel_service_client::ChannelServiceClient,
+    },
+    tonic::transport::Channel,
+    tracing::error,
+};
 
 #[derive(Clone, Debug)]
 pub struct Account {
@@ -12,16 +16,21 @@ pub struct Account {
 
 impl Account {
     pub fn new(config: String) -> Self {
-        Self{
+        Self {
             config,
             connection: None,
         }
     }
 
-    pub async fn get_connection(&mut self) -> Option<AccountServiceClient<Channel>> {
+    pub async fn get_connection(
+        &mut self,
+    ) -> Option<AccountServiceClient<Channel>> {
         if self.connection.is_none() {
             if let Err(err) = self.connect().await {
-                error!("Error connecting to ChannelServiceClient again: {:?}", err);
+                error!(
+                    "Error connecting to ChannelServiceClient again: {:?}",
+                    err
+                );
                 return None;
             }
         }
@@ -34,9 +43,7 @@ impl Account {
             return Ok(());
         }
 
-        let channel = Channel::from_static(&self.config)
-            .connect()
-            .await?; // todo; change the error to client connection error
+        let channel = Channel::from_static(&self.config).connect().await?; // todo; change the error to client connection error
 
         let client = AccountServiceClient::new(channel);
 
@@ -47,4 +54,4 @@ impl Account {
 }
 
 #[async_trait]
-pub trait AccountOperations{}
+pub trait AccountOperations {}
