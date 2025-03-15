@@ -1,4 +1,7 @@
-use crate::config::{app::App, downstream::Downstream, redis::Redis};
+use crate::config::{
+    app::App, downstream::Downstream, kafka::KafkaConfig,
+    object_store::ObjectStore, redis::Redis,
+};
 
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -6,6 +9,8 @@ pub struct Config {
     pub downstream: Downstream,
     pub redis: Redis,
     pub uploads_bucket: String,
+    pub kafka: KafkaConfig,
+    pub object_store: ObjectStore,
 }
 
 impl Config {
@@ -19,6 +24,8 @@ impl Config {
             downstream,
             redis,
             uploads_bucket: "".to_string(),
+            kafka: KafkaConfig::new(),
+            object_store: ObjectStore::new(),
         }
     }
 }

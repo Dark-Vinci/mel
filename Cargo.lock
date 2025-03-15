@@ -785,17 +785,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "axum-debug"
-version = "0.3.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86481eea76608eb3e9c3c2273060818369ec6c63e1543f60bc46f1ed6dae386f"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "axum-macros"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1658,16 +1647,17 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "axum 0.8.1",
- "axum-debug",
  "axum-macros",
  "futures",
  "futures-util",
  "http-body-util",
+ "rdkafka",
  "sdk",
  "serde",
  "serde_json",
  "thiserror 2.0.12",
  "tokio",
+ "tonic",
  "tower 0.5.2",
  "tower-http",
  "tracing",

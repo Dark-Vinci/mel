@@ -49,7 +49,12 @@ impl MediaUploads for App {
             })
             .await
             .map_err(|err| {
-                error!("Failed to upload object {}", err);
+                error!(
+                    display = %err,
+                    debug = ?err,
+                    "error uploading media object"
+                );
+
                 return GatewayError::ObjectStore;
             })?;
 
