@@ -11,3 +11,6 @@ pub trait ChatMedia {}
 
 #[async_trait]
 pub trait ProfileMedia {}
+
+#[async_trait]
+pub trait Mailer {}

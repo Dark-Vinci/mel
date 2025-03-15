@@ -1,6 +1,8 @@
 use {
     crate::{
-        app::interface::{ChatMedia, ProfileMedia, ShortUrl, ShortUrlTrack},
+        app::interface::{
+            ChatMedia, Mailer, ProfileMedia, ShortUrl, ShortUrlTrack,
+        },
         config::config::Config,
         connections::db::DB,
         downstream::downstream::{Downstream, DownstreamImpl},
@@ -54,7 +56,7 @@ impl App {
             },
         );
 
-        let smpt_config = SmtpServerConfig {
+        let smtp_config = SmtpServerConfig {
             host: "".to_string(),
             port: 0,
             time_out: 0,
@@ -63,7 +65,7 @@ impl App {
             connection: Default::default(),
         };
 
-        let mailer = SmtpServer::create(&settings, smpt_config);
+        let mailer = SmtpServer::create(&settings, smtp_config);
 
         Self {
             db,
@@ -84,9 +86,9 @@ impl App {
     }
 }
 
-pub trait ExtrasInterface:
-    ShortUrl + ShortUrlTrack + ChatMedia + ProfileMedia
+pub trait Operations:
+    ShortUrl + ShortUrlTrack + ChatMedia + ProfileMedia + Mailer
 {
 }
 
-impl ExtrasInterface for App {}
+impl Operations for App {}
