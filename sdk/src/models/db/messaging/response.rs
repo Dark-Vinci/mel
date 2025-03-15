@@ -48,4 +48,17 @@ impl From<UpdateResponse> for Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "super::message::Entity",
+        from = "Column::MessageId",
+        to = "super::message::Column::Id"
+    )]
+    Message,
+}
+
+impl Related<super::message::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Message.def()
+    }
+}

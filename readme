@@ -1,1 +1,21 @@
 # My slack clone
+
+Later we should have the db implementation below
+
+future addition
+
+1] database layers
+db -> retry layer -> search layer -> Timer layer -> cache layer
+
+
+2] monitoring, metrics and observability
+Jaeger -> Otel -> Prometheus
+
+// for each cases
+Logging-> Tracing and tracing subscriber
+
+Metrics-> Prometheus
+
+Tracing-> tracing-open telemetry, Jaeger
+
+3] Unit and integration testing

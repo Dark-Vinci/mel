@@ -1,7 +1,9 @@
 use {
-    crate::models::others::messaging::CreateReaction,
+    crate::models::others::messaging::{
+        CreatePlatformUserMessage, UpdatePlatformUserMessage,
+    },
     chrono::{DateTime, Utc},
-    sea_orm::prelude::*,
+    sea_orm::{prelude::*, Set},
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
@@ -9,7 +11,7 @@ use {
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
 )]
-#[sea_orm(table_name = "reactions", schema_name = "public")]
+#[sea_orm(table_name = "channel_user_message", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
@@ -17,36 +19,59 @@ pub struct Model {
     #[sea_orm(indexed)]
     pub message_id: Uuid,
 
+    pub is_private_message: bool,
+
     #[sea_orm(indexed)]
-    pub emoji_id: Uuid,
+    pub user_id: Uuid,
 
-    pub max_count: u32,
-
-    pub workspace_user_id: Uuid,
+    #[sea_orm(indexed)]
+    pub platform_id: Uuid,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
     pub created_at: DateTime<Utc>,
 
-    #[sea_orm(nullable)]
+    #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
+    pub updated_at: DateTime<Utc>,
+
+    pub seen_at: Option<DateTime<Utc>>,
+
     pub deleted_at: Option<DateTime<Utc>>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}
 
-impl From<CreateReaction> for Model {
-    fn from(reaction: CreateReaction) -> Self {
+impl From<CreatePlatformUserMessage> for Model {
+    fn from(reaction: CreatePlatformUserMessage) -> Self {
         let mut value = Model {
             ..Default::default()
         };
 
         value.id = Uuid::new_v4();
-        value.emoji_id = reaction.emoji_id;
+        value.user_id = reaction.user_id;
         value.message_id = reaction.message_id;
-        value.workspace_user_id = reaction.workspace_user_id;
-        value.max_count = reaction.max_count;
+        value.seen_at = None;
+        value.is_private_message = reaction.is_private_message;
         value.created_at = Utc::now();
+        value.updated_at = Utc::now();
 
         value
+    }
+}
+
+impl From<(UpdatePlatformUserMessage, ActiveModel)> for ActiveModel {
+    fn from(value: (UpdatePlatformUserMessage, ActiveModel)) -> Self {
+        let reaction = value.0;
+        let mut active_model = value.1;
+
+        if reaction.seen {
+            active_model.seen_at = Set(Some(Utc::now()));
+        } else {
+            active_model.seen_at = Set(None);
+        }
+
+        active_model.updated_at = Set(Utc::now());
+
+        active_model
     }
 }
 

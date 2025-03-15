@@ -77,8 +77,10 @@ async fn main() -> Result<(), AppError> {
         app_name, service_name, addr
     );
 
-    let service =
-        MessagingServiceServer::with_interceptor(messaging_server, service_auth);
+    let service = MessagingServiceServer::with_interceptor(
+        messaging_server,
+        service_auth,
+    );
 
     // start service and listen to shut down hooks;
     Server::builder()

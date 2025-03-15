@@ -2,7 +2,7 @@ use {
     crate::connections::db::DB,
     async_trait::async_trait,
     sdk::{
-        errors::RepoError,
+        errors::{RepoError, RepoResult},
         models::{
             db::messaging::chat::{
                 ActiveModel, Column, Entity as ChatEntity, Model as Chat,
@@ -20,7 +20,6 @@ use {
     tracing::{debug, error},
     uuid::Uuid,
 };
-use sdk::errors::RepoResult;
 
 #[async_trait]
 pub trait ChatRepository {
@@ -30,11 +29,7 @@ pub trait ChatRepository {
         request_id: Uuid,
     ) -> RepoResult<Chat>;
 
-    async fn find_by_id(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<Chat>;
+    async fn find_by_id(&self, id: Uuid, request_id: Uuid) -> RepoResult<Chat>;
 
     async fn find_for_user(
         &self,
@@ -60,12 +55,19 @@ impl ChatRepository for ChatRepo {
         payload: CreateChat,
         request_id: Uuid,
     ) -> RepoResult<Chat> {
-        debug!("Got request to create direct message(chat), payload: {}, request_id: {}", payload, request_id);
+        debug!(
+            request_id = %request_id,
+            "Got request to create direct chat(private message)"
+        );
 
         let chat: ActiveModel = payload.into();
 
         let result = chat.insert(&self.0.connection).await.map_err(|err| {
-            error!("Failed to insert into database: {}", err);
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "Failed to insert into database"
+            );
 
             RepoError::FailedToInsert
         })?;
@@ -73,21 +75,22 @@ impl ChatRepository for ChatRepo {
         Ok(result)
     }
 
-    async fn find_by_id(
-        &self,
-        id: Uuid,
-        request_id: Uuid,
-    ) -> RepoResult<Chat> {
+    #[tracing::instrument(skip(self), name = "ChatRepository::find_by_id")]
+    async fn find_by_id(&self, id: Uuid, request_id: Uuid) -> RepoResult<Chat> {
         debug!(
-            "Got request to find direct message(id: {}), request_id: {}",
-            id, request_id
+            request_id = %request_id,
+            "Got request to find direct message",
         );
 
         let chat = ChatEntity::find_by_id(id)
             .one(&self.0.connection)
             .await
             .map_err(|err| {
-                error!("failure, unable to find chat by id");
+                error!(
+                    debug_error = ?err,
+                    display_error = %err,
+                    "failure, unable to find chat by id"
+                );
 
                 RepoError::NotFound
             })?;
@@ -101,6 +104,7 @@ impl ChatRepository for ChatRepo {
         Ok(chat.unwrap())
     }
 
+    #[tracing::instrument(skip(self), name = "ChatRepository::find_for_user")]
     async fn find_for_user(
         &self,
         user_id: Uuid,
@@ -108,9 +112,11 @@ impl ChatRepository for ChatRepo {
         request_id: Uuid,
     ) -> RepoResult<Paginated<Vec<Chat>>> {
         debug!(
-            "Got request to find for {} chat(user_id: {}, request_id: {})",
-            user_id, request_id
+            request_id = %request_id,
+            "Got request to fetch all user chats"
         );
+
+        // todo; use tokio::join() for parallel fetch
 
         let result = ChatEntity::find()
             .filter(
@@ -122,19 +128,32 @@ impl ChatRepository for ChatRepo {
             .all(&self.0.connection)
             .await
             .map_err(|err| {
-                error!("Unable to fetch user chats");
+                error!(
+                    debug_error = ?err,
+                    display_error = %err,
+                    "failure; unable to fetch all user chat"
+                );
 
                 RepoError::SomethingWentWrong
             })?;
 
         let count = ChatEntity::find().count().await.map_err(|err| {
-            error!("Unable to count message by range with error {err}");
+            error!(
+                debug_error = ?err,
+                display_error = %err,
+                "failure; unable to count all user chat"
+            );
 
             RepoError::SomethingWentWrong
         })?;
 
-        let paginated =
-            Paginated::new(result, pagination.total_pages(count), 0, 0, count);
+        let paginated = Paginated::new(
+            result,
+            pagination.total_pages(count),
+            pagination.page_number + 1,
+            pagination.page_size,
+            count,
+        );
 
         Ok(paginated)
     }
