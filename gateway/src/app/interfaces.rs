@@ -4,7 +4,7 @@ use {
     sdk::utils::{objects::ObjectCreateResponse, types::FileInfo},
 };
 
-pub trait AppInterface: Account + Send + Sync + MediaUploads {}
+pub trait AppInterface: Account + MediaUploads + Send + Sync {}
 
 #[async_trait]
 pub trait MediaUploads {

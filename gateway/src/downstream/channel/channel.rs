@@ -1,10 +1,7 @@
 use {
     async_trait::async_trait,
-    sdk::generated_proto_rs::{
-        mel_channel::channel_service_client::ChannelServiceClient,
-        mel_extras::extras_service_client::ExtrasServiceClient,
-    },
-    tonic::transport::Channel as TonicChannel,
+    sdk::generated_proto_rs::mel_channel::channel_service_client::ChannelServiceClient,
+    tonic::transport::{Channel as TonicChannel, Uri},
     tracing::error,
 };
 
@@ -43,7 +40,9 @@ impl Channel {
             return Ok(());
         }
 
-        let channel = TonicChannel::from_static(&self.config).connect().await?; // todo; change the error to client connection error
+        let uri = Uri::try_from(&self.config)?;
+
+        let channel = TonicChannel::builder(uri).connect().await?; // todo; change the error to client connection error
 
         let client = ChannelServiceClient::new(channel);
 

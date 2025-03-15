@@ -1,7 +1,8 @@
 use {
     async_trait::async_trait,
     sdk::generated_proto_rs::mel_messaging::messaging_service_client::MessagingServiceClient,
-    tonic::transport::Channel, tracing::error,
+    tonic::transport::{Channel, Uri},
+    tracing::error,
 };
 
 #[derive(Clone, Debug)]
@@ -36,7 +37,9 @@ impl Messaging {
             return Ok(());
         }
 
-        let channel = Channel::from_static(&self.config).connect().await?; // todo; change the error to client connection error
+        let uri = Uri::try_from(&self.config)?;
+
+        let channel = Channel::builder(uri).connect().await?; // todo; change the error to client connection error
 
         let client = MessagingServiceClient::new(channel);
 

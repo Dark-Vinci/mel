@@ -1,10 +1,7 @@
 use {
     async_trait::async_trait,
-    sdk::generated_proto_rs::{
-        mel_account::account_service_client::AccountServiceClient,
-        mel_channel::channel_service_client::ChannelServiceClient,
-    },
-    tonic::transport::Channel,
+    sdk::generated_proto_rs::mel_account::account_service_client::AccountServiceClient,
+    tonic::transport::{Channel, Uri},
     tracing::error,
 };
 
@@ -43,7 +40,9 @@ impl Account {
             return Ok(());
         }
 
-        let channel = Channel::from_static(&self.config).connect().await?; // todo; change the error to client connection error
+        let uri = Uri::try_from(&self.config)?;
+
+        let channel = Channel::builder(uri).connect().await?; // todo; change the error to client connection error
 
         let client = AccountServiceClient::new(channel);
 
