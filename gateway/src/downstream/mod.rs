@@ -1,12 +1,6 @@
-#[derive(Clone, Debug)]
-pub struct Downstream;
+mod extras;
+mod account;
+mod messaging;
+mod channel;
 
-impl Downstream {
-    pub fn new() -> Downstream {
-        Downstream {}
-    }
-}
-
-pub(crate) trait DownstreamInterface {}
-
-impl DownstreamInterface for Downstream {}
+pub mod downstream;
