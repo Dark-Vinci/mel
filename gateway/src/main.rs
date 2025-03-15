@@ -57,7 +57,7 @@ async fn main() -> Result<(), AppError> {
 
     let config = Config::new();
 
-    let app = App::new(config.clone()).await;
+    let app = App::new(config.clone()).await?;
 
     let handlers = Handlers::build(app).await?;
 

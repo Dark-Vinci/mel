@@ -18,6 +18,18 @@ pub const REDIS_HOST: &str = "REDIS_HOST";
 pub const REDIS_PORT: &str = "REDIS_PORT";
 pub const REDIS_NAME: &str = "REDIS_NAME";
 
+pub const KAFKA_GROUP_ID: &'static str = "KAFKA_GROUP_ID";
+pub const KAFKA_USERNAME: &'static str = "KAFKA_USERNAME";
+pub const KAFKA_PASSWORD: &'static str = "KAFKA_PASSWORD";
+pub const KAFKA_HOST: &'static str = "KAFKA_HOST";
+pub const KAFKA_PORT: &'static str = "KAFKA_PORT";
+pub const KAFKA_TOPIC: &'static str = "KAFKA_TOPIC";
+
+pub const OBJECT_STORE_URL: &'static str = "OBJECT_STORE_URL";
+pub const OBJECT_STORE_ACCESS_KEY_ID: &'static str = "OBJECT_STORE_ACCESS_KEY_ID";
+pub const OBJECT_STORE_SECRET_ACCESS_KEY: &'static str = "OBJECT_STORE_SECRET_ACCESS_KEY";
+pub const OBJECT_STORE_PROVIDER_NAME: &'static str = "OBJECT_STORE_PROVIDER_NAME";
+
 pub const ACCOUNT_PORT: &str = "ACCOUNT_PORT";
 pub const PORT: &str = "PORT";
 pub const ACCOUNT: &str = "ACCOUNT";
