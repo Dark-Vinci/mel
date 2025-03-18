@@ -1,6 +1,5 @@
 // use sdk::errors::ConnectionError::DB;
-use crate::connections::db::DB;
-use async_trait::async_trait;
+use {crate::connections::db::DB, async_trait::async_trait};
 
 #[async_trait]
 pub trait EmailRepository {}

@@ -7,7 +7,7 @@ use {
         repository::{
             audit_logs::{AuditLogRepository, AuditLogsRepo},
             chat_media::{ChatMediaRepo, ChatMediaRepository},
-            emails::{EmailRepository, EmailRepo},
+            emails::{EmailRepo, EmailRepository},
             history::{HistoryRepo, HistoryRepository},
             profile_media::{ProfileMediaRepo, ProfileMediaRepository},
             search::{SearchRepo, SearchRepository},
