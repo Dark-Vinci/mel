@@ -6,6 +6,7 @@ use {
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::extras::CreateHistory;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -30,8 +31,6 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
 pub enum Relation {}
-
-struct CreateHistory {}
 
 impl From<CreateHistory> for ActiveModel {
     fn from(_value: CreateHistory) -> Self {

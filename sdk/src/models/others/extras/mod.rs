@@ -24,3 +24,6 @@ pub struct CreateSearch {}
 
 #[derive(Debug)]
 pub struct CreateAuditLogs {}
+
+#[derive(Debug)]
+pub struct CreateHistory {}
