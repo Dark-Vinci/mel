@@ -2,3 +2,8 @@ pub mod chat_media;
 pub mod profile_media;
 pub mod short_url;
 pub mod short_url_track;
+pub mod emails;
+pub mod search;
+pub mod history;
+pub mod devices;
+pub mod audit_logs;
