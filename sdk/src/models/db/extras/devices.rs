@@ -1,11 +1,16 @@
-use chrono::{DateTime, Utc};
-use sea_orm::{ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use {
+    chrono::{DateTime, Utc},
+    sea_orm::{
+        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
+    },
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
 
-
-#[derive(Debug, Clone, PartialEq, DeriveEntityModel, Serialize, Deserialize)]
-#[sea_orm(table_name = "devices", schema_name="public")]
+#[derive(
+    Debug, Clone, PartialEq, DeriveEntityModel, Serialize, Deserialize,
+)]
+#[sea_orm(table_name = "devices", schema_name = "public")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: Uuid,
@@ -22,7 +27,7 @@ pub struct Model {
     pub user_agent: String,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub created_at: DateTime<Utc>
+    pub created_at: DateTime<Utc>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

@@ -1,7 +1,12 @@
-use chrono::{DateTime, Utc};
-use sea_orm::{ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use {
+    chrono::{DateTime, Utc},
+    sea_orm::{
+        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
+    },
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
+use crate::models::others::extras::CreateSearch;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -32,6 +37,3 @@ impl From<CreateSearch> for ActiveModel {
         todo!()
     }
 }
-
-
-struct CreateSearch {}

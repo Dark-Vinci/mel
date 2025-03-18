@@ -1,7 +1,13 @@
-use chrono::{DateTime, Utc};
-use sea_orm::{ActiveModelBehavior, DeriveActiveEnum, DeriveEntityModel, DeriveRelation, EnumIter};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
+use {
+    chrono::{DateTime, Utc},
+    sea_orm::{
+        ActiveModelBehavior, DeriveActiveEnum, DeriveEntityModel,
+        DeriveRelation, EnumIter,
+    },
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+    crate::models::others::extras::CreateAuditLogs
+};
 
 #[derive(Clone, Debug, PartialEq, EnumIter, DeriveActiveEnum)]
 #[sea_orm(rs_type = "String", db_type = "String(StringLen::None)")]
@@ -39,18 +45,13 @@ pub struct Model {
     pub status: Status,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub created_at: DateTime<Utc>
+    pub created_at: DateTime<Utc>,
 }
 
-impl ActiveModelBehavior for crate::models::db::extras::chat_media::ActiveModel {}
+impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
 pub enum Relation {}
-
-
-struct CreateAuditLogs {
-
-}
 
 impl From<CreateAuditLogs> for ActiveModel {
     fn from(_value: CreateAuditLogs) -> Self {

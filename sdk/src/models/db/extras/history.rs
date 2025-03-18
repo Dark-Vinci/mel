@@ -1,8 +1,11 @@
-use chrono::{DateTime, Utc};
-use sea_orm::{ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter};
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-
+use {
+    chrono::{DateTime, Utc},
+    sea_orm::{
+        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
+    },
+    serde::{Deserialize, Serialize},
+    uuid::Uuid,
+};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -20,7 +23,7 @@ pub struct Model {
     pub workspace_user_id: Uuid,
 
     #[sea_orm(default_value = "CURRENT_TIMESTAMP")]
-    pub created_at: DateTime<Utc>
+    pub created_at: DateTime<Utc>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}
