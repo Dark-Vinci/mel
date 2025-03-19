@@ -4,14 +4,8 @@ use {
     sdk::{
         errors::{RepoError, RepoResult},
         models::{
-            db::extras::{
-                emails::{ActiveModel, Entity as EmailEntity, Model as Email},
-                search::Column,
-            },
-            others::{
-                extras::{CreateEmail, CreateHistory, CreateShortUrl},
-                Paginated, Pagination,
-            },
+            db::extras::emails::{ActiveModel, Model as Email},
+            others::extras::CreateEmail,
         },
     },
     sea_orm::{ActiveModelTrait, DbErr},
@@ -51,7 +45,7 @@ impl EmailRepository for EmailRepo {
         request_id: Uuid,
     ) -> RepoResult<Email> {
         debug!(
-            request_id = ?request_id
+            request_id = ?request_id,
             "Got a request to create email detail"
         );
 
@@ -81,7 +75,7 @@ impl EmailRepository for EmailRepo {
         request_id: Uuid,
     ) -> RepoResult<()> {
         debug!(
-            request_id = request_id
+            request_id = ?request_id,
             "Got a request to update the email detail payload"
         );
 

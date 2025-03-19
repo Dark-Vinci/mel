@@ -64,4 +64,4 @@ pub trait ChannelTrait {
     // ) -> Result<(), GrpcError>;
 }
 
-pub trait AccountInterface: Auth + Account + Settings + ChannelTrait {}
+pub trait AccountOperations: Auth + Account + Settings + ChannelTrait {}

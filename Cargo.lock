@@ -1452,7 +1452,6 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "chrono",
- "mockall",
  "sdk",
  "sea-orm",
  "sea-orm-migration",

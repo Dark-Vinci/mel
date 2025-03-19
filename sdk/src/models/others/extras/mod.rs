@@ -28,4 +28,5 @@ pub struct CreateAuditLogs {}
 #[derive(Debug)]
 pub struct CreateHistory {}
 
+#[derive(Debug)]
 pub struct CreateEmail {}

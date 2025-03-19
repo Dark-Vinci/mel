@@ -8,7 +8,7 @@ use {
                 ActiveModel, Column, Entity as ChatEntity, Model as Chat,
             },
             others::{
-                messaging::{CreateChat, UpdateChat},
+                messaging::{CreateChat},
                 Paginated, Pagination,
             },
         },
@@ -108,7 +108,7 @@ impl ChatRepository for ChatRepo {
         request_id: Uuid,
     ) -> RepoResult<Paginated<Vec<Chat>>> {
         debug!(
-            "Got request to find for {} chat(user_id: {}, request_id: {})",
+            "Got request to find for chat(user_id: {}, request_id: {})",
             user_id, request_id
         );
 

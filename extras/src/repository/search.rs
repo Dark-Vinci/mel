@@ -11,10 +11,9 @@ use {
         },
     },
     sea_orm::{
-        ActiveModelTrait, ActiveValue::Set, Condition, DbErr, EntityTrait,
-        IntoActiveModel, PaginatorTrait, QuerySelect,
+        ActiveModelTrait, ColumnTrait, DbErr, EntityTrait, PaginatorTrait,
+        QueryFilter, QuerySelect,
     },
-    tonic::codegen::tokio_stream::StreamExt,
     tracing::{debug, error},
     uuid::Uuid,
 };
@@ -32,7 +31,7 @@ pub trait SearchRepository {
         workspace_user_id: Uuid,
         page: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Search>, RepoError>;
+    ) -> Result<Paginated<Vec<Search>>, RepoError>;
 }
 
 pub struct SearchRepo(DB);
@@ -85,25 +84,19 @@ impl SearchRepository for SearchRepo {
         workspace_user_id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> Result<Paginated<Search>, RepoError> {
+    ) -> Result<Paginated<Vec<Search>>, RepoError> {
         debug!(
             request_id = %request_id,
             "Got request to get search by workspace_user_id"
         );
 
-        let (result, count) = tokio::join!(
+        let (result, count): (Result<Vec<Search>, DbErr>, Result<u64, DbErr>) = tokio::join!(
             SearchEntity::find()
-                .filter(
-                    Condition::any()
-                        .add(Column::WorkspaceUserId.eq(workspace_user_id))
-                )
-                .limit(Some(pagination.page_size).into())
+                .filter(Column::WorkspaceUserId.eq(workspace_user_id))
+                .limit(Some(pagination.page_size))
                 .all(&self.0.connection),
             SearchEntity::find()
-                .filter(
-                    Condition::any()
-                        .add(Column::WorkspaceUserId.eq(workspace_user_id))
-                )
+                .filter(Column::WorkspaceUserId.eq(workspace_user_id))
                 .count(&self.0.connection)
         );
 

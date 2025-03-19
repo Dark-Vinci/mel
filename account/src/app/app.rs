@@ -1,6 +1,6 @@
 use {
     crate::{
-        app::interface::{Account, AccountInterface, Auth, Settings},
+        app::interface::{Account, AccountOperations, Auth, Settings},
         config::config::Config,
         connections::db::DB,
         downstream::downstream::{Downstream, DownstreamImpl},
@@ -27,7 +27,7 @@ pub struct App {
 
 impl Display for App {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, format!("DB: {:?}\n; Config: {:?}", self.db, self.config))
+        write!(f, "{}", format!("DB: {:?}\n; Config: {:?}", self.db, self.config))
     }
 }
 
@@ -59,34 +59,34 @@ impl App {
     }
 }
 
-impl AccountInterface for App {}
-
-#[cfg(test)]
-mod test {
-    use {
-        super::*,
-        mockall::{
-            automock,
-            predicate::{eq, *},
-        },
-        tracing_subscriber::layer::SubscriberExt,
-    };
-
-    #[test]
-    fn first() {
-        #[automock]
-        trait MyTrait {
-            fn foo(&self, x: u32) -> u32;
-        }
-
-        fn call_with_four(x: &dyn MyTrait) -> u32 {
-            x.foo(4)
-        }
-
-        let mut mock = MockMyTrait::new();
-
-        mock.expect_foo().with(eq(4)).times(1).returning(|x| x + 1);
-
-        assert_eq!(5, call_with_four(&mock));
-    }
-}
+impl AccountOperations for App {}
+//
+// #[cfg(test)]
+// mod test {
+//     use {
+//         super::*,
+//         mockall::{
+//             automock,
+//             predicate::{eq, *},
+//         },
+//         tracing_subscriber::layer::SubscriberExt,
+//     };
+//
+//     #[test]
+//     fn first() {
+//         #[automock]
+//         trait MyTrait {
+//             fn foo(&self, x: u32) -> u32;
+//         }
+//
+//         fn call_with_four(x: &dyn MyTrait) -> u32 {
+//             x.foo(4)
+//         }
+//
+//         let mut mock = MockMyTrait::new();
+//
+//         mock.expect_foo().with(eq(4)).times(1).returning(|x| x + 1);
+//
+//         assert_eq!(5, call_with_four(&mock));
+//     }
+// }

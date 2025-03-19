@@ -4,10 +4,7 @@ use {
     sdk::{
         errors::RepoError,
         models::{
-            db::extras::audit_logs::{
-                ActiveModel, Column, Entity as AuditLogEntity,
-                Model as AuditLog,
-            },
+            db::extras::audit_logs::{ActiveModel, Model as AuditLog},
             others::extras::CreateAuditLogs,
         },
     },
@@ -41,7 +38,7 @@ impl AuditLogRepository for AuditLogsRepo {
         payload: CreateAuditLogs,
         request_id: Uuid,
     ) -> Result<AuditLog, RepoError> {
-        debug!(request_id = request_id, "Got a request to create audit logs");
+        debug!(request_id = ?request_id, "Got a request to create audit logs");
 
         let audit_log: ActiveModel = payload.into();
 

@@ -95,7 +95,7 @@ where
 
 pub fn service_auth(
     token: &str,
-) -> impl Fn(Request<()>) -> Result<Request<()>, Status> + '_ {
+) -> impl Fn(Request<()>) -> Result<Request<()>, Status> +  Clone + '_ {
     let token = token.to_string(); // Ensure token is owned and accessible in closure
 
     move |req: Request<()>| -> Result<Request<()>, Status> {

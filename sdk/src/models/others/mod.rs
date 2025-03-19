@@ -3,6 +3,7 @@ pub mod channel;
 pub mod extras;
 pub mod messaging;
 
+#[derive(Debug)]
 pub struct Pagination {
     pub page_size: u64,
     pub page_number: u64,

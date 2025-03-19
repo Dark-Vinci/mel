@@ -10,17 +10,13 @@ use {
                 },
                 search::Column,
             },
-            others::{
-                extras::{CreateHistory, CreateShortUrl},
-                Paginated, Pagination,
-            },
+            others::{extras::CreateHistory, Paginated, Pagination},
         },
     },
     sea_orm::{
-        ActiveModelTrait, ActiveValue::Set, Condition, DbErr, EntityTrait,
-        IntoActiveModel, PaginatorTrait, QuerySelect,
+        ActiveModelTrait, ColumnTrait, DbErr, EntityTrait, PaginatorTrait,
+        QueryFilter, QuerySelect,
     },
-    tonic::codegen::tokio_stream::StreamExt,
     tracing::{debug, error},
     uuid::Uuid,
 };
@@ -32,12 +28,13 @@ pub trait HistoryRepository {
         payload: CreateHistory,
         request_id: Uuid,
     ) -> RepoResult<History>;
+
     async fn get_by_workspace_user_id(
         &self,
         workspace_user_id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> RepoResult<History>;
+    ) -> RepoResult<Paginated<Vec<History>>>;
 }
 
 pub struct HistoryRepo(DB);
@@ -56,7 +53,7 @@ impl HistoryRepository for HistoryRepo {
         payload: CreateHistory,
         request_id: Uuid,
     ) -> RepoResult<History> {
-        debug!(request_id = request_id, "Got request to create a new history");
+        debug!(request_id = ?request_id, "Got request to create a new history");
 
         let history: ActiveModel = payload.into();
 
@@ -87,25 +84,19 @@ impl HistoryRepository for HistoryRepo {
         workspace_user_id: Uuid,
         pagination: Pagination,
         request_id: Uuid,
-    ) -> RepoResult<History> {
+    ) -> RepoResult<Paginated<Vec<History>>> {
         debug!(
-            request_id = request_id,
+            request_id = ?request_id,
             "Got a request to fetch paginated users workspace history"
         );
 
         let (result, count) = tokio::join!(
             HistoryEntity::find()
-                .filter(
-                    Condition::all()
-                        .add(Column::WorkspaceUserId.eq(workspace_user_id))
-                )
-                .limit(Some(pagination.page_size).into())
+                .filter(Column::WorkspaceUserId.eq(workspace_user_id))
+                .limit(Some(pagination.page_size))
                 .all(&self.0.connection),
             HistoryEntity::find()
-                .filter(
-                    Condition::all()
-                        .add(Column::WorkspaceUserId.eq(workspace_user_id))
-                )
+                .filter(Column::WorkspaceUserId.eq(workspace_user_id))
                 .count(&self.0.connection)
         );
 

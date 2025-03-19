@@ -77,8 +77,10 @@ async fn main() -> Result<(), AppError> {
         app_name, service_name, addr
     );
 
-    let service =
-        ExtrasServiceServer::with_interceptor(extras_server, service_auth);
+    let service = ExtrasServiceServer::with_interceptor(
+        extras_server,
+        service_auth(Box::leak(config.auth_token.into_boxed_str())),
+    );
 
     // start service and listen to shut down hooks;
     Server::builder()
