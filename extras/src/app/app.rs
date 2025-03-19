@@ -67,9 +67,9 @@ impl App {
     }
 }
 
-pub trait ExtrasInterface:
+pub trait ExtrasOperations:
     ShortUrl + ShortUrlTrack + ChatMedia + ProfileMedia
 {
 }
 
-impl ExtrasInterface for App {}
+impl ExtrasOperations for App {}
