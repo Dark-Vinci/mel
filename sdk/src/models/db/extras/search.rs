@@ -1,12 +1,13 @@
 use {
+    crate::models::others::extras::CreateSearch,
     chrono::{DateTime, Utc},
     sea_orm::{
-        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
+        prelude::*, ActiveModelBehavior, DeriveEntityModel, DeriveRelation,
+        EnumIter,
     },
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::extras::CreateSearch;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -30,7 +31,7 @@ pub struct Model {
 impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
-pub enum Relations {}
+pub enum Relation {}
 
 impl From<CreateSearch> for ActiveModel {
     fn from(_value: CreateSearch) -> Self {

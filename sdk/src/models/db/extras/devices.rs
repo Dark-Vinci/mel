@@ -1,7 +1,8 @@
 use {
     chrono::{DateTime, Utc},
     sea_orm::{
-        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
+        prelude::*, ActiveModelBehavior, DeriveEntityModel, DeriveRelation,
+        EnumIter,
     },
     serde::{Deserialize, Serialize},
     uuid::Uuid,

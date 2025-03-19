@@ -1,17 +1,20 @@
 use {
+    crate::models::others::extras::CreateAuditLogs,
     chrono::{DateTime, Utc},
     sea_orm::{
+        prelude::{StringLen, *},
         ActiveModelBehavior, DeriveActiveEnum, DeriveEntityModel,
-        DeriveRelation, EnumIter,
+        DeriveRelation, EnumIter, PrimaryKeyTrait,
     },
     serde::{Deserialize, Serialize},
     uuid::Uuid,
-    crate::models::others::extras::CreateAuditLogs
 };
 
-#[derive(Clone, Debug, PartialEq, EnumIter, DeriveActiveEnum)]
+#[derive(
+    Clone, Debug, PartialEq, EnumIter, DeriveActiveEnum, Serialize, Deserialize,
+)]
 #[sea_orm(rs_type = "String", db_type = "String(StringLen::None)")]
-enum Status {
+pub enum Status {
     #[sea_orm(string_value = "success")]
     Success,
     #[sea_orm(string_value = "error")]

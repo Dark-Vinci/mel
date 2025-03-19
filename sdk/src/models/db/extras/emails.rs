@@ -1,11 +1,13 @@
-use sea_orm::{ActiveModelBehavior, DeriveRelation, EnumIter, Set};
 use {
+    crate::models::others::extras::CreateEmail,
     chrono::{DateTime, Utc},
-    sea_orm::DeriveEntityModel,
+    sea_orm::{
+        prelude::*, ActiveModelBehavior, DeriveEntityModel, DeriveRelation,
+        EnumIter, Set,
+    },
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::extras::{CreateEmail};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -47,4 +49,3 @@ impl ActiveModel {
         self.seen_at = Set(Some(Utc::now()));
     }
 }
-

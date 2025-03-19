@@ -1,12 +1,13 @@
 use {
+    crate::models::others::extras::CreateHistory,
     chrono::{DateTime, Utc},
     sea_orm::{
-        ActiveModelBehavior, DeriveEntityModel, DeriveRelation, EnumIter,
+        prelude::*, ActiveModelBehavior, DeriveEntityModel, DeriveRelation,
+        EnumIter,
     },
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
-use crate::models::others::extras::CreateHistory;
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,

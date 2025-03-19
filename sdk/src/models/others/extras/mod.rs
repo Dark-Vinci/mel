@@ -28,4 +28,4 @@ pub struct CreateAuditLogs {}
 #[derive(Debug)]
 pub struct CreateHistory {}
 
-pub struct CreateEmail{}
+pub struct CreateEmail {}

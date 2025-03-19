@@ -27,8 +27,11 @@ pub trait EmailRepository {
         request_id: Uuid,
     ) -> RepoResult<Email>;
 
-    async fn update(&self, payload: ActiveModel, request_id: Uuid)
-        -> RepoResult<()>;
+    async fn update(
+        &self,
+        payload: ActiveModel,
+        request_id: Uuid,
+    ) -> RepoResult<()>;
 }
 
 pub struct EmailRepo(DB);
