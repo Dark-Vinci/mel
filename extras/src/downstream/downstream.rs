@@ -1,5 +1,4 @@
-use async_trait::async_trait;
-use uuid::Uuid;
+use {async_trait::async_trait, uuid::Uuid};
 
 #[async_trait]
 pub trait Downstream {

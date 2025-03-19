@@ -2,5 +2,5 @@ mod account;
 pub mod app;
 mod auth;
 mod channels;
-mod interface;
+pub mod interface;
 mod settings;

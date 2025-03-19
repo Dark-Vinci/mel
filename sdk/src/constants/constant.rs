@@ -26,9 +26,12 @@ pub const KAFKA_PORT: &'static str = "KAFKA_PORT";
 pub const KAFKA_TOPIC: &'static str = "KAFKA_TOPIC";
 
 pub const OBJECT_STORE_URL: &'static str = "OBJECT_STORE_URL";
-pub const OBJECT_STORE_ACCESS_KEY_ID: &'static str = "OBJECT_STORE_ACCESS_KEY_ID";
-pub const OBJECT_STORE_SECRET_ACCESS_KEY: &'static str = "OBJECT_STORE_SECRET_ACCESS_KEY";
-pub const OBJECT_STORE_PROVIDER_NAME: &'static str = "OBJECT_STORE_PROVIDER_NAME";
+pub const OBJECT_STORE_ACCESS_KEY_ID: &'static str =
+    "OBJECT_STORE_ACCESS_KEY_ID";
+pub const OBJECT_STORE_SECRET_ACCESS_KEY: &'static str =
+    "OBJECT_STORE_SECRET_ACCESS_KEY";
+pub const OBJECT_STORE_PROVIDER_NAME: &'static str =
+    "OBJECT_STORE_PROVIDER_NAME";
 
 pub const ACCOUNT_PORT: &str = "ACCOUNT_PORT";
 pub const PORT: &str = "PORT";

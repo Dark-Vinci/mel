@@ -11,7 +11,6 @@ path= "src/bin/main.rs"
 [dependencies]
 async-trait = "0.1.83"
 chrono = "0.4.39"
-mockall = "0.13.1"
 sdk = {path = "../sdk"}
 sea-orm = { version= "1.1.1", features = ["sqlx-postgres", "runtime-tokio", "debug-print", "macros", "tests-cfg", "sqlx-sqlite"] }
 sea-orm-migration = "1.1.2"

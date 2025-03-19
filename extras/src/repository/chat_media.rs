@@ -11,8 +11,7 @@ use {
             others::extras::CreateChatMedia,
         },
     },
-    sea_orm::ColumnTrait,
-    sea_orm::{ActiveModelTrait, EntityTrait, QueryFilter},
+    sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter},
     tracing::{debug, error},
     uuid::Uuid,
 };

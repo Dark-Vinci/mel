@@ -18,3 +18,15 @@ pub struct CreateChatMedia {
     pub channel_id: Option<Uuid>,
     pub message_id: Uuid,
 }
+
+#[derive(Debug)]
+pub struct CreateSearch {}
+
+#[derive(Debug)]
+pub struct CreateAuditLogs {}
+
+#[derive(Debug)]
+pub struct CreateHistory {}
+
+#[derive(Debug)]
+pub struct CreateEmail {}

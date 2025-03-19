@@ -1,5 +1,5 @@
 use {
-    crate::app::app::ExtrasInterface,
+    crate::app::app::ExtrasOperations,
     async_trait::async_trait,
     sdk::generated_proto_rs::{
         mel_extras::{
@@ -12,16 +12,16 @@ use {
     uuid::Uuid,
 };
 
-pub struct Extras<E: ExtrasInterface>(E);
+pub struct Extras<E: ExtrasOperations>(E);
 
-impl<E: ExtrasInterface> Extras<E> {
+impl<E: ExtrasOperations> Extras<E> {
     pub fn new(a: E) -> Self {
         Self(a)
     }
 }
 
 #[async_trait]
-impl<T: ExtrasInterface + Send + Sync + 'static> ExtrasService for Extras<T> {
+impl<T: ExtrasOperations + Send + Sync + 'static> ExtrasService for Extras<T> {
     async fn ping(
         &self,
         _request: Request<Empty>,

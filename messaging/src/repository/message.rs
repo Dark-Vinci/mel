@@ -71,7 +71,7 @@ impl MessageRepository for MessageRepo {
         request_id: Uuid,
     ) -> RepoResult<Message> {
         debug!(
-            "Got Create Message request with request id {} and payload",
+            "Got Create Message request with request id {} and payload {}",
             request_id, payload
         );
 
@@ -97,7 +97,7 @@ impl MessageRepository for MessageRepo {
         request_id: Uuid,
     ) -> RepoResult<Message> {
         debug!(
-            "Got Update Message request with request id {} and payload",
+            "Got Update Message request with request id {} and payload {}",
             request_id, payload
         );
 
