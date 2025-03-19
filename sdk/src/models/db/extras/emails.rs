@@ -1,9 +1,11 @@
+use sea_orm::{ActiveModelBehavior, DeriveRelation, EnumIter, Set};
 use {
     chrono::{DateTime, Utc},
     sea_orm::DeriveEntityModel,
     serde::{Deserialize, Serialize},
     uuid::Uuid,
 };
+use crate::models::others::extras::{CreateEmail};
 
 #[derive(
     Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize,
@@ -19,8 +21,6 @@ pub struct Model {
 
     pub content: serde_json::Value,
 
-    pub seen: bool,
-
     #[sea_orm(type = "TEXT")]
     pub seen_url: String,
 
@@ -29,3 +29,22 @@ pub struct Model {
 
     pub seen_at: Option<DateTime<Utc>>,
 }
+
+impl ActiveModelBehavior for ActiveModel {}
+
+#[derive(Copy, EnumIter, DeriveRelation, Debug, Clone)]
+pub enum Relation {}
+
+impl From<CreateEmail> for ActiveModel {
+    fn from(_value: CreateEmail) -> Self {
+        todo!()
+    }
+}
+
+// the only update should be on the {seen_at} field
+impl ActiveModel {
+    pub fn set_seen(&mut self) {
+        self.seen_at = Set(Some(Utc::now()));
+    }
+}
+
